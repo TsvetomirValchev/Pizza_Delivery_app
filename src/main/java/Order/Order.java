@@ -40,12 +40,13 @@ public class Order{
 
     @Override
     public String toString() {
-        return "Order{" +
-                "id=" + id +
-                ", customerId=" + customerId +
-                ", driverId=" + driverId +
-                ", orderedAt=" + orderedAt +
-                ", deliveredAt=" + deliveredAt +
-                '}';
+
+        return "Order #"+getId()
+                +" for:" +getCustomerId()
+                +" Ordered at: " + getOrderedAt()
+                +" Assigned delivery to: " + getDriverId()
+                +" Delivered at: " + getDeliveredAt().orElse(null);
+
+
     }
 }

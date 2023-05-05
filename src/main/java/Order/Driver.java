@@ -34,10 +34,10 @@ public class Driver {
 
     @Override
     public String toString() {
-        String status = isFree ? "Free" : "Busy";
+        String status = isFree() ? "Free" : "Busy";
         return "Driver:" +
                 " " + f_name +
                 " " + l_name
-                +"is "+ status;
+                +" is "+ status;
     }
 }

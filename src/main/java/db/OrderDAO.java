@@ -3,8 +3,10 @@ package db;
 import Order.Order;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class OrderDAO extends DAO<Order>{
 
@@ -14,9 +16,10 @@ public class OrderDAO extends DAO<Order>{
 
     @Override
     protected Map<Integer, Order> read() throws SQLException {
-        String query = "SELECT * FROM orders "
-                + "JOIN customer c ON c.id = orders.customer_id"
-                + "\nJOIN delivery_driver d ON orders.assigned_driver_id = d.id";
+        String query = """
+                SELECT o.id, o.ordered_at, o.delivered_at, o.customer_id, o.assigned_driver_id,d.first_name,d.last_name,c.username FROM orders AS o
+                JOIN customer c ON c.id = o.customer_id
+                JOIN delivery_driver d ON o.assigned_driver_id = d.id""";
 
         Map<Integer, Order> entries = new HashMap<>();
 
@@ -43,7 +46,19 @@ public class OrderDAO extends DAO<Order>{
 
     @Override
     protected Order mapReadResultSetToObject(ResultSet resultSet) throws SQLException {
-        return null;
+        LocalDateTime deliveryTime = null;
+        Timestamp deliveryTimestamp = resultSet.getTimestamp("delivered_at");
+        if (deliveryTimestamp != null){
+            deliveryTime = deliveryTimestamp.toLocalDateTime();
+        }
+
+        return new Order(
+                resultSet.getInt("id"),
+                resultSet.getInt("customer_id"),
+                resultSet.getInt("assigned_driver_id"),
+                resultSet.getTimestamp("ordered_at").toLocalDateTime(),
+                Optional.ofNullable(deliveryTime)
+        );
     }
 
     @Override

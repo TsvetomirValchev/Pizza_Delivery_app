@@ -28,9 +28,6 @@ public class Customer extends User{
 
     @Override
     public String toString() {
-        return "Customer{" +
-                "email='" + email + '\'' +
-                ", address='" + address + '\'' +
-                '}';
+        return getUsername() + " " + getEmail() + " "+ getAddress();
     }
 }
