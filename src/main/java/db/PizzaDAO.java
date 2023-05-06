@@ -4,6 +4,7 @@ import Products.Pizza;
 import Products.PizzaIngredient.*;
 import Products.PizzaIngredient.abstraction.PizzaIngredient;
 
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,26 +20,27 @@ public class PizzaDAO extends DAO<Pizza>{
 
     @Override
     protected Map<Integer, Pizza> read() throws SQLException {
-        String query = "SELECT product.id," +
-                "product.name," +
-                "product.price," +
-                "pizza.product_id," +
-                "pizza.size_id," +
-                "pizza.cheese_id," +
-                "pizza.meat_id," +
-                "pizza.sauce_id," +
-                "pizza.addon_id," +
-                "pizza_size.size_name," +
-                "pizza_cheese.cheese_name," +
-                "pizza_meat.meat_name," +
-                "pizza_sauce.sauce_name," +
-                "pizza_addon.addon_name FROM pizza\n" +
-                "JOIN product ON pizza.product_id = product.id \n" +
-                "JOIN pizza_size ON pizza_size.id = pizza.size_id\n" +
-                "JOIN pizza_cheese ON pizza_cheese.id = pizza.cheese_id \n" +
-                "JOIN pizza_meat ON pizza_meat.id = pizza.meat_id\n" +
-                "JOIN pizza_sauce ON pizza_sauce.id = pizza.sauce_id\n" +
-                "JOIN pizza_addon ON pizza_addon.id = pizza.addon_id;";
+        String query = """
+                SELECT product.id,
+                product.name,
+                product.price,
+                pizza.product_id,
+                pizza.size_id,
+                pizza.cheese_id,
+                pizza.meat_id,
+                pizza.sauce_id,
+                pizza.addon_id,
+                size.size_name,
+                cheese.cheese_name,
+                meat.meat_name,
+                sauce.sauce_name,
+                addon.addon_name FROM pizza
+                JOIN product ON pizza.product_id = product.id\s
+                JOIN size ON size.id = pizza.size_id
+                JOIN cheese ON cheese.id = pizza.cheese_id\s
+                JOIN meat ON meat.id = pizza.meat_id
+                JOIN sauce ON sauce.id = pizza.sauce_id
+                JOIN addon ON addon.id = pizza.addon_id;""";
         Map<Integer, Pizza> entries = new HashMap<>();
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement();
@@ -117,6 +119,64 @@ public class PizzaDAO extends DAO<Pizza>{
             case 6 -> statement.setInt(6, (Integer) updatedValue);
         }
     }
+
+
+
+
+    public void readAllMeat() throws SQLException {
+        String query = "SELECT * FROM meat";
+
+        List<Meat> allMeat = new ArrayList<>();
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                allMeat.add(new Meat(resultSet.getInt("id"),
+                        resultSet.getString("meat_name")));
+
+            }
+        }
+        for (Meat meat : allMeat) {
+            System.out.println(meat);
+        }
+    }
+
+    public void readAllSauce() throws SQLException {
+        String query = "SELECT * FROM sauce";
+
+        List<Meat> allSauce = new ArrayList<>();
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                allSauce.add(new Meat(resultSet.getInt("id"),
+                        resultSet.getString("sauce_name")));
+
+            }
+        }
+        for (Meat meat : allSauce) {
+            System.out.println(meat);
+        }
+    }
+
+
+    public void readAllIngredients(String tableName) throws SQLException {
+        String query = "SELECT * FROM " + tableName;
+
+        List<PizzaIngredient> allIngredients = new ArrayList<>();
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                allIngredients.add(new PizzaIngredient(resultSet.getInt("id"),
+                        resultSet.getString(tableName + "_name")));
+            }
+        }
+        for(PizzaIngredient ingredient: allIngredients){
+            System.out.println(ingredient);
+        }
+    }
+
 
 
 

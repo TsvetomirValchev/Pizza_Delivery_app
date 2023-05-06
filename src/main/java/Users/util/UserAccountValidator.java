@@ -74,7 +74,7 @@ public class UserAccountValidator {
         return false;
     }
 
-    private boolean doesPasswordMatch(){
+    private boolean areCredentialsCorrect(){
         for(Customer c: adminController.getAllCustomers().values()){
             if (c.getUsername().equals(customer.getUsername()) && c.getPassword().equals(customer.getPassword())){
                 return true;
@@ -83,15 +83,4 @@ public class UserAccountValidator {
         return false;
 
     }
-
-    boolean doesUserExist(){
-        return isUsernameTaken() && doesPasswordMatch();
-    }
-
-
-
-
-
-
-
 }

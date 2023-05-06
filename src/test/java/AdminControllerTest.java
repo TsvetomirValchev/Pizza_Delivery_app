@@ -43,7 +43,7 @@ public class AdminControllerTest {
     }
 
     @Test
-    @DisplayName("Should read all drivers from the database with the correct username of the client, first and last name of the driver")
+    @DisplayName("Should read all drivers from the database with the correct first and last name of the driver and status")
     public void testReadingDriversFromDB(){
 
         AdminController adminController = new AdminController(new Admin());
@@ -51,4 +51,7 @@ public class AdminControllerTest {
                 .values()
                 .forEach(System.out::println);
     }
+
+
+
 }

@@ -5,6 +5,8 @@ import View.abstraction.View;
 import db.AdminController;
 import logging.PizzaDeliveryLogger;
 
+import java.util.InputMismatchException;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class AdminView implements View {
@@ -31,4 +33,27 @@ public class AdminView implements View {
     public void printExceptionMsg(String msg) {
 
     }
+
+
+
+    private void addProductMenu(){
+        try{
+            Scanner scanner = new Scanner(System.in);
+            System.out.println();
+
+
+
+
+        }catch (InputMismatchException | NumberFormatException e){
+            LOGGER.warning(e.getMessage());
+            if(e instanceof  NumberFormatException){
+                System.err.println("Invalid price!");
+            }else{
+                System.err.println("Invalid input!");
+            }
+
+        }
+
+    }
+    private void addPizzaMenu(){}
 }

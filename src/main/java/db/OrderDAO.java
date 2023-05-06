@@ -14,25 +14,25 @@ public class OrderDAO extends DAO<Order>{
         super("orders", "id");
     }
 
-    @Override
-    protected Map<Integer, Order> read() throws SQLException {
-        String query = """
-                SELECT o.id, o.ordered_at, o.delivered_at, o.customer_id, o.assigned_driver_id,d.first_name,d.last_name,c.username FROM orders AS o
-                JOIN customer c ON c.id = o.customer_id
-                JOIN delivery_driver d ON o.assigned_driver_id = d.id""";
-
-        Map<Integer, Order> entries = new HashMap<>();
-
-        try (Connection connection = getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-            while (resultSet.next()) {
-                Order object = mapReadResultSetToObject(resultSet);
-                entries.put(getKey(object), object);
-            }
-        }
-        return entries;
-    }
+//    @Override
+//    protected Map<Integer, Order> read() throws SQLException {
+//        String query = """
+//                SELECT o.id, o.ordered_at, o.delivered_at, o.customer_id, o.assigned_driver_id,d.first_name,d.last_name,c.username FROM orders AS o
+//                JOIN customer c ON c.id = o.customer_id
+//                JOIN delivery_driver d ON o.assigned_driver_id = d.id""";
+//
+//        Map<Integer, Order> entries = new HashMap<>();
+//
+//        try (Connection connection = getConnection();
+//             Statement statement = connection.createStatement();
+//             ResultSet resultSet = statement.executeQuery(query)) {
+//            while (resultSet.next()) {
+//                Order object = mapReadResultSetToObject(resultSet);
+//                entries.put(getKey(object), object);
+//            }
+//        }
+//        return entries;
+//    }
 
     @Override
     protected String buildInsertQuery(Object object) {

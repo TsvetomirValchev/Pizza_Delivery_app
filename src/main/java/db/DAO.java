@@ -11,9 +11,6 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 public abstract class DAO<T> {
-
-
-
      private static final Logger LOGGER = PizzaDeliveryLogger.getLogger(DAO.class.getName());
      private String DB_USERNAME;
      private String DB_PASSWORD;

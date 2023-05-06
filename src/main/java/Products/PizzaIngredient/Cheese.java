@@ -6,4 +6,5 @@ public class Cheese extends PizzaIngredient {
     public Cheese(Integer id, String name) {
         super(id, name);
     }
+
 }

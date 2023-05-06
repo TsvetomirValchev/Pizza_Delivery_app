@@ -7,4 +7,5 @@ public class Size extends PizzaIngredient {
     public Size(Integer id, String name) {
         super(id, name);
     }
+
 }
