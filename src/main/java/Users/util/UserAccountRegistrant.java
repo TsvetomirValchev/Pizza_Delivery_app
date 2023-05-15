@@ -9,7 +9,7 @@ import db.abstraction.Controller;
 
 public class UserAccountRegistrant extends Controller {
     private final LoginView loginView = new LoginView();
-    private Customer customer;
+    private final Customer customer;
 
     public UserAccountRegistrant(Customer customer){
         this.customer = customer;
@@ -21,7 +21,8 @@ public class UserAccountRegistrant extends Controller {
     }
 
     public void RegisterCustomer(){
-        UserAccountValidator validator= new UserAccountValidator(customer);
+        UserAccountValidator validator = new UserAccountValidator(customer);
+        System.out.println("Email address: " + customer.getEmail());
         validator.isValidUser();
         buildCustomer();
     }

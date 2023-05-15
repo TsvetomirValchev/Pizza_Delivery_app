@@ -51,7 +51,7 @@ public abstract class DAO<T> {
           }
      }
 
-     protected void create(Object object) throws SQLException {
+     public void create(Object object) throws SQLException {
           try (Connection connection = getConnection();
                PreparedStatement statement = connection.prepareStatement(buildInsertQuery(object))) {
                setValues(statement, object);
@@ -59,7 +59,7 @@ public abstract class DAO<T> {
           }
      }
 
-     protected Map<Integer, T> read() throws SQLException {
+     protected Map<Integer, T> readAll() throws SQLException {
           String query = "SELECT * FROM " + this.tableName;
           Map<Integer, T> entries = new HashMap<>();
 
@@ -76,7 +76,6 @@ public abstract class DAO<T> {
 
     protected void update(Object key, int variableIndex, Object updatedValue) throws SQLException {
           String query = buildUpdateQuery(variableIndex);
-
           try (Connection connection = getConnection();
                PreparedStatement statement = connection.prepareStatement(query)) {
                setUpdatedValues(statement, variableIndex, updatedValue);

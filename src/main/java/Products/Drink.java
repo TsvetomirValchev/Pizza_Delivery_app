@@ -1,20 +1,20 @@
 package Products;
 
 public class Drink extends Product{
-private final boolean isCarbonated;
+private final boolean isDiet;
 
     public Drink(Integer id, String name, Double price, boolean isCarbonated) {
         super(id, name, price);
-        this.isCarbonated = isCarbonated;
+        this.isDiet = isCarbonated;
     }
 
-    public boolean isCarbonated() {
-        return isCarbonated;
+    public boolean isDiet() {
+        return isDiet;
     }
 
     @Override
     public String toString() {
-        String carbonated = isCarbonated ? "Carbonated" : "Not carbonated";
-        return "Your" + carbonated + getName()+ "costs:"+getPrice();
+        String isDiet = this.isDiet ? "Diet " : "";
+        return isDiet + getName()+ " cost: "+getPrice();
     }
 }

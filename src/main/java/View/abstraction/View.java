@@ -8,7 +8,7 @@ public interface View {
 
     default void printSeparator(int length){
         for (int i =0; i<length; i++){
-            System.out.println("-");
+            System.out.print("-");
 
         }
         System.out.println();

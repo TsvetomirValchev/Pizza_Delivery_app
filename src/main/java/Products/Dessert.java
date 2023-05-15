@@ -11,4 +11,11 @@ public class Dessert extends Product{
     public boolean isVegan() {
         return isVegan;
     }
+
+
+    @Override
+    public String toString() {
+        String vegan = isVegan ? "Vegan " : "";
+        return  vegan + getName()+ " cost: "+getPrice();
+    }
 }

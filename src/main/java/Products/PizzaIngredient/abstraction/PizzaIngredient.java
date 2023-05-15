@@ -1,6 +1,6 @@
 package Products.PizzaIngredient.abstraction;
 
-public  class PizzaIngredient {
+public class PizzaIngredient {
         final Integer id;
         final String name;
 
@@ -20,7 +20,7 @@ public  class PizzaIngredient {
 
         @Override
         public String toString() {
-            return "id:"+getId()+" name:"+getName();
+            return "id:"+getId()+" "+getName();
         }
 
 }

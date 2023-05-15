@@ -14,7 +14,7 @@ public class DriverDAO extends DAO<Driver>{
 
     @Override
     protected String buildInsertQuery(Object object) {
-        return "INSERT INTO" + this.tableName
+        return "INSERT INTO " + this.tableName
                 +"(first_name, last_name)"
                 +"VALUES(?,?)";
     }
@@ -22,9 +22,9 @@ public class DriverDAO extends DAO<Driver>{
     @Override
     protected void setValues(PreparedStatement statement, Object object) throws SQLException {
         if(object instanceof Driver driver) {
-            statement.setString(1,driver.getF_name());
-            statement.setString(2,driver.getL_name());
-
+            statement.setObject(1, driver.getId());
+            statement.setString(2,driver.getF_name());
+            statement.setString(3,driver.getL_name());
         }
 
     }
@@ -47,9 +47,10 @@ public class DriverDAO extends DAO<Driver>{
     @Override
     String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(
-                1, "first_name",
-                2, "last_name",
-                3, "is_free"
+                1, "id",
+                2, "first_name",
+                3, "last_name",
+                4, "is_free"
 
 
         );
@@ -60,9 +61,10 @@ public class DriverDAO extends DAO<Driver>{
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
             switch (variableIndex){
-                case 1 -> statement.setString(1,(String)updatedValue);
+                case 1 -> statement.setInt(1,(Integer) updatedValue);
                 case 2 -> statement.setString(2,(String)updatedValue);
-                case 3 -> statement.setBoolean(3,(Boolean) updatedValue);
+                case 3 -> statement.setString(3,(String)updatedValue);
+                case 4 -> statement.setBoolean(4,(Boolean) updatedValue);
             }
     }
 }

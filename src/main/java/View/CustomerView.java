@@ -2,6 +2,7 @@ package View;
 
 
 
+import Users.Customer;
 import View.abstraction.View;
 import db.CustomerController;
 import logging.PizzaDeliveryLogger;
@@ -24,7 +25,7 @@ public class CustomerView implements View {
         System.out.println("1. View all pizzas");
         System.out.println("2. View all drinks");
         System.out.println("3. View all desserts");
-        System.out.println("4. Make and order");
+        System.out.println("4. Make an order");
         System.out.println("5. Check order status");
         System.out.println("0. Exit");
 
@@ -38,5 +39,28 @@ public class CustomerView implements View {
     @Override
     public void printExceptionMsg(String msg) {
 
+    }
+
+
+    //TODO: make private once you don't need tests
+    public void printAllProductsInOrder(Customer customer){
+        System.out.println("All products in your order:");
+        customerController.getProductsInOrder(customer.getId()).forEach(System.out::println);
+    }
+
+    //TODO: make private once you don't need tests
+    public void printAllPizzas(){
+        System.out.println("All pizzas in our restaurant:");
+        customerController.getPizzas().forEach(System.out::println);
+    }
+    //TODO: make private once you don't need tests
+    public void printAllDesserts(){
+        System.out.println("All desserts in our restaurant:");
+        customerController.getDesserts().forEach(System.out::println);
+    }
+    //TODO: make private once you don't need tests
+    public void printAllDrinks(){
+        System.out.println("All drinks in our restaurant:");
+        customerController.getDrinks().forEach(System.out::println);
     }
 }

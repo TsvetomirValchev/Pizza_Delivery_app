@@ -1,10 +1,13 @@
 package db;
 
 import Order.Order;
+import Products.Product;
+import Users.Customer;
 
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -14,34 +17,23 @@ public class OrderDAO extends DAO<Order>{
         super("orders", "id");
     }
 
-//    @Override
-//    protected Map<Integer, Order> read() throws SQLException {
-//        String query = """
-//                SELECT o.id, o.ordered_at, o.delivered_at, o.customer_id, o.assigned_driver_id,d.first_name,d.last_name,c.username FROM orders AS o
-//                JOIN customer c ON c.id = o.customer_id
-//                JOIN delivery_driver d ON o.assigned_driver_id = d.id""";
-//
-//        Map<Integer, Order> entries = new HashMap<>();
-//
-//        try (Connection connection = getConnection();
-//             Statement statement = connection.createStatement();
-//             ResultSet resultSet = statement.executeQuery(query)) {
-//            while (resultSet.next()) {
-//                Order object = mapReadResultSetToObject(resultSet);
-//                entries.put(getKey(object), object);
-//            }
-//        }
-//        return entries;
-//    }
-
     @Override
     protected String buildInsertQuery(Object object) {
-        return null;
+        return "INSERT INTO " + this.tableName +
+                "(customer_id,assigned_driver_id,ordered_at,delivered_at) VALUES(?, ?, ?, ?)";
     }
 
     @Override
     protected void setValues(PreparedStatement statement, Object object) throws SQLException {
-
+        if (object instanceof Order order) {
+            statement.setInt(1, order.getCustomerId());
+            statement.setTimestamp(2, Timestamp.valueOf(order.getOrderedAt()));
+            if (order.getDeliveredAt().isPresent()) {
+                statement.setTimestamp(3, Timestamp.valueOf(order.getDeliveredAt().get()));
+            } else {
+                statement.setNull(3, Types.TIMESTAMP);
+            }
+        }
     }
 
     @Override
@@ -55,7 +47,6 @@ public class OrderDAO extends DAO<Order>{
         return new Order(
                 resultSet.getInt("id"),
                 resultSet.getInt("customer_id"),
-                resultSet.getInt("assigned_driver_id"),
                 resultSet.getTimestamp("ordered_at").toLocalDateTime(),
                 Optional.ofNullable(deliveryTime)
         );
@@ -63,16 +54,80 @@ public class OrderDAO extends DAO<Order>{
 
     @Override
     String buildUpdateQuery(int variableIndex) {
-        return null;
+        Map<Integer, String> columnMap = Map.of(
+                1, "customer_id",
+                2, "ordered_at",
+                3, "delivered_at"
+        );
+        String columnName = columnMap.get(variableIndex);
+        return "UPDATE " + tableName + " SET " + columnName + "=? WHERE " + tablePrimaryKey + "=?";
     }
+
 
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
-
+        switch (variableIndex){
+            case 1-> statement.setInt(1,(Integer) updatedValue);
+            case 2 -> statement.setTimestamp(2,Timestamp.valueOf((LocalDateTime) updatedValue));
+            case 3 -> statement.setTimestamp(3,Timestamp.valueOf((LocalDateTime) updatedValue));
+        }
     }
 
     @Override
     protected Integer getKey(Order object) {
-        return null;
+        return object.getId();
     }
+
+
+
+
+
+    public List<Product> readAllProductsInOrder(int OrderId) throws SQLException {
+        String query = "SELECT product_id, name, price FROM order_item " +
+                "JOIN orders ON order_id = orders.id " +
+                "JOIN product p on p.id = order_item.product_id" +
+                " WHERE order_id =" + OrderId ;
+
+        List<Product> allProducts = new ArrayList<>();
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                allProducts.add(new Product(
+                        resultSet.getInt("product_id"),
+                        resultSet.getString("name"),
+                        resultSet.getDouble("price")));
+            }
+        }
+        return allProducts;
+    }
+
+    public int getActiveOrderIdByCustomerId(Customer customer) throws SQLException {
+        String query = "SELECT orders.id FROM orders WHERE customer_id = " +customer.getId()+ " AND delivered_at IS NULL ";
+        int orderId = 0;
+        try (Connection connection = getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                orderId = resultSet.getInt("id");
+            }
+        }
+        return orderId;
+    }
+
+
+    public void InsertInOrderItemTable(int productId, int orderId) throws SQLException {
+        String query = "INSERT INTO order_item(order_id, product_id) VALUES(? , ?)";
+        try (Connection connection = getConnection();
+                PreparedStatement statement = connection.prepareStatement(query))
+             {
+                statement.setInt(1, productId);
+                statement.setInt(2, orderId);
+                statement.executeUpdate();
+            }
+
+    }
+
+
+
 }

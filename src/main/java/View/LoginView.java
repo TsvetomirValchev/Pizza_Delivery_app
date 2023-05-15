@@ -67,15 +67,11 @@ public class LoginView implements View {
             System.out.println("Enter password");
             password = scanner.nextLine();
 
-
-
-
         }catch (IllegalArgumentException e){
             LOGGER.warning(e.getMessage());
             System.err.println("Please enter valid account credentials");
             printLoginMenu();
         }
-
 
         if(username.equals(admin.getUsername())&&password.equals(admin.getPassword())){
             openAdminView();
@@ -85,6 +81,7 @@ public class LoginView implements View {
             if(customer!=null && customer.getPassword().equals(password)){
                 openCustomerView(customer);
             }else if(customer!=null){
+                printSeparator(100);
                 System.out.println("Wrong password!");
                 printLoginMenu();
             }
@@ -132,9 +129,14 @@ public class LoginView implements View {
             System.out.println("Please enter your username: ");
             String username = scanner.nextLine();
 
-            System.out.println("Please enter your password: ");
-            char[] passwordChars = console.readPassword();
-            String password = String.valueOf(passwordChars);
+            String password = null;
+            System.out.println("Please enter your password(1 uppercase letter,1 lowercase letter,1 number): ");
+            if(console != null) {
+                char[] passwordChars = console.readPassword();
+                password = String.valueOf(passwordChars);
+            }else{
+                password = scanner.nextLine();
+            }
 
             System.out.println("Please enter delivery address: ");
             String address = scanner.nextLine();
@@ -142,7 +144,6 @@ public class LoginView implements View {
             Customer customer = new Customer(username,password,null,email,address);
             UserAccountRegistrant registrant = new UserAccountRegistrant(customer);
             registrant.RegisterCustomer();
-
 
         }catch (InputMismatchException e){
             LOGGER.warning(e.getMessage());

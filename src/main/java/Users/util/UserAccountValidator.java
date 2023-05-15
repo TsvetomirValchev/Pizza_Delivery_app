@@ -8,7 +8,8 @@ import java.util.regex.Pattern;
 
 public class UserAccountValidator {
 
-    private static final String EMAIL_PATTERN = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$";
+    private static final String EMAIL_PATTERN = "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
+            + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     private static final String USERNAME_PATTERN = "^[a-zA-Z0-9]{3,30}$";
     private static final String PASSWORD_PATTERN = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$";
     private static final AdminController adminController = new AdminController(new Admin());
@@ -40,7 +41,7 @@ public class UserAccountValidator {
 
     public boolean isValidEmail() {
         Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        return pattern.matcher(customer.getEmail()).matches();
+        return pattern.matcher(customer.getEmail().trim()).matches();
     }
 
     public boolean isValidUsername() {

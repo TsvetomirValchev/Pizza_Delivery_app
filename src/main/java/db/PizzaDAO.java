@@ -19,7 +19,7 @@ public class PizzaDAO extends DAO<Pizza>{
     }
 
     @Override
-    protected Map<Integer, Pizza> read() throws SQLException {
+    protected Map<Integer, Pizza> readAll() throws SQLException {
         String query = """
                 SELECT product.id,
                 product.name,
@@ -55,26 +55,26 @@ public class PizzaDAO extends DAO<Pizza>{
 
     @Override
     protected String buildInsertQuery(Object object) {
-        return "INSERT INTO" + this.tableName
+        return "INSERT INTO " + this.tableName
                 +"(product_id,size_id,cheese_id,meat_id,sauce_id,addon_id)"
-                +"VALUES(?,?,?,?,?)";
+                +"VALUES(?, ?, ?, ?, ?, ?)";
     }
 
     @Override
     protected void setValues(PreparedStatement statement, Object object) throws SQLException {
         if(object instanceof Pizza pizza){
-            statement.setInt(1,pizza.getProduct_id());
-            statement.setInt(2,pizza.getSize().getId());
-            statement.setInt(3,pizza.getCheese().getId());
-            statement.setInt(4,pizza.getMeat().getId());
-            statement.setInt(5,pizza.getSauce().getId());
-            statement.setInt(6,pizza.getAddon().getId());
+            statement.setInt(1, pizza.getId());
+            statement.setInt(2, pizza.getSize().getId());
+            statement.setInt(3, pizza.getCheese().getId());
+            statement.setInt(4, pizza.getMeat().getId());
+            statement.setInt(5, pizza.getSauce().getId());
+            statement.setInt(6, pizza.getAddon().getId());
         }
     }
 
     @Override
     protected Integer getKey(Pizza object) {
-        return object.getProduct_id();
+        return object.getId();
     }
 
 
@@ -85,7 +85,6 @@ public class PizzaDAO extends DAO<Pizza>{
                 resultSet.getInt("id"),
                 resultSet.getString("name"),
                 resultSet.getDouble("price"),
-                resultSet.getInt("product_id"),
                 new Size(resultSet.getInt("size_id"),resultSet.getString("size_name")),
                 new Cheese(resultSet.getInt("cheese_id"),resultSet.getString("cheese_name")),
                 new Meat(resultSet.getInt("meat_id"),resultSet.getString("meat_name")),
@@ -111,56 +110,16 @@ public class PizzaDAO extends DAO<Pizza>{
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         switch (variableIndex) {
-            case 1 -> statement.setInt(1, (Integer) updatedValue);
+            case 1-> statement.setInt(1, (Integer) updatedValue);
             case 2 -> statement.setInt(2, (Integer) updatedValue);
-            case 3 -> statement.setInt(3,(Integer) updatedValue);
-            case 4 -> statement.setInt(4, (Integer) updatedValue);
+            case 3 -> statement.setInt(3, (Integer) updatedValue);
+            case 4 -> statement.setInt(4,(Integer) updatedValue);
             case 5 -> statement.setInt(5, (Integer) updatedValue);
             case 6 -> statement.setInt(6, (Integer) updatedValue);
         }
     }
 
-
-
-
-    public void readAllMeat() throws SQLException {
-        String query = "SELECT * FROM meat";
-
-        List<Meat> allMeat = new ArrayList<>();
-        try (Connection connection = getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-            while (resultSet.next()) {
-                allMeat.add(new Meat(resultSet.getInt("id"),
-                        resultSet.getString("meat_name")));
-
-            }
-        }
-        for (Meat meat : allMeat) {
-            System.out.println(meat);
-        }
-    }
-
-    public void readAllSauce() throws SQLException {
-        String query = "SELECT * FROM sauce";
-
-        List<Meat> allSauce = new ArrayList<>();
-        try (Connection connection = getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-            while (resultSet.next()) {
-                allSauce.add(new Meat(resultSet.getInt("id"),
-                        resultSet.getString("sauce_name")));
-
-            }
-        }
-        for (Meat meat : allSauce) {
-            System.out.println(meat);
-        }
-    }
-
-
-    public void readAllIngredients(String tableName) throws SQLException {
+    public List<? extends PizzaIngredient> readAllIngredients(String tableName) throws SQLException {
         String query = "SELECT * FROM " + tableName;
 
         List<PizzaIngredient> allIngredients = new ArrayList<>();
@@ -172,9 +131,7 @@ public class PizzaDAO extends DAO<Pizza>{
                         resultSet.getString(tableName + "_name")));
             }
         }
-        for(PizzaIngredient ingredient: allIngredients){
-            System.out.println(ingredient);
-        }
+       return allIngredients;
     }
 
 

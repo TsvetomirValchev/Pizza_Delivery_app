@@ -2,30 +2,30 @@ package db;
 
 import Products.Product;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Map;
 
 public class ProductDAO extends DAO<Product>{
 
 
-    protected ProductDAO() {
+    public ProductDAO() {
         super("product", "id");
     }
 
     @Override
     protected String buildInsertQuery(Object object) {
-        return "INSERT INTO" + this.tableName
-                +"(name,price)"
-                +"VALUES(?, ?)";
+        return "INSERT INTO " + this.tableName
+                +"(id,name,price)"
+                +"VALUES(?, ?, ?)";
     }
+
 
     @Override
     protected void setValues(PreparedStatement statement, Object object) throws SQLException {
         if (object instanceof Product product) {
-            statement.setString(1, product.getName());
-            statement.setDouble(2, product.getPrice());
+            statement.setInt(1,product.getId());
+            statement.setString(2, product.getName());
+            statement.setDouble(3, product.getPrice());
         }
 
     }
