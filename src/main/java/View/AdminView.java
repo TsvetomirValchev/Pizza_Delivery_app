@@ -2,10 +2,12 @@ package View;
 
 import Products.PizzaIngredient.*;
 import Products.Product;
+import Users.Customer;
 import View.abstraction.View;
 import db.AdminController;
 import logging.PizzaDeliveryLogger;
 
+import java.util.Comparator;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -22,31 +24,85 @@ public class AdminView implements View {
 
     @Override
     public void printMenu() {
-
+        System.out.println("Welcome, master! What would you like to do?");
+        System.out.println("1. Add a new product to the menu");
+        System.out.println("2. Delete a product from the menu");
+        System.out.println("3. Delete a customer's account");
+        System.out.println("0. Exit");
     }
 
     @Override
     public void getChoice() {
+        Scanner scan = new Scanner(System.in);
+        int choice;
+        do{
+            printMenu();
+            choice = scan.nextInt();
+            printSeparator(80);
+            switch (choice){
+                case 1 -> addAProductMenu();
+
+                case 3 -> deleteAccountMenu();
+                case 0-> System.out.println("Exiting..");
+                default -> System.err.println("Enter a valid option!");
+            }
+            if(choice!=0){
+                printSeparator(80);
+            }
+        }while (choice!=0);
+    }
+
+
+    public void deleteAccountMenu(){
+           try {
+               readAllCustomers();
+               printSeparator(100);
+               Scanner scanner = new Scanner(System.in);
+               System.out.println("Enter the username of the account you want to delete: ");
+               String username = scanner.nextLine();
+               adminController.deleteCustomer(username);
+           }catch (InputMismatchException e) {
+               LOGGER.warning(e.getMessage());
+               System.err.println(e.getMessage());
+               deleteAccountMenu();
+           }
+        System.out.println("Account deleted!");
+    }
+
+
+    public void addAProductMenu(){
+            Scanner scanner = new Scanner(System.in);
+            int choice;
+            do {
+                printSeparator(100);
+                System.out.println("What product do you want to add?");
+                printSeparator(100);
+                System.out.println("1. Pizza");
+                System.out.println("2. Drink");
+                System.out.println("3. Dessert");
+                System.out.println("0. Do something else ");
+                printSeparator(100);
+                choice = scanner.nextInt();
+                switch (choice) {
+                    case 1 -> addAPizzaMenu();
+                    case 2 -> addADrinkMenu();
+                    case 3 -> addADessertMenu();
+                    case 0 -> getChoice();
+                }
+            }while (choice != 0);
+
 
     }
 
-    @Override
-    public void printExceptionMsg(String msg) {
 
-    }
-
-
-
-
-
-    //TODO MAKE PRIVATE LATER!
+    //TODO: MAKE PRIVATE LATER!
     public void addADrinkMenu(){
         try{
             Scanner scanner = new Scanner(System.in);
             Product product = createAProductMenu();
             System.out.println("Is the drink Diet friendly?");
             boolean diet = scanner.nextBoolean();
-            adminController.createDrinkProduct(product.getId(), product.getName(), product.getPrice(),diet);
+            adminController.createDrinkProduct(product.getId(), product.getName(), product.getPrice(), diet);
 
         }catch (InputMismatchException | NumberFormatException e){
             LOGGER.warning(e.getMessage());
@@ -55,19 +111,19 @@ public class AdminView implements View {
             }else{
                 System.err.println("Invalid input!");
             }
-
+            addADrinkMenu();
         }
 
     }
 
-    //TODO MAKE PRIVATE LATER!
+    //TODO: MAKE PRIVATE LATER!
     public void addADessertMenu(){
         try{
             Scanner scanner = new Scanner(System.in);
             Product product = createAProductMenu();
             System.out.println("Is the drink dessert vegan?");
             boolean vegan = scanner.nextBoolean();
-            adminController.createDrinkProduct(product.getId(), product.getName(), product.getPrice(),vegan);
+            adminController.createDessertProduct(product.getId(), product.getName(), product.getPrice(),vegan);
 
         }catch (InputMismatchException | NumberFormatException e){
             LOGGER.warning(e.getMessage());
@@ -76,53 +132,52 @@ public class AdminView implements View {
             }else{
                 System.err.println("Invalid input!");
             }
-
+            addADessertMenu();
         }
 
     }
 
 
-    //TODO MAKE PRIVATE LATER!
+    //TODO: MAKE PRIVATE LATER!
     public void addAPizzaMenu(){
         try{
             Scanner scanner = new Scanner(System.in);
             Product product = createAProductMenu();
-            adminController.getAllIngredients("size");
+            readAllIngredients("size");
             printSeparator(100);
             System.out.println("Choose the size of the pizza(by entering it's id):");
             int sizeId = scanner.nextInt();
             scanner.nextLine();
             Size size = new Size(sizeId,"");
             printSeparator(100);
-            adminController.getAllIngredients("cheese");
+            readAllIngredients("cheese");
             printSeparator(100);
             System.out.println("Choose the cheese(by entering it's id):");
             int cheeseId = scanner.nextInt();
             scanner.nextLine();
             Cheese cheese = new Cheese(cheeseId,"");
             printSeparator(100);
-            adminController.getAllIngredients("meat");
+            readAllIngredients("meat");
             printSeparator(100);
             System.out.println("Choose the meat(by entering it's id):");
             int meatId = scanner.nextInt();
             scanner.nextLine();
             Meat meat = new Meat(meatId,"");
             printSeparator(100);
-            adminController.getAllIngredients("sauce");
+            readAllIngredients("sauce");
             printSeparator(100);
             System.out.println("Choose the sauce(by entering it's id):");
             int sauceId = scanner.nextInt();
             scanner.nextLine();
             Sauce sauce = new Sauce(sauceId,"");
             printSeparator(100);
-            adminController.getAllIngredients("addon");
+            readAllIngredients("addon");
             printSeparator(100);
             System.out.println("Choose the addon(by entering it's id): ");
             int addonId = scanner.nextInt();
             scanner.nextLine();
             printSeparator(100);
             Addon addon = new Addon(addonId,"");
-
             adminController.createPizzaProduct(product.getId(),product.getName(),product.getPrice(),size,cheese,meat,sauce,addon);
 
         }catch (InputMismatchException | NumberFormatException e){
@@ -132,10 +187,11 @@ public class AdminView implements View {
             }else{
                 System.err.println("Invalid input!");
             }
-
+            addAPizzaMenu();
         }
 
     }
+
 
     private Product createAProductMenu(){
         String productName = null;
@@ -165,6 +221,28 @@ public class AdminView implements View {
 
         }
         return new Product(id,productName,price);
+    }
+
+    private void readAllIngredients(String tableName){
+        adminController.getAllIngredients(tableName)
+                .values()
+                .forEach(System.out::println);
+    }
+
+    private void readAllCustomers(){
+        adminController.getAllCustomers()
+                .values()
+                .stream()
+                .sorted(Comparator.comparing(Customer::getUsername))
+                .forEach(System.out::println);
+    }
+
+    private void readAllPizzas(){
+        adminController.getAllPizzas()
+                .values()
+                .stream()
+                .sorted(Comparator.comparing(Product::getId))
+                .forEach(System.out::println);
     }
 
 }

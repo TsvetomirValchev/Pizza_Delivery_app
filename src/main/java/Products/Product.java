@@ -25,5 +25,8 @@ public class Product {
     }
 
 
-
+    @Override
+    public String toString() {
+        return getName() + " costs:" + getPrice();
+    }
 }

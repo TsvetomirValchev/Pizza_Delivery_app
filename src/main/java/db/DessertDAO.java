@@ -12,7 +12,6 @@ public class DessertDAO extends DAO<Dessert>{
         super("dessert", "product_id");
     }
 
-
     @Override
     protected Map<Integer, Dessert> readAll() throws SQLException {
         String query = """
@@ -40,7 +39,8 @@ public class DessertDAO extends DAO<Dessert>{
     @Override
     protected void setValues(PreparedStatement statement, Object object) throws SQLException {
         if(object instanceof Dessert dessert){
-            statement.setBoolean(1,dessert.isVegan());
+            statement.setInt(1,dessert.getId());
+            statement.setBoolean(2,dessert.isVegan());
         }
     }
 
@@ -56,14 +56,14 @@ public class DessertDAO extends DAO<Dessert>{
                 resultSet.getString("name"),
                 resultSet.getDouble("price"),
                 resultSet.getBoolean("isVegan")
-
         );
     }
 
     @Override
     String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(
-                1, "isVegan"
+                1, "product_id",
+                2, "isVegan"
         );
         String columnName = columnMap.get(variableIndex);
         return "UPDATE " + this.tableName + " SET " + columnName + "=? WHERE product_id=?";
@@ -72,7 +72,8 @@ public class DessertDAO extends DAO<Dessert>{
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         if (variableIndex == 1) {
-            statement.setBoolean(1, (Boolean) updatedValue);
+            statement.setInt(1, (Integer) updatedValue);
+            statement.setBoolean(2, (boolean) updatedValue);
         }
         else System.out.println("The only thing you can update is the isVegan value");
     }

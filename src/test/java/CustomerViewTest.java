@@ -1,5 +1,5 @@
 
-import Users.Customer;
+
 import View.CustomerView;
 import db.CustomerController;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +10,17 @@ import org.junit.jupiter.api.Test;
 public class CustomerViewTest {
     CustomerController customerController = new CustomerController("woshmc@abv.bg");
     CustomerView customerView = new CustomerView(customerController);
+
+
+
+
+
+
+    @Test
+    @DisplayName("Display all products in order")
+    public void testDisplayAllProductsInOrder(){
+        customerView.printCurrentOrderDetails();
+    }
 
 
 

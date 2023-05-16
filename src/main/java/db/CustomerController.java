@@ -27,12 +27,11 @@ public class CustomerController extends Controller {
     private static final OrderDAO orderDAO = new OrderDAO();
     private static final DAO<Customer> customerDAO = new CustomerDAO();
     private final CustomerView customerView = new CustomerView(this);
-     private final String customerEmail;
+    private final String customerEmail;
 
     public CustomerController(String customerEmail){
         this.customerEmail = customerEmail;
     }
-
 
     @Override
     protected View getView() {
@@ -51,7 +50,6 @@ public class CustomerController extends Controller {
         }
         return null;
     }
-
 
     public boolean placeAnOrder(int productId){
         try {
@@ -72,11 +70,27 @@ public class CustomerController extends Controller {
         return false;
     }
 
+    public List<Product> getCurrentOrderDetails(){
+            try{
+                return new ArrayList<>(
+                        orderDAO.getAllProductsInActiveOrder
+                                (getCurrentOrderIdByCustomerId(getCustomerAccount().getId())
+                        )
+                );
+            }
+            catch (SQLException e)
+            {
+                transmitException(e, Level.SEVERE, "Couldn't display your order details!");
+            }
+            return Collections.emptyList();
+    }
+
+
     public void addProductToOrderCart(int productId){
         try {
-            orderDAO.InsertInOrderItemTable(getProductByID(productId).getId(), getCustomerAccount().getId());
+            orderDAO.InsertInOrderItemTable(productId, getCustomerAccount().getId());
         }catch (SQLException e){
-            transmitException(e, Level.SEVERE, "Couldn't add product to cart");
+            transmitException(e, Level.SEVERE, "Couldn't add product to cart!");
         }
     }
 
@@ -85,15 +99,15 @@ public class CustomerController extends Controller {
             if (isUserCurrentlyWaitingDelivery()) {
                 for (Order o : orderDAO.readAll().values()) {
                     if (getCustomerAccount().getId() == o.getCustomerId() && o.getDeliveredAt().isEmpty()) {
-                        orderDAO.update(o.getId(), 4, LocalDateTime.now());
+                        orderDAO.update(o.getId(), 3, LocalDateTime.now());
                         break;
                     }
                 }
             } else {
-                transmitException(new IllegalStateException(),Level.WARNING,"You are not renting a car!");
+                transmitException(new IllegalStateException(),Level.WARNING,"You are not expecting delivery!");
             }
         }catch (SQLException e){
-            transmitException(e,Level.SEVERE,"Couldn't update trip!");
+            transmitException(e,Level.SEVERE,"Couldn't update order status!");
         }
 
     }
@@ -125,17 +139,17 @@ public class CustomerController extends Controller {
         return Collections.emptyList();
     }
 
-    public Order getOrderIdByCustomerId(int customerId) {
+    public int getCurrentOrderIdByCustomerId(int customerId) {
         try {
             for (Order order : orderDAO.readAll().values()) {
-                if (order.getCustomerId() == customerId) {
-                    return order;
+                if (order.getCustomerId() == customerId && order.getDeliveredAt().isEmpty()) {
+                    return order.getId();
                 }
             }
         } catch (SQLException e) {
             transmitException(e,Level.SEVERE,"Couldn't find order!");
         }
-        return null;
+        return 0;
     }
 
     public Product getProductByID(int productId) {

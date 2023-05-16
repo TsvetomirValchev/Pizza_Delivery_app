@@ -82,11 +82,11 @@ public class OrderDAO extends DAO<Order>{
 
 
 
-    public List<Product> readAllProductsInOrder(int OrderId) throws SQLException {
+    public List<Product> getAllProductsInActiveOrder(int OrderId) throws SQLException {
         String query = "SELECT product_id, name, price FROM order_item " +
                 "JOIN orders ON order_id = orders.id " +
                 "JOIN product p on p.id = order_item.product_id" +
-                " WHERE order_id =" + OrderId ;
+                " WHERE order_id = " + OrderId ;
 
         List<Product> allProducts = new ArrayList<>();
         try (Connection connection = getConnection();
@@ -103,7 +103,7 @@ public class OrderDAO extends DAO<Order>{
     }
 
     public int getActiveOrderIdByCustomerId(Customer customer) throws SQLException {
-        String query = "SELECT orders.id FROM orders WHERE customer_id = " +customer.getId()+ " AND delivered_at IS NULL ";
+        String query = "SELECT orders.id FROM orders WHERE customer_id = " +customer.getId()+ "  ";
         int orderId = 0;
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement();

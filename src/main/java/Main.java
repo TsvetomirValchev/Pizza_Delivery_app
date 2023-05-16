@@ -10,8 +10,9 @@ public class Main {
 
         AdminController adminController = new AdminController(new Admin());
         AdminView adminView = new AdminView(adminController);
-        //adminView.addAPizzaMenu();
-        adminView.addADrinkMenu();
+        //adminView.addAProductMenu();
+        adminView.addAPizzaMenu();
+        //adminView.addADrinkMenu();
         //adminView.addADessertMenu();
 
     }

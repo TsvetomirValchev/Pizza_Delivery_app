@@ -167,10 +167,6 @@ public class LoginView implements View {
 
     }
 
-    @Override
-    public void printExceptionMsg(String msg) {
-        System.err.println(msg);
-        accountCreationChoice();
-    }
+
 
 }

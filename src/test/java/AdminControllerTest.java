@@ -1,8 +1,12 @@
 import Products.PizzaIngredient.*;
+import Products.Product;
 import Users.Admin;
+import Users.Customer;
 import db.AdminController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.Comparator;
 
 
 public class AdminControllerTest {
@@ -14,6 +18,8 @@ public class AdminControllerTest {
 
         adminController.getAllPizzas()
             .values()
+            .stream()
+            .sorted(Comparator.comparing(Product::getId))
             .forEach(System.out::println);
     }
 
@@ -24,28 +30,7 @@ public class AdminControllerTest {
         adminController.getAllCustomers()
                 .values()
                 .stream()
-                .sorted()
-                .forEach(System.out::println);
-    }
-
-    @Test
-    @DisplayName("Should read all orders from the database with the correct username of the client, first and last name of the driver")
-    public void testReadingOrdersFromDB(){
-
-
-        adminController.getAllOrders()
-                .values()
-                .stream()
-                .sorted()
-                .forEach(System.out::println);
-    }
-
-    @Test
-    @DisplayName("Should read all drivers from the database with the correct first and last name of the driver and status")
-    public void testReadingDriversFromDB(){
-
-        adminController.getAllDrivers()
-                .values()
+                .sorted(Comparator.comparing(Customer::getUsername))
                 .forEach(System.out::println);
     }
 

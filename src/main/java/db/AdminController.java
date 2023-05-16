@@ -5,6 +5,7 @@ import Products.Dessert;
 import Products.Drink;
 import Products.Pizza;
 import Products.PizzaIngredient.*;
+import Products.PizzaIngredient.abstraction.PizzaIngredient;
 import Products.Product;
 import Users.Admin;
 import Users.Customer;
@@ -13,8 +14,10 @@ import View.AdminView;
 import db.abstraction.Controller;
 
 
+import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -48,7 +51,6 @@ public class AdminController extends Controller {
         return Collections.emptyMap();
     }
 
-
     public void createDrinkProduct(int productId,String name, double price,Boolean isDiet){
         addProduct(productId,name,price);
         addDrink(productId,name,price,isDiet);
@@ -56,13 +58,75 @@ public class AdminController extends Controller {
 
     public void createDessertProduct(int productId,String name, double price,Boolean isVegan){
         addProduct(productId,name,price);
-        addDrink(productId,name,price,isVegan);
+        addDessert(productId,name,price,isVegan);
     }
 
     public void createPizzaProduct(int productId,String name, double price, Size size, Cheese cheese, Meat meat, Sauce sauce, Addon addon){
         addProduct(productId,name,price);
         addPizza(productId, name, price, size, cheese, meat, sauce, addon);
     }
+
+
+
+    public Map<Integer, Customer> getAllCustomers() {
+        try {
+            return customerDAO.readAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyMap();
+    }
+
+
+
+    public void addCustomer(Customer customer){
+        try{
+            customerDAO.create(customer);
+        }catch (SQLException e) {
+            transmitException(e, Level.SEVERE, "Couldn't register customer!");
+        }
+
+    }
+    public void deleteCustomer(String customerUsername){
+        try {
+            Customer customer = getCustomerByUsername(customerUsername);
+            if (customer != null ) {
+                customerDAO.delete(customerUsername);
+            } else {
+                transmitException(new IllegalArgumentException(),Level.WARNING,"User with username: '"+customerUsername+"' does not exist!");
+            }
+        } catch (SQLException e) {
+            if (e instanceof SQLDataException) {
+                transmitException(e, Level.SEVERE, "Couldn't delete customer account!");
+            }
+        }
+    }
+
+    public Customer getCustomerByUsername(String customerUsername){
+        Map<Integer, Customer> customers = getAllCustomers();
+        return customers.values().stream()
+                .filter(c -> c.getUsername().equals(customerUsername))
+                .findFirst()
+                .orElse(null);
+    }
+
+//    public Customer getCustomerById(int customerId){
+//        Map<Integer, Customer> customers = getAllCustomers();
+//        return customers.values().stream()
+//                .filter(c -> c.getId().equals(customerId))
+//                .findFirst()
+//                .orElse(null);
+//    }
+
+    public Map<Integer, PizzaIngredient> getAllIngredients(String tableName){
+        try{
+            return pizzaDAO.readAllIngredients(tableName);
+        } catch (SQLException e) {
+            transmitException(e, Level.SEVERE, "Couldn't read ingredients!");
+        }
+        return  Collections.emptyMap();
+    }
+
 
     public void addProduct(int productId,String name, double price) {
         try {
@@ -99,69 +163,6 @@ public class AdminController extends Controller {
             transmitException(e, Level.SEVERE, "Couldn't add dessert!");
         }
     }
-
-    public Map<Integer, Customer> getAllCustomers() {
-        try {
-            return customerDAO.readAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyMap();
-    }
-
-    public Customer getCustomerByUsername(String customerUsername){
-        Map<Integer, Customer> customers = getAllCustomers();
-        return customers.values().stream()
-                .filter(c -> c.getUsername().equals(customerUsername))
-                .findFirst()
-                .orElse(null);
-    }
-
-//    public Customer getCustomerByEmail(String customerEmail){
-//        Map<Integer, Customer> customers = getAllCustomers();
-//        return customers.values().stream()
-//                .filter(c -> c.getUsername().equals(customerEmail))
-//                .findFirst()
-//                .orElse(null);
-//    }
-
-    public void addCustomer(Customer customer){
-        try{
-            customerDAO.create(customer);
-        }catch (SQLException e) {
-            transmitException(e,
-                    Level.SEVERE,
-                    "Couldn't register customer!");
-        }
-
-    }
-
-    public Map<Integer, Order> getAllOrders() {
-        try {
-            return orderDAO.readAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyMap();
-    }
-
-    public Map<Integer, Driver> getAllDrivers() {
-        try {
-            return driverDAO.readAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyMap();
-    }
-
-    public void getAllIngredients(String tableName){
-        try{
-            pizzaDAO.readAllIngredients(tableName).forEach(System.out::println);
-        } catch (SQLException e) {
-            transmitException(e, Level.SEVERE, "Couldn't read ingredients!");
-        }
-    }
-
 
     @Override
     protected View getView() {

@@ -12,7 +12,6 @@ public class AdminViewTest {
     @Test
     public void addAPizzaMenuTest()
     {
-
     adminView.addAPizzaMenu();
     }
 }

@@ -119,16 +119,17 @@ public class PizzaDAO extends DAO<Pizza>{
         }
     }
 
-    public List<? extends PizzaIngredient> readAllIngredients(String tableName) throws SQLException {
+    public Map<Integer, PizzaIngredient> readAllIngredients(String tableName) throws SQLException {
         String query = "SELECT * FROM " + tableName;
 
-        List<PizzaIngredient> allIngredients = new ArrayList<>();
+        Map<Integer, PizzaIngredient> allIngredients = new HashMap<>();
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
-                allIngredients.add(new PizzaIngredient(resultSet.getInt("id"),
+                PizzaIngredient ingredient = (new PizzaIngredient(resultSet.getInt("id"),
                         resultSet.getString(tableName + "_name")));
+                allIngredients.put(ingredient.getId(), ingredient);
             }
         }
        return allIngredients;

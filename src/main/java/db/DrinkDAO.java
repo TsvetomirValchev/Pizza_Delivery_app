@@ -33,13 +33,14 @@ public class DrinkDAO extends DAO<Drink>{
     }
     @Override
     protected String buildInsertQuery(Object object) {
-        return "INSERT INTO " + this.tableName + "(isSugarFree)"+ "VALUES(?)";
+        return "INSERT INTO " + this.tableName + "(product_id, isDiet)"+ "VALUES(?, ?)";
     }
 
     @Override
     protected void setValues(PreparedStatement statement, Object object) throws SQLException {
         if(object instanceof Drink drink){
-            statement.setBoolean(1, drink.isDiet());
+            statement.setInt(1, drink.getId());
+            statement.setBoolean(2, drink.isDiet());
         }
     }
 
@@ -54,14 +55,14 @@ public class DrinkDAO extends DAO<Drink>{
                 resultSet.getInt("id"),
                 resultSet.getString("name"),
                 resultSet.getDouble("price"),
-                resultSet.getBoolean("isSugarFree")
+                resultSet.getBoolean("isDiet")
         );
     }
 
     @Override
     String buildUpdateQuery(int variableIndex) {
        Map<Integer, String> columnMap = Map.of(
-                1, "isCarbonated"
+                1, "isDiet"
         );
         String columnName = columnMap.get(variableIndex);
         return "UPDATE " + this.tableName + " SET " + columnName + "=? WHERE product_id=?";

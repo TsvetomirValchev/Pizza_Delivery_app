@@ -2,7 +2,6 @@ package View;
 
 
 
-import Users.Customer;
 import View.abstraction.View;
 import db.CustomerController;
 import logging.PizzaDeliveryLogger;
@@ -36,16 +35,13 @@ public class CustomerView implements View {
 
     }
 
-    @Override
-    public void printExceptionMsg(String msg) {
 
-    }
 
 
     //TODO: make private once you don't need tests
-    public void printAllProductsInOrder(Customer customer){
+    public void printCurrentOrderDetails(){
         System.out.println("All products in your order:");
-        customerController.getProductsInOrder(customer.getId()).forEach(System.out::println);
+        customerController.getCurrentOrderDetails().forEach(System.out::println);
     }
 
     //TODO: make private once you don't need tests
