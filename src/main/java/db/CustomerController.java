@@ -73,7 +73,7 @@ public class CustomerController extends Controller {
     public List<Product> getCurrentOrderDetails(){
             try{
                 return new ArrayList<>(
-                        orderDAO.getAllProductsInActiveOrder
+                        orderDAO.getAllProductsInOrder
                                 (getCurrentOrderIdByCustomerId(getCustomerAccount().getId())
                         )
                 );

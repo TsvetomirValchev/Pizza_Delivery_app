@@ -2,7 +2,6 @@ package db;
 
 import Order.Order;
 import Products.Product;
-import Users.Customer;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -82,7 +81,7 @@ public class OrderDAO extends DAO<Order>{
 
 
 
-    public List<Product> getAllProductsInActiveOrder(int OrderId) throws SQLException {
+    public List<Product> getAllProductsInOrder(int OrderId) throws SQLException {
         String query = "SELECT product_id, name, price FROM order_item " +
                 "JOIN orders ON order_id = orders.id " +
                 "JOIN product p on p.id = order_item.product_id" +
@@ -102,17 +101,32 @@ public class OrderDAO extends DAO<Order>{
         return allProducts;
     }
 
-    public int getActiveOrderIdByCustomerId(Customer customer) throws SQLException {
-        String query = "SELECT orders.id FROM orders WHERE customer_id = " +customer.getId()+ "  ";
-        int orderId = 0;
+    public List<Order> getOrderByProductId(int productId) throws SQLException {
+        String query = "SELECT order_id,customer_id,ordered_at,delivered_at FROM order_item " +
+                "JOIN orders ON order_id = orders.id " +
+                "JOIN product p on p.id = order_item.product_id" +
+                " WHERE product_id = " + productId ;
+
+        List<Order> allOrdersWithProductInThem = new ArrayList<>();
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
-                orderId = resultSet.getInt("id");
+                LocalDateTime deliveryTime = null;
+                Timestamp deliveryTimestamp = resultSet.getTimestamp("delivered_at");
+
+                if (deliveryTimestamp != null){
+                    deliveryTime = deliveryTimestamp.toLocalDateTime();
+                }
+
+                allOrdersWithProductInThem.add(new Order(
+                        resultSet.getInt("order_id"),
+                        resultSet.getInt("customer_id"),
+                        resultSet.getTimestamp("ordered_at").toLocalDateTime(),
+                        Optional.ofNullable(deliveryTime)));
             }
         }
-        return orderId;
+        return allOrdersWithProductInThem;
     }
 
 

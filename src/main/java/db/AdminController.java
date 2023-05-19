@@ -17,7 +17,6 @@ import db.abstraction.Controller;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -27,12 +26,11 @@ public class AdminController extends Controller {
     private static final PizzaDAO pizzaDAO = new PizzaDAO();
     private static final DAO<Product> productDAO = new ProductDAO();
     private static final DAO<Drink> drinkDAO = new DrinkDAO();
-
     private static final DAO<Dessert> dessertDAO = new DessertDAO();
-
     private static final DAO<Customer> customerDAO = new CustomerDAO();
-    private static final DAO<Order> orderDAO = new OrderDAO();
-    private static final DAO<Driver> driverDAO = new DriverDAO();
+
+    private static final OrderDAO orderDAO = new OrderDAO();
+
 
     private final AdminView adminView = new AdminView(this);
     private final Admin adminModel;
@@ -45,6 +43,25 @@ public class AdminController extends Controller {
     public Map<Integer, Pizza> getAllPizzas() {
         try {
             return pizzaDAO.readAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyMap();
+    }
+
+
+    public Map<Integer, Drink> getAllDrinks() {
+        try {
+            return drinkDAO.readAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyMap();
+    }
+
+    public Map<Integer, Dessert> getAllDesserts() {
+        try {
+            return dessertDAO.readAll();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -76,8 +93,6 @@ public class AdminController extends Controller {
         }
         return Collections.emptyMap();
     }
-
-
 
     public void addCustomer(Customer customer){
         try{
@@ -128,6 +143,8 @@ public class AdminController extends Controller {
     }
 
 
+    //utils
+
     public void addProduct(int productId,String name, double price) {
         try {
             Product product = new Product(productId, name, price);
@@ -137,12 +154,45 @@ public class AdminController extends Controller {
         }
     }
 
+
+
     public void addPizza(int productId,String name, double price, Size size, Cheese cheese, Meat meat, Sauce sauce, Addon addon) {
         try {
             Pizza pizza = new Pizza(productId, name, price, size, cheese, meat, sauce, addon);
             pizzaDAO.create(pizza);
         } catch (SQLException e) {
             transmitException(e, Level.SEVERE, "Couldn't add pizza!");
+        }
+    }
+
+    public void deletePizza(int productId){
+        try {
+            Pizza pizza = getAllPizzas()
+                    .values()
+                    .stream()
+                    .filter((p)->p.getId()==productId).findFirst().orElse(null);
+
+            if(pizza==null){
+                transmitException(new IllegalArgumentException(),Level.WARNING,"No pizza found with  product ID of: '"+productId+"'");
+                System.err.println("Product with that id does not exist!");
+            }
+            else if (isProductCurrentlyOrdered(pizza.getId())){
+                transmitException(new IllegalArgumentException(),Level.WARNING,"This product is currently in a delivery: '"+productId+"'");
+                System.err.println("Cannot delete product that is currently in an active order!");
+            }
+            else
+            {
+                pizzaDAO.delete(productId);
+                productDAO.delete(productId);
+                System.out.println("Pizza removed successfully! ");
+            }
+
+        } catch (SQLException e) {
+            if (e instanceof SQLDataException){
+                transmitException(e,Level.WARNING,e.getMessage());
+            } else {
+                transmitException(e,Level.SEVERE,"Couldn't remove pizza!");
+            }
         }
     }
 
@@ -155,6 +205,37 @@ public class AdminController extends Controller {
         }
     }
 
+    public void deleteDrink(int productId){
+        try {
+            Drink drink = getAllDrinks()
+                    .values()
+                    .stream()
+                    .filter((d)->d.getId()==productId).findFirst().orElse(null);
+            if(drink==null)
+            {
+                transmitException(new IllegalArgumentException(),Level.WARNING,"No drink found with product ID of: '"+productId+"'");
+                System.err.println("Product with that id does not exist!");
+            }
+            else if (isProductCurrentlyOrdered(drink.getId()))
+            {
+                transmitException(new IllegalArgumentException(),Level.WARNING,"This product is currently in a delivery: '"+productId+"'");
+                System.err.println("Cannot delete product that is currently in an active order!");
+            }
+            else
+            {
+            drinkDAO.delete(productId);
+            productDAO.delete(productId);
+            System.out.println("Drink removed successfully!");
+            }
+
+        } catch (SQLException e) {
+            if (e instanceof SQLDataException){
+                transmitException(e,Level.WARNING,e.getMessage());
+            } else {
+                transmitException(e,Level.SEVERE,"Couldn't remove drink!");
+            }
+        }
+    }
     public void addDessert(int productId,String name, double price, boolean isVegan) {
         try {
             Dessert dessert = new Dessert(productId, name, price, isVegan);
@@ -163,6 +244,46 @@ public class AdminController extends Controller {
             transmitException(e, Level.SEVERE, "Couldn't add dessert!");
         }
     }
+
+    public void deleteDessert(int productId){
+        try {
+            Dessert dessert = getAllDesserts()
+                    .values()
+                    .stream()
+                    .filter((d)->d.getId()==productId).findFirst().orElse(null);
+            if(dessert==null){
+                transmitException(new IllegalArgumentException(),Level.WARNING,"No dessert found with product ID of: '"+productId+"'");
+                System.err.println("Product with that id does not exist!");
+            }else if (isProductCurrentlyOrdered(dessert.getId())){
+                transmitException(new IllegalArgumentException(),Level.WARNING,"This product is currently in a delivery: '"+productId+"'");
+                System.err.println("Cannot delete product that is currently in an active order!");
+            }else
+            {
+                dessertDAO.delete(productId);
+                productDAO.delete(productId);
+                System.out.println("Dessert removed successfully");
+            }
+
+        } catch (SQLException e) {
+            if (e instanceof SQLDataException){
+                transmitException(e,Level.WARNING,e.getMessage());
+            } else {
+                transmitException(e,Level.SEVERE,"Couldn't remove dessert!");
+            }
+        }
+    }
+
+    public boolean isProductCurrentlyOrdered(int productId) throws SQLException {
+        for (Order order : orderDAO.getOrderByProductId(productId)) {
+            if (order.getDeliveredAt().isEmpty()) {
+                return true;
+            }
+    }
+        return false;
+    }
+
+
+
 
     @Override
     protected View getView() {

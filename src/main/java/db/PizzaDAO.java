@@ -80,7 +80,6 @@ public class PizzaDAO extends DAO<Pizza>{
 
     @Override
     protected Pizza mapReadResultSetToObject(ResultSet resultSet) throws SQLException {
-
         return new Pizza(
                 resultSet.getInt("id"),
                 resultSet.getString("name"),

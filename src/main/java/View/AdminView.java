@@ -7,6 +7,7 @@ import View.abstraction.View;
 import db.AdminController;
 import logging.PizzaDeliveryLogger;
 
+import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -24,7 +25,7 @@ public class AdminView implements View {
 
     @Override
     public void printMenu() {
-        System.out.println("Welcome, master! What would you like to do?");
+        System.out.println("What would you like to do?");
         System.out.println("1. Add a new product to the menu");
         System.out.println("2. Delete a product from the menu");
         System.out.println("3. Delete a customer's account");
@@ -41,7 +42,7 @@ public class AdminView implements View {
             printSeparator(80);
             switch (choice){
                 case 1 -> addAProductMenu();
-
+                case 2 -> deleteAProductMenu();
                 case 3 -> deleteAccountMenu();
                 case 0-> System.out.println("Exiting..");
                 default -> System.err.println("Enter a valid option!");
@@ -51,6 +52,9 @@ public class AdminView implements View {
             }
         }while (choice!=0);
     }
+
+
+
 
 
     public void deleteAccountMenu(){
@@ -90,6 +94,30 @@ public class AdminView implements View {
                     case 0 -> getChoice();
                 }
             }while (choice != 0);
+
+
+    }
+
+    public void deleteAProductMenu(){
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+        do {
+            printSeparator(100);
+            System.out.println("What product do you want to remove?");
+            printSeparator(100);
+            System.out.println("1. Pizza");
+            System.out.println("2. Drink");
+            System.out.println("3. Dessert");
+            System.out.println("0. Do something else ");
+            printSeparator(100);
+            choice = scanner.nextInt();
+            switch (choice) {
+                case 1 -> deleteAPizzaMenu();
+                case 2 -> deleteADrinkMenu();
+                case 3 -> deleteADessertMenu();
+                case 0 -> getChoice();
+            }
+        }while (choice != 0);
 
 
     }
@@ -223,6 +251,59 @@ public class AdminView implements View {
         return new Product(id,productName,price);
     }
 
+
+    public void deleteAPizzaMenu(){
+        try {
+
+            readAllPizzas();
+            printSeparator(100);
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Enter the product id of the pizza you want to delete: ");
+            int productId = scanner.nextInt();
+            adminController.deletePizza(productId);
+        }catch (InputMismatchException e) {
+            LOGGER.warning(e.getMessage());
+            System.err.println(e.getMessage());
+            deleteAPizzaMenu();
+        }
+
+    }
+
+    public void deleteADrinkMenu(){
+        try {
+            readAllDrinks();
+            printSeparator(100);
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Enter the product id of the drink you want to delete: ");
+            int productId = scanner.nextInt();
+            adminController.deleteDrink(productId);
+
+        }catch (InputMismatchException e) {
+            LOGGER.warning(e.getMessage());
+            System.err.println(e.getMessage());
+            deleteADrinkMenu();
+        }
+
+    }
+
+
+    public void deleteADessertMenu(){
+        try {
+            readAllDesserts();
+            printSeparator(100);
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Enter the product id of the dessert you want to delete: ");
+            int productId = scanner.nextInt();
+            adminController.deleteDessert(productId);
+        }catch (InputMismatchException e) {
+            LOGGER.warning(e.getMessage());
+            System.err.println(e.getMessage());
+            deleteAccountMenu();
+        }
+
+    }
+
+
     private void readAllIngredients(String tableName){
         adminController.getAllIngredients(tableName)
                 .values()
@@ -239,6 +320,23 @@ public class AdminView implements View {
 
     private void readAllPizzas(){
         adminController.getAllPizzas()
+                .values()
+                .stream()
+                .sorted(Comparator.comparing(Product::getId))
+                .forEach(System.out::println);
+    }
+
+
+    private void readAllDrinks(){
+        adminController.getAllDrinks()
+                .values()
+                .stream()
+                .sorted(Comparator.comparing(Product::getId))
+                .forEach(System.out::println);
+    }
+
+    private void readAllDesserts(){
+        adminController.getAllDesserts()
                 .values()
                 .stream()
                 .sorted(Comparator.comparing(Product::getId))

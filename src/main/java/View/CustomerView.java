@@ -25,7 +25,7 @@ public class CustomerView implements View {
         System.out.println("2. View all drinks");
         System.out.println("3. View all desserts");
         System.out.println("4. Make an order");
-        System.out.println("5. Check order status");
+        System.out.println("5. Check current order details");
         System.out.println("0. Exit");
 
     }

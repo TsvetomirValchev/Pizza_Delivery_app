@@ -5,13 +5,13 @@ import db.AdminController;
 
 public class Main {
     public static void main(String[] args) {
-        //new LoginView().getChoice();
+        new LoginView().getChoice();
 
 
-        AdminController adminController = new AdminController(new Admin());
-        AdminView adminView = new AdminView(adminController);
+        //AdminController adminController = new AdminController(new Admin());
+        //AdminView adminView = new AdminView(adminController);
         //adminView.addAProductMenu();
-        adminView.addAPizzaMenu();
+        //adminView.addAPizzaMenu();
         //adminView.addADrinkMenu();
         //adminView.addADessertMenu();
 
