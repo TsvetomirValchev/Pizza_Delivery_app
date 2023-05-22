@@ -102,11 +102,12 @@ public class AdminController extends Controller {
         }
 
     }
+
     public void deleteCustomer(String customerUsername){
         try {
             Customer customer = getCustomerByUsername(customerUsername);
             if (customer != null ) {
-                customerDAO.delete(customerUsername);
+                customerDAO.delete(customer.getId());
             } else {
                 transmitException(new IllegalArgumentException(),Level.WARNING,"User with username: '"+customerUsername+"' does not exist!");
             }
@@ -124,14 +125,6 @@ public class AdminController extends Controller {
                 .findFirst()
                 .orElse(null);
     }
-
-//    public Customer getCustomerById(int customerId){
-//        Map<Integer, Customer> customers = getAllCustomers();
-//        return customers.values().stream()
-//                .filter(c -> c.getId().equals(customerId))
-//                .findFirst()
-//                .orElse(null);
-//    }
 
     public Map<Integer, PizzaIngredient> getAllIngredients(String tableName){
         try{
@@ -174,11 +167,9 @@ public class AdminController extends Controller {
 
             if(pizza==null){
                 transmitException(new IllegalArgumentException(),Level.WARNING,"No pizza found with  product ID of: '"+productId+"'");
-                System.err.println("Product with that id does not exist!");
             }
             else if (isProductCurrentlyOrdered(pizza.getId())){
                 transmitException(new IllegalArgumentException(),Level.WARNING,"This product is currently in a delivery: '"+productId+"'");
-                System.err.println("Cannot delete product that is currently in an active order!");
             }
             else
             {
@@ -214,12 +205,12 @@ public class AdminController extends Controller {
             if(drink==null)
             {
                 transmitException(new IllegalArgumentException(),Level.WARNING,"No drink found with product ID of: '"+productId+"'");
-                System.err.println("Product with that id does not exist!");
+
             }
             else if (isProductCurrentlyOrdered(drink.getId()))
             {
                 transmitException(new IllegalArgumentException(),Level.WARNING,"This product is currently in a delivery: '"+productId+"'");
-                System.err.println("Cannot delete product that is currently in an active order!");
+
             }
             else
             {
@@ -253,10 +244,8 @@ public class AdminController extends Controller {
                     .filter((d)->d.getId()==productId).findFirst().orElse(null);
             if(dessert==null){
                 transmitException(new IllegalArgumentException(),Level.WARNING,"No dessert found with product ID of: '"+productId+"'");
-                System.err.println("Product with that id does not exist!");
             }else if (isProductCurrentlyOrdered(dessert.getId())){
                 transmitException(new IllegalArgumentException(),Level.WARNING,"This product is currently in a delivery: '"+productId+"'");
-                System.err.println("Cannot delete product that is currently in an active order!");
             }else
             {
                 dessertDAO.delete(productId);
@@ -281,9 +270,6 @@ public class AdminController extends Controller {
     }
         return false;
     }
-
-
-
 
     @Override
     protected View getView() {

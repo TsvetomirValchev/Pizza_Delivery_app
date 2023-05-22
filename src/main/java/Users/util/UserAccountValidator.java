@@ -34,17 +34,17 @@ public class UserAccountValidator {
             throw new IllegalArgumentException("This username is taken!");
         }
         if (!isValidPassword()){
-            throw new IllegalArgumentException("Invalid password!/nPassword must include: at least 1 uppercase letter,1 lowercase letter and 1 number!");
+            throw new IllegalArgumentException("\"Invalid password!\\nPassword must include:\\nat least 1 uppercase letter,\\nat least 1 lowercase letter,\\nat least 1 number.\"");
         }
 
     }
 
-    public boolean isValidEmail() {
+    private boolean isValidEmail() {
         Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        return pattern.matcher(customer.getEmail().trim()).matches();
+        return pattern.matcher(customer.getEmail()).matches();
     }
 
-    public boolean isValidUsername() {
+    private boolean isValidUsername() {
         if (customer.getUsername().equals(new Admin().getUsername())){
             return false;
         }
@@ -52,12 +52,12 @@ public class UserAccountValidator {
         return pattern.matcher(customer.getUsername()).matches();
     }
 
-    public  boolean isValidPassword() {
+    private boolean isValidPassword() {
         Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
         return pattern.matcher(customer.getPassword()).matches();
     }
 
-    private boolean isEmailTaken(){
+    public boolean isEmailTaken(){
         for(Customer c: adminController.getAllCustomers().values()){
             if (c.getEmail().equals(customer.getEmail())){
                 return true;
@@ -75,13 +75,12 @@ public class UserAccountValidator {
         return false;
     }
 
-    private boolean areCredentialsCorrect(){
+    boolean areCredentialsMatching(){
         for(Customer c: adminController.getAllCustomers().values()){
-            if (c.getUsername().equals(customer.getUsername()) && c.getPassword().equals(customer.getPassword())){
+            if (c.getUsername().equals(customer.getUsername()) && c.getPassword().equals(customer.getPassword()) && c.getEmail().equals(customer.getEmail())){
                 return true;
             }
         }
         return false;
-
     }
 }

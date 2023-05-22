@@ -85,7 +85,7 @@ public abstract class DAO<T> {
      }
 
      protected void delete(Object key) throws SQLException {
-          String query = "DELETE FROM " + this.tableName + " WHERE " + this.tablePrimaryKey + " = ? ";
+          String query = "DELETE FROM " + this.tableName + " WHERE " + this.tablePrimaryKey + "= ? ";
           try (Connection connection = getConnection();
                PreparedStatement statement = connection.prepareStatement(query)) {
                statement.setObject(1, key);

@@ -7,7 +7,6 @@ import View.abstraction.View;
 import db.AdminController;
 import logging.PizzaDeliveryLogger;
 
-import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -53,10 +52,6 @@ public class AdminView implements View {
         }while (choice!=0);
     }
 
-
-
-
-
     public void deleteAccountMenu(){
            try {
                readAllCustomers();
@@ -74,7 +69,7 @@ public class AdminView implements View {
     }
 
 
-    public void addAProductMenu(){
+    private void addAProductMenu(){
             Scanner scanner = new Scanner(System.in);
             int choice;
             do {
@@ -98,7 +93,7 @@ public class AdminView implements View {
 
     }
 
-    public void deleteAProductMenu(){
+    private void deleteAProductMenu(){
         Scanner scanner = new Scanner(System.in);
         int choice;
         do {
@@ -122,9 +117,7 @@ public class AdminView implements View {
 
     }
 
-
-    //TODO: MAKE PRIVATE LATER!
-    public void addADrinkMenu(){
+    private void addADrinkMenu(){
         try{
             Scanner scanner = new Scanner(System.in);
             Product product = createAProductMenu();
@@ -144,8 +137,7 @@ public class AdminView implements View {
 
     }
 
-    //TODO: MAKE PRIVATE LATER!
-    public void addADessertMenu(){
+    private void addADessertMenu(){
         try{
             Scanner scanner = new Scanner(System.in);
             Product product = createAProductMenu();
@@ -166,8 +158,7 @@ public class AdminView implements View {
     }
 
 
-    //TODO: MAKE PRIVATE LATER!
-    public void addAPizzaMenu(){
+    private void addAPizzaMenu(){
         try{
             Scanner scanner = new Scanner(System.in);
             Product product = createAProductMenu();
@@ -220,7 +211,6 @@ public class AdminView implements View {
 
     }
 
-
     private Product createAProductMenu(){
         String productName = null;
         Double price = null;
@@ -251,8 +241,7 @@ public class AdminView implements View {
         return new Product(id,productName,price);
     }
 
-
-    public void deleteAPizzaMenu(){
+    private void deleteAPizzaMenu(){
         try {
 
             readAllPizzas();
@@ -269,7 +258,7 @@ public class AdminView implements View {
 
     }
 
-    public void deleteADrinkMenu(){
+    private void deleteADrinkMenu(){
         try {
             readAllDrinks();
             printSeparator(100);
@@ -287,7 +276,7 @@ public class AdminView implements View {
     }
 
 
-    public void deleteADessertMenu(){
+    private void deleteADessertMenu(){
         try {
             readAllDesserts();
             printSeparator(100);
@@ -298,11 +287,10 @@ public class AdminView implements View {
         }catch (InputMismatchException e) {
             LOGGER.warning(e.getMessage());
             System.err.println(e.getMessage());
-            deleteAccountMenu();
+            deleteADessertMenu();
         }
 
     }
-
 
     private void readAllIngredients(String tableName){
         adminController.getAllIngredients(tableName)
@@ -343,4 +331,10 @@ public class AdminView implements View {
                 .forEach(System.out::println);
     }
 
+    @Override
+    public void printExceptionMessage(String message) {
+        System.err.println(message);
+        printSeparator(80);
+        getChoice();
+    }
 }

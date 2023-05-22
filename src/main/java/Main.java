@@ -1,7 +1,5 @@
-import Users.Admin;
-import View.AdminView;
+
 import View.LoginView;
-import db.AdminController;
 
 public class Main {
     public static void main(String[] args) {

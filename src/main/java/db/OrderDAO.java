@@ -12,14 +12,15 @@ import java.util.Optional;
 
 public class OrderDAO extends DAO<Order>{
 
-    protected OrderDAO() {
+    // TODO: MAKE PROTECTED AFTER TEST!
+    public OrderDAO() {
         super("orders", "id");
     }
 
     @Override
     protected String buildInsertQuery(Object object) {
         return "INSERT INTO " + this.tableName +
-                "(customer_id,assigned_driver_id,ordered_at,delivered_at) VALUES(?, ?, ?, ?)";
+                "(customer_id,ordered_at,delivered_at) VALUES(?, ?, ?)";
     }
 
     @Override
@@ -67,8 +68,8 @@ public class OrderDAO extends DAO<Order>{
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         switch (variableIndex){
             case 1-> statement.setInt(1,(Integer) updatedValue);
-            case 2 -> statement.setTimestamp(2,Timestamp.valueOf((LocalDateTime) updatedValue));
-            case 3 -> statement.setTimestamp(3,Timestamp.valueOf((LocalDateTime) updatedValue));
+            case 2 -> statement.setTimestamp(2, Timestamp.valueOf((LocalDateTime) updatedValue));
+            case 3 -> statement.setTimestamp(3, Timestamp.valueOf((LocalDateTime) updatedValue));
         }
     }
 
@@ -76,10 +77,6 @@ public class OrderDAO extends DAO<Order>{
     protected Integer getKey(Order object) {
         return object.getId();
     }
-
-
-
-
 
     public List<Product> getAllProductsInOrder(int OrderId) throws SQLException {
         String query = "SELECT product_id, name, price FROM order_item " +

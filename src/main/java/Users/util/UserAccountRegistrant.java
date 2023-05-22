@@ -7,6 +7,8 @@ import View.abstraction.View;
 import db.AdminController;
 import db.abstraction.Controller;
 
+import java.util.logging.Level;
+
 public class UserAccountRegistrant extends Controller {
     private final LoginView loginView = new LoginView();
     private final Customer customer;
@@ -21,10 +23,16 @@ public class UserAccountRegistrant extends Controller {
     }
 
     public void RegisterCustomer(){
-        UserAccountValidator validator = new UserAccountValidator(customer);
-        System.out.println("Email address: " + customer.getEmail());
-        validator.isValidUser();
-        buildCustomer();
+        try {
+            UserAccountValidator validator = new UserAccountValidator(customer);
+
+            if(!validator.areCredentialsMatching()) {
+                validator.isValidUser();
+                buildCustomer();
+            }
+        } catch (IllegalArgumentException e) {
+            transmitException(e, Level.WARNING, e.getMessage());
+        }
     }
 
     private void buildCustomer(){

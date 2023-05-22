@@ -6,6 +6,8 @@ import View.abstraction.View;
 import db.CustomerController;
 import logging.PizzaDeliveryLogger;
 
+import java.util.InputMismatchException;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class CustomerView implements View {
@@ -20,11 +22,11 @@ public class CustomerView implements View {
 
     @Override
     public void printMenu() {
-        System.out.println("\nDominos 2 where your choice matters!\n");
+        System.out.println("\nWelcome to the imaginary pizza restaurant!\n");
         System.out.println("1. View all pizzas");
         System.out.println("2. View all drinks");
         System.out.println("3. View all desserts");
-        System.out.println("4. Make an order");
+        System.out.println("4. Place an order");
         System.out.println("5. Check current order details");
         System.out.println("0. Exit");
 
@@ -32,31 +34,83 @@ public class CustomerView implements View {
 
     @Override
     public void getChoice() {
+        Scanner scan = new Scanner(System.in);
+        int choice;
+        do{
+            printMenu();
+            choice = scan.nextInt();
+            printSeparator(80);
+            switch (choice){
+                case 1 -> printAllPizzas();
+                case 2 -> printAllDrinks();
+                case 3 -> printAllDesserts();
+                case 4 -> placeAnOrderMenu();
+                case 5 -> printCurrentOrderDetails(); //TODO: make it print the total cost of the order somehow
+                case 0-> System.out.println("Exiting..");
+                default -> System.err.println("Enter a valid option!");
+            }
+            if(choice!=0){
+                printSeparator(80);
+            }
+        }while (choice!=0);
 
     }
 
+    private void placeAnOrderMenu(){
+        try{
+            Scanner scan = new Scanner(System.in);
 
+            printAllProductsInTheRestaurant();
+            printSeparator(100);
 
+            System.out.println("Enter the ID of the product you wish to order:  ");
+            int productId = scan.nextInt();
 
-    //TODO: make private once you don't need tests
-    public void printCurrentOrderDetails(){
+            if (customerController.placeAnOrder(productId)) {
+                System.out.println("Product has been added to your order");
+            }
+        }catch (InputMismatchException e){
+            LOGGER.warning(e.getMessage());
+            System.err.println("Invalid input format!");
+            placeAnOrderMenu();
+        }
+    }
+
+    private void printCurrentOrderDetails(){
         System.out.println("All products in your order:");
-        customerController.getCurrentOrderDetails().forEach(System.out::println);
+        customerController.GetAllProductsInCurrentOrder().forEach(System.out::println);
+
     }
 
-    //TODO: make private once you don't need tests
-    public void printAllPizzas(){
+
+    private void printAllProductsInTheRestaurant(){
+        printSeparator(100);
+        printAllPizzas();
+        printSeparator(100);
+        printAllDrinks();
+        printSeparator(100);
+        printAllDesserts();
+    }
+
+    private void printAllPizzas(){
         System.out.println("All pizzas in our restaurant:");
         customerController.getPizzas().forEach(System.out::println);
     }
-    //TODO: make private once you don't need tests
-    public void printAllDesserts(){
+
+    private void printAllDesserts(){
         System.out.println("All desserts in our restaurant:");
         customerController.getDesserts().forEach(System.out::println);
     }
-    //TODO: make private once you don't need tests
-    public void printAllDrinks(){
+
+    private void printAllDrinks(){
         System.out.println("All drinks in our restaurant:");
         customerController.getDrinks().forEach(System.out::println);
+    }
+
+    @Override
+    public void printExceptionMessage(String message) {
+        System.err.println(message);
+        printSeparator(80);
+        getChoice();
     }
 }

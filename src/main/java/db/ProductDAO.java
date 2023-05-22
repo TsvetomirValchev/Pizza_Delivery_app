@@ -39,7 +39,7 @@ public class ProductDAO extends DAO<Product>{
     protected Product mapReadResultSetToObject(ResultSet resultSet) throws SQLException {
         return new Product(
                 resultSet.getInt("id"),
-                resultSet.getString("username"),
+                resultSet.getString("name"),
                 resultSet.getDouble("price")
         );
     }
@@ -47,8 +47,9 @@ public class ProductDAO extends DAO<Product>{
     @Override
     String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(
-                1, "name",
-                2, "price"
+                1,"id",
+                2, "name",
+                3, "price"
         );
         String columnName = columnMap.get(variableIndex);
         return "UPDATE " + this.tableName + " SET " + columnName + "=? WHERE id=?";
@@ -58,8 +59,9 @@ public class ProductDAO extends DAO<Product>{
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         switch (variableIndex){
-            case 1 -> statement.setString(1,(String) updatedValue);
-            case 2 -> statement.setDouble(2,(Double) updatedValue);
+            case 1 -> statement.setInt(1, (Integer) updatedValue);
+            case 2 -> statement.setString(2,(String) updatedValue);
+            case 3 -> statement.setDouble(3,(Double) updatedValue);
         }
     }
 }

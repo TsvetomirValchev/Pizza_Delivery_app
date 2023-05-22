@@ -61,16 +61,15 @@ public class CustomerController extends Controller {
                     getCustomerAccount().getId(),
                     LocalDateTime.now(),
                     Optional.empty()));
-
             addProductToOrderCart(productId);
             return true;
         }catch (SQLException e){
-            transmitException(e,Level.SEVERE, "Couldn't place an order!");
+            transmitException(e, Level.SEVERE , "Couldn't place an order!");
         }
         return false;
     }
 
-    public List<Product> getCurrentOrderDetails(){
+    public List<Product> GetAllProductsInCurrentOrder(){
             try{
                 return new ArrayList<>(
                         orderDAO.getAllProductsInOrder
@@ -86,9 +85,9 @@ public class CustomerController extends Controller {
     }
 
 
-    public void addProductToOrderCart(int productId){
+    private void addProductToOrderCart(int productId){
         try {
-            orderDAO.InsertInOrderItemTable(productId, getCustomerAccount().getId());
+            orderDAO.InsertInOrderItemTable(productId, getCurrentOrderIdByCustomerId(getCustomerAccount().getId()));
         }catch (SQLException e){
             transmitException(e, Level.SEVERE, "Couldn't add product to cart!");
         }
@@ -139,7 +138,7 @@ public class CustomerController extends Controller {
         return Collections.emptyList();
     }
 
-    public int getCurrentOrderIdByCustomerId(int customerId) {
+    private int getCurrentOrderIdByCustomerId(int customerId) {
         try {
             for (Order order : orderDAO.readAll().values()) {
                 if (order.getCustomerId() == customerId && order.getDeliveredAt().isEmpty()) {
@@ -152,7 +151,7 @@ public class CustomerController extends Controller {
         return 0;
     }
 
-    public Product getProductByID(int productId) {
+    private Product getProductByID(int productId) {
         try {
             for (Product product : productDAO.readAll().values()) {
                 if (product.getId() == productId) {
@@ -160,13 +159,13 @@ public class CustomerController extends Controller {
                 }
             }
         } catch (SQLException e) {
-            transmitException(e,Level.SEVERE,"Couldn't find order!");
+            transmitException(e,Level.SEVERE,"Couldn't find product!");
         }
         return null;
     }
 
 
-    boolean isUserCurrentlyWaitingDelivery() {
+    private boolean isUserCurrentlyWaitingDelivery() {
         try {
             for (Order order : orderDAO.readAll().values()) {
                 if (order.getCustomerId()==(getCustomerAccount().getId()) && order.getDeliveredAt().isEmpty()) {

@@ -39,8 +39,6 @@ public class LoginView implements View {
                 case 2 -> {
                     printSeparator(100);
                     accountCreationChoice();
-
-
                     }
                 case 0 -> System.out.println("Exiting!");
                 default -> System.err.println("Invalid account details!");
@@ -62,9 +60,9 @@ public class LoginView implements View {
         String username = null;
         String password = null;
         try{
-            System.out.println("Enter username:");
+            System.out.println("Enter username: ");
             username = scanner.nextLine();
-            System.out.println("Enter password");
+            System.out.println("Enter password: ");
             password = scanner.nextLine();
 
         }catch (IllegalArgumentException e){
@@ -82,11 +80,11 @@ public class LoginView implements View {
                 openCustomerView(customer);
             }else if(customer!=null){
                 printSeparator(100);
-                System.out.println("Wrong password!");
+                System.err.println("Wrong password!");
                 printLoginMenu();
             }
             else {
-                System.out.println("No account found with this username");
+                System.err.println("No account found with this username");
                 accountCreationChoice();
             }
 
@@ -103,11 +101,13 @@ public class LoginView implements View {
         switch (choice){
             case 1 -> {
                 printRegistrationMenu();
+                printSeparator(100);
                 System.out.println("Account created!");
                 getChoice();
             }
             case 2 ->{
                 System.out.println("Account creation canceled!");
+                printSeparator(100);
                 getChoice();
             }
             default -> {
@@ -120,7 +120,7 @@ public class LoginView implements View {
     }
     private void printRegistrationMenu(){
         Scanner scanner = new Scanner(System.in);
-        Console console = System.console(); // to read a password without displaying the input
+        Console console = System.console();
 
         try {
             System.out.println("Please enter your e-mail address: ");
@@ -133,7 +133,7 @@ public class LoginView implements View {
             System.out.println("Please enter your password(1 uppercase letter,1 lowercase letter,1 number): ");
             if(console != null) {
                 char[] passwordChars = console.readPassword();
-                password = String.valueOf(passwordChars);
+                password = new String(passwordChars);
             }else{
                 password = scanner.nextLine();
             }
@@ -160,13 +160,18 @@ public class LoginView implements View {
 
     }
     private void openCustomerView(Customer customer){
-        System.out.println("Welcome " +customer.getUsername());
+        System.out.println("Welcome, " +customer.getUsername());
         CustomerController customerController = new CustomerController(customer.getEmail());
         View customerView = new CustomerView(customerController);
         customerView.getChoice();
 
     }
 
+    @Override
+    public void printExceptionMessage(String message) {
+        System.err.println(message);
+        accountCreationChoice();
+    }
 
 
 }

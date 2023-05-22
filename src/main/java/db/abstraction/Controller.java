@@ -14,6 +14,7 @@ public abstract class Controller {
 
     public void transmitException(Exception e, Level SeverityLevel,String message){
         logException(e,SeverityLevel,message);
+        getView().printExceptionMessage(message);
 
     }
 
