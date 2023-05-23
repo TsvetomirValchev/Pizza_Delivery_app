@@ -62,7 +62,8 @@ public class DrinkDAO extends DAO<Drink>{
     @Override
     String buildUpdateQuery(int variableIndex) {
        Map<Integer, String> columnMap = Map.of(
-                1, "isDiet"
+               1,"product_id",
+               2, "isDiet"
         );
         String columnName = columnMap.get(variableIndex);
         return "UPDATE " + this.tableName + " SET " + columnName + "=? WHERE product_id=?";

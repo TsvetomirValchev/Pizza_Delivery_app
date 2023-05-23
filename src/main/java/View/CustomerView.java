@@ -28,6 +28,7 @@ public class CustomerView implements View {
         System.out.println("3. View all desserts");
         System.out.println("4. Place an order");
         System.out.println("5. Check current order details");
+        System.out.println("6. Mark your order as received");
         System.out.println("0. Exit");
 
     }
@@ -46,6 +47,7 @@ public class CustomerView implements View {
                 case 3 -> printAllDesserts();
                 case 4 -> placeAnOrderMenu();
                 case 5 -> printCurrentOrderDetails(); //TODO: make it print the total cost of the order somehow
+                case 6 -> markOrderAsReceived();
                 case 0-> System.out.println("Exiting..");
                 default -> System.err.println("Enter a valid option!");
             }
@@ -56,15 +58,40 @@ public class CustomerView implements View {
 
     }
 
+    private void markOrderAsReceived(){
+        try {
+            Scanner scanner = new Scanner(System.in);
+
+            System.out.println("Is the order received?");
+            System.out.println("1.Yes\n2.No");
+            int choice = scanner.nextInt();
+
+            switch (choice){
+                case 1 -> {
+                    customerController.markOrderAsComplete();
+                    System.out.println("Order has been received...");
+                    getChoice();
+                }
+                case 2 -> getChoice();
+            }
+
+        }catch (InputMismatchException e) {
+            LOGGER.warning(e.getMessage());
+            System.err.println("Please select one of the options");
+            markOrderAsReceived();
+
+        }
+
+    }
     private void placeAnOrderMenu(){
         try{
-            Scanner scan = new Scanner(System.in);
+            Scanner scanner = new Scanner(System.in);
 
             printAllProductsInTheRestaurant();
             printSeparator(100);
 
             System.out.println("Enter the ID of the product you wish to order:  ");
-            int productId = scan.nextInt();
+            int productId = scanner.nextInt();
 
             if (customerController.placeAnOrder(productId)) {
                 System.out.println("Product has been added to your order");
@@ -79,7 +106,7 @@ public class CustomerView implements View {
     private void printCurrentOrderDetails(){
         System.out.println("All products in your order:");
         customerController.GetAllProductsInCurrentOrder().forEach(System.out::println);
-
+        System.out.println("Order total: " + customerController.calculateCurrentOrderTotal());
     }
 
 

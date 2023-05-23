@@ -43,7 +43,7 @@ private final Addon addon;
 
     @Override
     public String toString() {
-        return  getId()+"."+
+        return   "№"+getId()+"."+
                 getName() +" pizza \ningredients:" +" "+
                 getSauce().getName()+","+
                 getCheese().getName()+","+

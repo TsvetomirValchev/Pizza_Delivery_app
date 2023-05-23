@@ -4,7 +4,6 @@ import Products.Pizza;
 import Products.PizzaIngredient.*;
 import Products.PizzaIngredient.abstraction.PizzaIngredient;
 
-
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -107,12 +106,7 @@ public class PizzaDAO extends DAO<Pizza>{
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         switch (variableIndex) {
-            case 1-> statement.setInt(1, (Integer) updatedValue);
-            case 2 -> statement.setInt(2, (Integer) updatedValue);
-            case 3 -> statement.setInt(3, (Integer) updatedValue);
-            case 4 -> statement.setInt(4,(Integer) updatedValue);
-            case 5 -> statement.setInt(5, (Integer) updatedValue);
-            case 6 -> statement.setInt(6, (Integer) updatedValue);
+            case 1,2,3,4,5,6-> statement.setInt(1, (Integer) updatedValue);
         }
     }
 

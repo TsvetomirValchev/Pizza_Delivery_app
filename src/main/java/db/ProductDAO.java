@@ -19,7 +19,6 @@ public class ProductDAO extends DAO<Product>{
                 +"VALUES(?, ?, ?)";
     }
 
-
     @Override
     protected void setValues(PreparedStatement statement, Object object) throws SQLException {
         if (object instanceof Product product) {

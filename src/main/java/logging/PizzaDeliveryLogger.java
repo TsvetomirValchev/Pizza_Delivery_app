@@ -11,7 +11,7 @@ import java.util.logging.SimpleFormatter;
 public class PizzaDeliveryLogger {
     private static FileHandler fileHandler;
     private static final Path logFilePath = Paths.get("errors.log");
-
+    //Static initialization block that runs before the main method.
     static {
         try {
             fileHandler = new FileHandler(logFilePath.toString(), true);
@@ -29,7 +29,6 @@ public class PizzaDeliveryLogger {
             System.err.println(e + "Logger couldn't access file!");
         }
     }
-
     public static Logger getLogger(String className) {
         Logger logger = Logger.getLogger(className);
         logger.addHandler(fileHandler);

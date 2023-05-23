@@ -28,10 +28,7 @@ public class AdminController extends Controller {
     private static final DAO<Drink> drinkDAO = new DrinkDAO();
     private static final DAO<Dessert> dessertDAO = new DessertDAO();
     private static final DAO<Customer> customerDAO = new CustomerDAO();
-
     private static final OrderDAO orderDAO = new OrderDAO();
-
-
     private final AdminView adminView = new AdminView(this);
     private final Admin adminModel;
 
@@ -48,7 +45,6 @@ public class AdminController extends Controller {
         }
         return Collections.emptyMap();
     }
-
 
     public Map<Integer, Drink> getAllDrinks() {
         try {
@@ -82,8 +78,6 @@ public class AdminController extends Controller {
         addProduct(productId,name,price);
         addPizza(productId, name, price, size, cheese, meat, sauce, addon);
     }
-
-
 
     public Map<Integer, Customer> getAllCustomers() {
         try {
@@ -137,7 +131,6 @@ public class AdminController extends Controller {
 
 
     //utils
-
     public void addProduct(int productId,String name, double price) {
         try {
             Product product = new Product(productId, name, price);
@@ -146,8 +139,6 @@ public class AdminController extends Controller {
             transmitException(e, Level.SEVERE, "Couldn't add pizza!");
         }
     }
-
-
 
     public void addPizza(int productId,String name, double price, Size size, Cheese cheese, Meat meat, Sauce sauce, Addon addon) {
         try {
@@ -214,11 +205,10 @@ public class AdminController extends Controller {
             }
             else
             {
-            drinkDAO.delete(productId);
-            productDAO.delete(productId);
-            System.out.println("Drink removed successfully!");
+                drinkDAO.delete(productId);
+                productDAO.delete(productId);
+                System.out.println("Drink removed successfully!");
             }
-
         } catch (SQLException e) {
             if (e instanceof SQLDataException){
                 transmitException(e,Level.WARNING,e.getMessage());

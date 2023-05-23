@@ -57,16 +57,28 @@ public class CustomerController extends Controller {
                 transmitException(new IllegalArgumentException(), Level.WARNING, "Product with ID '" + productId + "' not found!");
                 return false;
             }
-            orderDAO.create(new Order(null,
-                    getCustomerAccount().getId(),
-                    LocalDateTime.now(),
-                    Optional.empty()));
+            if (!isUserCurrentlyWaitingDelivery()) {
+                orderDAO.create(new Order(null,
+                        getCustomerAccount().getId(),
+                        LocalDateTime.now(),
+                        Optional.empty()));
+            }
             addProductToOrderCart(productId);
             return true;
+
         }catch (SQLException e){
             transmitException(e, Level.SEVERE , "Couldn't place an order!");
         }
         return false;
+    }
+
+
+    public double calculateCurrentOrderTotal(){
+        double orderTotal = 0;
+        for (Product product: GetAllProductsInCurrentOrder()){
+            orderTotal += product.getPrice();
+        }
+        return orderTotal;
     }
 
     public List<Product> GetAllProductsInCurrentOrder(){
@@ -96,12 +108,8 @@ public class CustomerController extends Controller {
     public void markOrderAsComplete(){
         try{
             if (isUserCurrentlyWaitingDelivery()) {
-                for (Order o : orderDAO.readAll().values()) {
-                    if (getCustomerAccount().getId() == o.getCustomerId() && o.getDeliveredAt().isEmpty()) {
-                        orderDAO.update(o.getId(), 3, LocalDateTime.now());
-                        break;
-                    }
-                }
+                orderDAO.update(getCurrentOrderIdByCustomerId(getCustomerAccount().getId()),4,LocalDateTime.now());
+
             } else {
                 transmitException(new IllegalStateException(),Level.WARNING,"You are not expecting delivery!");
             }

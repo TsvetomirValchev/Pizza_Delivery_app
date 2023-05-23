@@ -49,10 +49,7 @@ public class CustomerDAO extends DAO<Customer>{
     @Override
     protected void setUpdatedValues(PreparedStatement statement, int propertyIndex, Object updatedValue) throws SQLException {
         switch (propertyIndex) {
-            case 1 -> statement.setString(1, (String) updatedValue);
-            case 2 -> statement.setString(2, (String) updatedValue);
-            case 3 -> statement.setString(3, (String) updatedValue);
-            case 4 -> statement.setString(4, (String) updatedValue);
+            case 1,2,3,4 -> statement.setString(1, (String) updatedValue);
         }
     }
 

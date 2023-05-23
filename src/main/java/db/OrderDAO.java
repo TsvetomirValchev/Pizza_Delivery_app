@@ -55,9 +55,10 @@ public class OrderDAO extends DAO<Order>{
     @Override
     String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(
-                1, "customer_id",
-                2, "ordered_at",
-                3, "delivered_at"
+                1,"id",
+                2, "customer_id",
+                3, "ordered_at",
+                4, "delivered_at"
         );
         String columnName = columnMap.get(variableIndex);
         return "UPDATE " + tableName + " SET " + columnName + "=? WHERE " + tablePrimaryKey + "=?";
@@ -67,9 +68,9 @@ public class OrderDAO extends DAO<Order>{
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         switch (variableIndex){
-            case 1-> statement.setInt(1,(Integer) updatedValue);
-            case 2 -> statement.setTimestamp(2, Timestamp.valueOf((LocalDateTime) updatedValue));
-            case 3 -> statement.setTimestamp(3, Timestamp.valueOf((LocalDateTime) updatedValue));
+            case 1,2-> statement.setInt(1,(Integer) updatedValue);
+            case 3,4 -> statement.setTimestamp(1, Timestamp.valueOf((LocalDateTime) updatedValue));
+
         }
     }
 
@@ -78,6 +79,8 @@ public class OrderDAO extends DAO<Order>{
         return object.getId();
     }
 
+
+    //utils for order_item
     public List<Product> getAllProductsInOrder(int OrderId) throws SQLException {
         String query = "SELECT product_id, name, price FROM order_item " +
                 "JOIN orders ON order_id = orders.id " +
@@ -101,8 +104,8 @@ public class OrderDAO extends DAO<Order>{
     public List<Order> getOrderByProductId(int productId) throws SQLException {
         String query = "SELECT order_id,customer_id,ordered_at,delivered_at FROM order_item " +
                 "JOIN orders ON order_id = orders.id " +
-                "JOIN product p on p.id = order_item.product_id" +
-                " WHERE product_id = " + productId ;
+                "JOIN product p on p.id = order_item.product_id " +
+                "WHERE product_id = " + productId ;
 
         List<Order> allOrdersWithProductInThem = new ArrayList<>();
         try (Connection connection = getConnection();
@@ -132,8 +135,8 @@ public class OrderDAO extends DAO<Order>{
         try (Connection connection = getConnection();
                 PreparedStatement statement = connection.prepareStatement(query))
              {
-                statement.setInt(1, productId);
-                statement.setInt(2, orderId);
+                statement.setInt(1, orderId);
+                statement.setInt(2, productId);
                 statement.executeUpdate();
             }
 
