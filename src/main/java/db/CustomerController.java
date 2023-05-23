@@ -50,7 +50,6 @@ public class CustomerController extends Controller {
         }
         return null;
     }
-
     public boolean placeAnOrder(int productId){
         try {
             if (getProductByID(productId) == null) {
@@ -71,7 +70,13 @@ public class CustomerController extends Controller {
         }
         return false;
     }
-
+    private void addProductToOrderCart(int productId){
+        try {
+            orderDAO.InsertInOrderItemTable(productId, getCurrentOrderIdByCustomerId(getCustomerAccount().getId()));
+        }catch (SQLException e){
+            transmitException(e, Level.SEVERE, "Couldn't add product to cart!");
+        }
+    }
 
     public double calculateCurrentOrderTotal(){
         double orderTotal = 0;
@@ -94,15 +99,6 @@ public class CustomerController extends Controller {
                 transmitException(e, Level.SEVERE, "Couldn't display your order details!");
             }
             return Collections.emptyList();
-    }
-
-
-    private void addProductToOrderCart(int productId){
-        try {
-            orderDAO.InsertInOrderItemTable(productId, getCurrentOrderIdByCustomerId(getCustomerAccount().getId()));
-        }catch (SQLException e){
-            transmitException(e, Level.SEVERE, "Couldn't add product to cart!");
-        }
     }
 
     public void markOrderAsComplete(){
@@ -146,6 +142,7 @@ public class CustomerController extends Controller {
         return Collections.emptyList();
     }
 
+    //utils
     private int getCurrentOrderIdByCustomerId(int customerId) {
         try {
             for (Order order : orderDAO.readAll().values()) {

@@ -131,7 +131,7 @@ public class AdminController extends Controller {
 
 
     //utils
-    public void addProduct(int productId,String name, double price) {
+    private void addProduct(int productId,String name, double price) {
         try {
             Product product = new Product(productId, name, price);
             productDAO.create(product);
@@ -140,7 +140,7 @@ public class AdminController extends Controller {
         }
     }
 
-    public void addPizza(int productId,String name, double price, Size size, Cheese cheese, Meat meat, Sauce sauce, Addon addon) {
+    private void addPizza(int productId,String name, double price, Size size, Cheese cheese, Meat meat, Sauce sauce, Addon addon) {
         try {
             Pizza pizza = new Pizza(productId, name, price, size, cheese, meat, sauce, addon);
             pizzaDAO.create(pizza);
