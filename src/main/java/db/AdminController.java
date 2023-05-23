@@ -178,7 +178,7 @@ public class AdminController extends Controller {
         }
     }
 
-    public void addDrink(int productId,String name, double price, boolean isDiet) {
+    private void addDrink(int productId,String name, double price, boolean isDiet) {
         try {
             Drink drink = new Drink(productId, name, price, isDiet);
             drinkDAO.create(drink);
@@ -217,7 +217,7 @@ public class AdminController extends Controller {
             }
         }
     }
-    public void addDessert(int productId,String name, double price, boolean isVegan) {
+    private void addDessert(int productId,String name, double price, boolean isVegan) {
         try {
             Dessert dessert = new Dessert(productId, name, price, isVegan);
             dessertDAO.create(dessert);
