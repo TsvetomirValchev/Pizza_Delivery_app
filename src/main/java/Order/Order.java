@@ -7,13 +7,12 @@ public class Order{
     private final Integer id;
     private final int customerId;
 
-    private final LocalDateTime orderedAt;
+    private final Optional<LocalDateTime>  orderedAt;
     private final Optional<LocalDateTime> deliveredAt;
 
-    public Order(Integer id, int customerId,LocalDateTime orderedAt, Optional<LocalDateTime> deliveredAt) {
+    public Order(Integer id, int customerId, Optional<LocalDateTime>  orderedAt, Optional<LocalDateTime> deliveredAt) {
         this.id = id;
         this.customerId = customerId;
-
         this.orderedAt = orderedAt;
         this.deliveredAt = deliveredAt;
     }
@@ -26,9 +25,7 @@ public class Order{
         return customerId;
     }
 
-
-
-    public LocalDateTime getOrderedAt() {
+    public Optional<LocalDateTime>  getOrderedAt() {
         return orderedAt;
     }
 
@@ -41,7 +38,7 @@ public class Order{
 
         return "Order #"+getId()
                 +" for:" +getCustomerId()
-                +" Ordered at: " + getOrderedAt()
+                +" Ordered at: " + getOrderedAt().orElse(null)
                 +" Delivered at: " + getDeliveredAt().orElse(null);
 
 

@@ -1,7 +1,5 @@
 package View;
 
-
-
 import View.abstraction.View;
 import db.CustomerController;
 import logging.PizzaDeliveryLogger;
@@ -45,9 +43,9 @@ public class CustomerView implements View {
                 case 1 -> printAllPizzas();
                 case 2 -> printAllDrinks();
                 case 3 -> printAllDesserts();
-                case 4 -> placeAnOrderMenu();
-                case 5 -> printCurrentOrderDetails(); //TODO: make it print the total cost of the order somehow
-                case 6 -> markOrderAsReceived();
+                case 4 -> AddAProductToShoppingCartMenu();
+                case 5 -> printCurrentOrderDetails();
+                case 6 -> markOrderAsReceivedMenu();
                 case 0-> System.out.println("Exiting..");
                 default -> System.err.println("Enter a valid option!");
             }
@@ -58,7 +56,7 @@ public class CustomerView implements View {
 
     }
 
-    private void markOrderAsReceived(){
+    private void markOrderAsReceivedMenu(){
         try {
             Scanner scanner = new Scanner(System.in);
 
@@ -68,8 +66,8 @@ public class CustomerView implements View {
 
             switch (choice){
                 case 1 -> {
-                    customerController.markOrderAsComplete();
-                    System.out.println("Order has been received...");
+                    customerController.markOrderAsReceived();
+                    System.out.println("Order has been delivered, thank you for choosing our restaurant!");
                     getChoice();
                 }
                 case 2 -> getChoice();
@@ -78,29 +76,57 @@ public class CustomerView implements View {
         }catch (InputMismatchException e) {
             LOGGER.warning(e.getMessage());
             System.err.println("Please select one of the options");
-            markOrderAsReceived();
+            markOrderAsReceivedMenu();
 
         }
 
     }
-    private void placeAnOrderMenu(){
+
+    private void AddAProductToShoppingCartMenu(){
         try{
             Scanner scanner = new Scanner(System.in);
 
             printAllProductsInTheRestaurant();
             printSeparator(100);
 
-            System.out.println("Enter the ID of the product you wish to order:  ");
+            System.out.println("Enter the ID of the product you wish to add to your cart:  ");
             int productId = scanner.nextInt();
 
             if (customerController.placeAnOrder(productId)) {
                 System.out.println("Product has been added to your order");
             }
+            markOrderAsFinalizedMenu();
         }catch (InputMismatchException e){
             LOGGER.warning(e.getMessage());
             System.err.println("Invalid input format!");
-            placeAnOrderMenu();
+            AddAProductToShoppingCartMenu();
         }
+    }
+
+    private void markOrderAsFinalizedMenu(){
+        try {
+            Scanner scanner = new Scanner(System.in);
+
+            System.out.println("Is the order finalized?");
+            System.out.println("1.Yes\n2.No");
+            int choice = scanner.nextInt();
+
+            switch (choice){
+                case 1 -> {
+                    customerController.markOrderAsFinalized();
+                    System.out.println("Order has been finalized and is waiting for delivery...");
+                    getChoice();
+                }
+                case 2 -> getChoice();
+            }
+
+        }catch (InputMismatchException e) {
+            LOGGER.warning(e.getMessage());
+            System.err.println("Please select one of the options");
+            markOrderAsReceivedMenu();
+
+        }
+
     }
 
     private void printCurrentOrderDetails(){

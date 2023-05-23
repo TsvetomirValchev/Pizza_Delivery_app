@@ -56,14 +56,19 @@ public class CustomerController extends Controller {
                 transmitException(new IllegalArgumentException(), Level.WARNING, "Product with ID '" + productId + "' not found!");
                 return false;
             }
-            if (!isUserCurrentlyWaitingDelivery()) {
+            if (isOrderFinalized()) {
                 orderDAO.create(new Order(null,
                         getCustomerAccount().getId(),
-                        LocalDateTime.now(),
+                       Optional.empty(),
                         Optional.empty()));
             }
-            addProductToOrderCart(productId);
-            return true;
+            if(!isOrderFinalized())
+            {
+                addProductToOrderCart(productId);
+                return true;
+            }else {
+                transmitException(new IllegalArgumentException() , Level.WARNING, "You cannot add a product to an order that is already waiting for delivery!");
+            }
 
         }catch (SQLException e){
             transmitException(e, Level.SEVERE , "Couldn't place an order!");
@@ -78,12 +83,12 @@ public class CustomerController extends Controller {
         }
     }
 
-    public double calculateCurrentOrderTotal(){
+    public String calculateCurrentOrderTotal(){
         double orderTotal = 0;
         for (Product product: GetAllProductsInCurrentOrder()){
             orderTotal += product.getPrice();
         }
-        return orderTotal;
+        return orderTotal+" BGN";
     }
 
     public List<Product> GetAllProductsInCurrentOrder(){
@@ -101,13 +106,26 @@ public class CustomerController extends Controller {
             return Collections.emptyList();
     }
 
-    public void markOrderAsComplete(){
+    public void markOrderAsReceived(){
         try{
             if (isUserCurrentlyWaitingDelivery()) {
                 orderDAO.update(getCurrentOrderIdByCustomerId(getCustomerAccount().getId()),4,LocalDateTime.now());
 
             } else {
                 transmitException(new IllegalStateException(),Level.WARNING,"You are not expecting delivery!");
+            }
+        }catch (SQLException e){
+            transmitException(e,Level.SEVERE,"Couldn't update order status!");
+        }
+
+    }
+
+    public void markOrderAsFinalized(){
+        try{
+            if (!isOrderFinalized()) {
+                orderDAO.update(getCurrentOrderIdByCustomerId(getCustomerAccount().getId()),3,LocalDateTime.now());
+            } else {
+                transmitException(new IllegalStateException(),Level.WARNING,"You do not have an order to finalize!");
             }
         }catch (SQLException e){
             transmitException(e,Level.SEVERE,"Couldn't update order status!");
@@ -169,7 +187,6 @@ public class CustomerController extends Controller {
         return null;
     }
 
-
     private boolean isUserCurrentlyWaitingDelivery() {
         try {
             for (Order order : orderDAO.readAll().values()) {
@@ -183,6 +200,18 @@ public class CustomerController extends Controller {
         return false;
     }
 
+    private boolean isOrderFinalized(){
+        try {
+            for (Order order : orderDAO.readAll().values()) {
+                if (order.getCustomerId()==(getCustomerAccount().getId()) && order.getOrderedAt().isEmpty()) {
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            transmitException(e,Level.SEVERE,"Couldn't load order details!");
+        }
+        return true;
+    }
 
 
 

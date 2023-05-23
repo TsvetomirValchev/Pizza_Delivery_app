@@ -27,7 +27,11 @@ public class OrderDAO extends DAO<Order>{
     protected void setValues(PreparedStatement statement, Object object) throws SQLException {
         if (object instanceof Order order) {
             statement.setInt(1, order.getCustomerId());
-            statement.setTimestamp(2, Timestamp.valueOf(order.getOrderedAt()));
+            if (order.getOrderedAt().isPresent()) {
+                statement.setTimestamp(2, Timestamp.valueOf(order.getOrderedAt().get()));
+            } else {
+                statement.setNull(2, Types.TIMESTAMP);
+            }
             if (order.getDeliveredAt().isPresent()) {
                 statement.setTimestamp(3, Timestamp.valueOf(order.getDeliveredAt().get()));
             } else {
@@ -38,16 +42,13 @@ public class OrderDAO extends DAO<Order>{
 
     @Override
     protected Order mapReadResultSetToObject(ResultSet resultSet) throws SQLException {
-        LocalDateTime deliveryTime = null;
-        Timestamp deliveryTimestamp = resultSet.getTimestamp("delivered_at");
-        if (deliveryTimestamp != null){
-            deliveryTime = deliveryTimestamp.toLocalDateTime();
-        }
+        LocalDateTime deliveryTime = getLocalDateTimeFromTimestamp(resultSet.getTimestamp("delivered_at"));
+        LocalDateTime orderedAtTime = getLocalDateTimeFromTimestamp(resultSet.getTimestamp("ordered_at"));
 
         return new Order(
                 resultSet.getInt("id"),
                 resultSet.getInt("customer_id"),
-                resultSet.getTimestamp("ordered_at").toLocalDateTime(),
+                Optional.ofNullable(orderedAtTime),
                 Optional.ofNullable(deliveryTime)
         );
     }
@@ -102,33 +103,32 @@ public class OrderDAO extends DAO<Order>{
     }
 
     public List<Order> getOrderByProductId(int productId) throws SQLException {
-        String query = "SELECT order_id,customer_id,ordered_at,delivered_at FROM order_item " +
+        String query = "SELECT order_id, customer_id, ordered_at, delivered_at FROM order_item " +
                 "JOIN orders ON order_id = orders.id " +
-                "JOIN product p on p.id = order_item.product_id " +
-                "WHERE product_id = " + productId ;
+                "JOIN product p ON p.id = order_item.product_id " +
+                "WHERE product_id = " + productId;
 
         List<Order> allOrdersWithProductInThem = new ArrayList<>();
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
-                LocalDateTime deliveryTime = null;
-                Timestamp deliveryTimestamp = resultSet.getTimestamp("delivered_at");
-
-                if (deliveryTimestamp != null){
-                    deliveryTime = deliveryTimestamp.toLocalDateTime();
-                }
+                LocalDateTime deliveryTime = getLocalDateTimeFromTimestamp(resultSet.getTimestamp("delivered_at"));
+                LocalDateTime orderedAtTime = getLocalDateTimeFromTimestamp(resultSet.getTimestamp("ordered_at"));
 
                 allOrdersWithProductInThem.add(new Order(
                         resultSet.getInt("order_id"),
                         resultSet.getInt("customer_id"),
-                        resultSet.getTimestamp("ordered_at").toLocalDateTime(),
+                        Optional.ofNullable(orderedAtTime),
                         Optional.ofNullable(deliveryTime)));
             }
         }
         return allOrdersWithProductInThem;
     }
 
+    private LocalDateTime getLocalDateTimeFromTimestamp(Timestamp timestamp) {
+        return (timestamp != null) ? timestamp.toLocalDateTime() : null;
+    }
 
     public void InsertInOrderItemTable(int productId, int orderId) throws SQLException {
         String query = "INSERT INTO order_item(order_id, product_id) VALUES(? , ?)";

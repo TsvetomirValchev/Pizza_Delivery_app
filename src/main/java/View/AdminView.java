@@ -28,6 +28,8 @@ public class AdminView implements View {
         System.out.println("1. Add a new product to the menu");
         System.out.println("2. Delete a product from the menu");
         System.out.println("3. Delete a customer's account");
+        System.out.println("4. View all products offered by the restaurant");
+        System.out.println("5. View all customers");
         System.out.println("0. Exit");
     }
 
@@ -43,6 +45,8 @@ public class AdminView implements View {
                 case 1 -> addAProductMenu();
                 case 2 -> deleteAProductMenu();
                 case 3 -> deleteAccountMenu();
+                case 4 -> readAllProductsInTheRestaurant();
+                case 5 -> readAllCustomers();
                 case 0-> System.out.println("Exiting..");
                 default -> System.err.println("Enter a valid option!");
             }
@@ -141,7 +145,7 @@ public class AdminView implements View {
         try{
             Scanner scanner = new Scanner(System.in);
             Product product = createAProductMenu();
-            System.out.println("Is the drink dessert vegan?");
+            System.out.println("Is the dessert vegan?");
             boolean vegan = scanner.nextBoolean();
             adminController.createDessertProduct(product.getId(), product.getName(), product.getPrice(),vegan);
 
@@ -242,7 +246,6 @@ public class AdminView implements View {
 
     private void deleteAPizzaMenu(){
         try {
-
             readAllPizzas();
             printSeparator(100);
             Scanner scanner = new Scanner(System.in);
@@ -328,6 +331,16 @@ public class AdminView implements View {
                 .stream()
                 .sorted(Comparator.comparing(Product::getId))
                 .forEach(System.out::println);
+    }
+
+    private void readAllProductsInTheRestaurant(){
+        readAllPizzas();
+        printSeparator(100);
+        readAllDrinks();
+        printSeparator(100);
+        readAllDesserts();
+
+
     }
 
     @Override

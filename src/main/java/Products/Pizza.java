@@ -48,7 +48,7 @@ private final Addon addon;
                 getSauce().getName()+","+
                 getCheese().getName()+","+
                 getMeat().getName()+","+
-                getAddon().getName()+","+
+                getAddon().getName()+
                 "\ncosts:" +getPrice()+" BGN";
     }
 }

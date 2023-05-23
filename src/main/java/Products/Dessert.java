@@ -16,7 +16,7 @@ public class Dessert extends Product{
     @Override
     public String toString() {
         String vegan = isVegan ? "Vegan " : "";
-        return   "№"+getId()+"."+
-                vegan + getName()+ " cost: "+getPrice();
+        return   "№"+getId()+" "+
+                vegan + getName()+ " cost: "+getPrice()+ " BGN";
     }
 }

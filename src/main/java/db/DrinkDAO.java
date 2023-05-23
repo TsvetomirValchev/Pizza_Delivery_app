@@ -71,9 +71,9 @@ public class DrinkDAO extends DAO<Drink>{
 
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
-        if (variableIndex == 1) {
-            statement.setBoolean(1, (Boolean) updatedValue);
+        switch (variableIndex) {
+            case 1 -> statement.setInt(1, (Integer) updatedValue);
+            case 2 -> statement.setBoolean(1,(boolean) updatedValue);
         }
-        else System.out.println("The only thing you can update is the isSugarFree value");
     }
 }

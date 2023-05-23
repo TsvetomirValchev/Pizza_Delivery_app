@@ -15,7 +15,7 @@ private final boolean isDiet;
     @Override
     public String toString() {
         String isDiet = this.isDiet ? "Diet " : "";
-        return  "№"+getId()+"."+
-                isDiet + getName()+ " cost: "+getPrice();
+        return  "№"+getId()+" "+
+                isDiet + getName()+ " cost: "+getPrice()+ " BGN";
     }
 }

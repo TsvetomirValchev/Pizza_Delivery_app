@@ -33,14 +33,14 @@ public class DessertDAO extends DAO<Dessert>{
     }
     @Override
     protected String buildInsertQuery(Object object) {
-        return "INSERT INTO " + this.tableName + "(isVegan) VALUES(?)";
+        return "INSERT INTO " + this.tableName + "(product_id, isVegan) VALUES(?, ?)";
     }
 
     @Override
     protected void setValues(PreparedStatement statement, Object object) throws SQLException {
         if(object instanceof Dessert dessert){
-            statement.setInt(1,dessert.getId());
-            statement.setBoolean(2,dessert.isVegan());
+            statement.setInt(1, dessert.getId());
+            statement.setBoolean(2, dessert.isVegan());
         }
     }
 
@@ -71,10 +71,9 @@ public class DessertDAO extends DAO<Dessert>{
 
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
-        if (variableIndex == 1) {
-            statement.setInt(1, (Integer) updatedValue);
-            statement.setBoolean(2, (boolean) updatedValue);
-        }
-        else System.out.println("The only thing you can update is the isVegan value");
+            switch (variableIndex) {
+              case 1 ->  statement.setInt(1, (Integer) updatedValue);
+              case 2 ->  statement.setBoolean(1, (boolean) updatedValue);
+            }
     }
 }
