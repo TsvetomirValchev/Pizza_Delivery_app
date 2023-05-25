@@ -28,8 +28,7 @@ public class Customer extends User{
 
     @Override
     public String toString() {
-        return "| Account id:"+getId()
-                +" | username: "+ getUsername()
+        return   " | username: "+ getUsername()
                 +" | e-mail: " + getEmail()
                 +" | delivery address: "+ getAddress()+" |";
     }

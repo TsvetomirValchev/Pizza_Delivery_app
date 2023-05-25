@@ -56,7 +56,7 @@ public class AdminView implements View {
         }while (choice!=0);
     }
 
-    public void deleteAccountMenu(){
+    private void deleteAccountMenu(){
            try {
                readAllCustomers();
                printSeparator(100);
@@ -334,10 +334,13 @@ public class AdminView implements View {
     }
 
     private void readAllProductsInTheRestaurant(){
+        System.out.println("All pizzas in the restaurant:\n");
         readAllPizzas();
         printSeparator(100);
+        System.out.println("All drinks in the restaurant:\n");
         readAllDrinks();
         printSeparator(100);
+        System.out.println("All desserts in the restaurant:\n");
         readAllDesserts();
 
 
