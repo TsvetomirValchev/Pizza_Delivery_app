@@ -7,7 +7,7 @@ This is the most recent schema of the database:
 
 There are 2 types of users in the app
 
-*Admins* - admins can make new entries for products(pizzas, drinks, desserts). When making a pizza they can select from predefined number of ingredients.
-They can also delete customer's accounts and products.
+*Admins* - admins can make new entries for products(pizzas, drinks, desserts). When making a pizza they can select from predefined number of ingredients. (admins cannot add new ingredients)
+They can also view/delete customer's accounts and products.
 
 *Customers* - They can view all the products of the restaurant and then choose what products they want to order. They can also view details of their current order such as what products are in it and how much is the total cost.
