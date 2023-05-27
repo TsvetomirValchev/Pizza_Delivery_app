@@ -6,9 +6,7 @@ import Products.Drink;
 import Products.Pizza;
 import Products.Product;
 import Users.Customer;
-import View.abstraction.View;
-import View.CustomerView;
-import db.abstraction.Controller;
+import logging.PizzaDeliveryLogger;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -17,48 +15,33 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class CustomerController extends Controller {
+public class CustomerService {
 
+    private static final Logger LOGGER = PizzaDeliveryLogger.getLogger(CustomerService.class.getName());
     private static final DAO<Pizza> pizzaDAO = new PizzaDAO();
     private static final DAO<Dessert> dessertDAO = new DessertDAO();
     private static final DAO<Drink> drinkDAO = new DrinkDAO();
     private static final DAO<Product> productDAO = new ProductDAO();
     private static final OrderDAO orderDAO = new OrderDAO();
     private static final DAO<Customer> customerDAO = new CustomerDAO();
-    private final CustomerView customerView = new CustomerView(this);
-    private final String customerEmail;
+    private final Customer customer;
 
-    public CustomerController(String customerEmail){
-        this.customerEmail = customerEmail;
+    public CustomerService(Customer customer){
+        this.customer = customer;
     }
 
-    @Override
-    protected View getView() {
-        return customerView;
-    }
 
-    public Customer getCustomerAccount() {
-        try {
-            for(Customer c: customerDAO.readAll().values()){
-                if(c.getEmail().equals(customerEmail)){
-                    return c;
-                }
-            }
-        } catch (SQLException e) {
-            transmitException(e, Level.SEVERE,"Couldn't find account!");
-        }
-        return null;
-    }
     public boolean placeAnOrder(int productId){
         try {
             if (getProductByID(productId) == null) {
-                transmitException(new IllegalArgumentException(), Level.WARNING, "Product with ID '" + productId + "' not found!");
+                LOGGER.log(Level.WARNING,"There is no product with such id");
                 return false;
             }
             if (isOrderFinalized()) {
                 orderDAO.create(new Order(null,
-                        getCustomerAccount().getId(),
+                        customer.getId(),
                        Optional.empty(),
                         Optional.empty()));
             }
@@ -67,19 +50,19 @@ public class CustomerController extends Controller {
                 addProductToOrderCart(productId);
                 return true;
             }else {
-                transmitException(new IllegalArgumentException() , Level.WARNING, "You cannot add a product to an order that is already waiting for delivery!");
+                LOGGER.log(Level.WARNING, "You cannot add a product to an order that is already waiting for delivery!");
             }
 
         }catch (SQLException e){
-            transmitException(e, Level.SEVERE , "Couldn't place an order!");
+            LOGGER.log(Level.SEVERE , "Couldn't place an order!");
         }
         return false;
     }
     private void addProductToOrderCart(int productId){
         try {
-            orderDAO.InsertInOrderItemTable(productId, getCurrentOrderIdByCustomerId(getCustomerAccount().getId()));
+            orderDAO.InsertInOrderItemTable(productId, getCurrentOrderIdByCustomerId(customer.getId()));
         }catch (SQLException e){
-            transmitException(e, Level.SEVERE, "Couldn't add product to cart!");
+            LOGGER.log(Level.SEVERE, "Couldn't add product to cart!");
         }
     }
 
@@ -95,13 +78,13 @@ public class CustomerController extends Controller {
             try{
                 return new ArrayList<>(
                         orderDAO.getAllProductsInOrder
-                                (getCurrentOrderIdByCustomerId(getCustomerAccount().getId())
+                                (getCurrentOrderIdByCustomerId(customer.getId())
                         )
                 );
             }
             catch (SQLException e)
             {
-                transmitException(e, Level.SEVERE, "Couldn't display your order details!");
+                LOGGER.log(Level.SEVERE, "Couldn't get all product in the order cart!");
             }
             return Collections.emptyList();
     }
@@ -109,13 +92,13 @@ public class CustomerController extends Controller {
     public void markOrderAsReceived(){
         try{
             if (isUserCurrentlyWaitingDelivery()) {
-                orderDAO.update(getCurrentOrderIdByCustomerId(getCustomerAccount().getId()),4,LocalDateTime.now());
+                orderDAO.update(getCurrentOrderIdByCustomerId(customer.getId()),4,LocalDateTime.now());
 
             } else {
-                transmitException(new IllegalStateException(),Level.WARNING,"You are not expecting delivery!");
+                LOGGER.log(Level.WARNING,"You are not expecting delivery!");
             }
         }catch (SQLException e){
-            transmitException(e,Level.SEVERE,"Couldn't update order status!");
+            LOGGER.log(Level.SEVERE,"Couldn't update order status!");
         }
 
     }
@@ -123,12 +106,12 @@ public class CustomerController extends Controller {
     public void markOrderAsFinalized(){
         try{
             if (!isOrderFinalized()) {
-                orderDAO.update(getCurrentOrderIdByCustomerId(getCustomerAccount().getId()),3,LocalDateTime.now());
+                orderDAO.update(getCurrentOrderIdByCustomerId(customer.getId()),3,LocalDateTime.now());
             } else {
-                transmitException(new IllegalStateException(),Level.WARNING,"You do not have an order to finalize!");
+                LOGGER.log(Level.WARNING,"You do not have an order to finalize!");
             }
         }catch (SQLException e){
-            transmitException(e,Level.SEVERE,"Couldn't update order status!");
+            LOGGER.log(Level.SEVERE,"Couldn't update order status!");
         }
 
     }
@@ -137,7 +120,7 @@ public class CustomerController extends Controller {
         try {
             return new ArrayList<>(pizzaDAO.readAll().values());
         } catch (SQLException e) {
-            transmitException(e,Level.SEVERE,"Couldn't load pizza list!");
+            LOGGER.log(Level.SEVERE,"Couldn't load pizza list!");
         }
         return Collections.emptyList();
     }
@@ -146,7 +129,7 @@ public class CustomerController extends Controller {
         try {
             return new ArrayList<>(dessertDAO.readAll().values());
         } catch (SQLException e) {
-            transmitException(e,Level.SEVERE,"Couldn't load dessert list!");
+           LOGGER.log(Level.SEVERE,"Couldn't load dessert list!");
         }
         return Collections.emptyList();
     }
@@ -155,7 +138,7 @@ public class CustomerController extends Controller {
         try {
             return new ArrayList<>(drinkDAO.readAll().values());
         } catch (SQLException e) {
-            transmitException(e,Level.SEVERE,"Couldn't load drinks list!");
+            LOGGER.log(Level.SEVERE,"Couldn't load drinks list!");
         }
         return Collections.emptyList();
     }
@@ -169,7 +152,7 @@ public class CustomerController extends Controller {
                 }
             }
         } catch (SQLException e) {
-            transmitException(e,Level.SEVERE,"Couldn't find order!");
+           LOGGER.log(Level.SEVERE,"Couldn't find order!");
         }
         return 0;
     }
@@ -182,7 +165,7 @@ public class CustomerController extends Controller {
                 }
             }
         } catch (SQLException e) {
-            transmitException(e,Level.SEVERE,"Couldn't find product!");
+            LOGGER.log(Level.SEVERE,"No product with such id exists.");
         }
         return null;
     }
@@ -190,12 +173,12 @@ public class CustomerController extends Controller {
     private boolean isUserCurrentlyWaitingDelivery() {
         try {
             for (Order order : orderDAO.readAll().values()) {
-                if (order.getCustomerId()==(getCustomerAccount().getId()) && order.getDeliveredAt().isEmpty()) {
+                if (order.getCustomerId()==(customer.getId()) && order.getDeliveredAt().isEmpty()) {
                     return true;
                 }
             }
         } catch (SQLException e) {
-            transmitException(e,Level.SEVERE,"Couldn't load order details!");
+            LOGGER.log(Level.SEVERE,"Couldn't load order details!");
         }
         return false;
     }
@@ -203,12 +186,12 @@ public class CustomerController extends Controller {
     private boolean isOrderFinalized(){
         try {
             for (Order order : orderDAO.readAll().values()) {
-                if (order.getCustomerId()==(getCustomerAccount().getId()) && order.getOrderedAt().isEmpty()) {
+                if (order.getCustomerId()==(customer.getId()) && order.getOrderedAt().isEmpty()) {
                     return false;
                 }
             }
         } catch (SQLException e) {
-            transmitException(e,Level.SEVERE,"Couldn't load order details!");
+            LOGGER.log(Level.SEVERE,"Couldn't load order details!");
         }
         return true;
     }

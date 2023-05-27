@@ -9,32 +9,30 @@ import Products.PizzaIngredient.abstraction.PizzaIngredient;
 import Products.Product;
 import Users.Admin;
 import Users.Customer;
-import View.abstraction.View;
-import View.AdminView;
-import db.abstraction.Controller;
-
+import logging.PizzaDeliveryLogger;
 
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class AdminController extends Controller {
+public class AdminService {
 
     // making them static to ensure only 1 instance is ever created and final, so they are immutable
+    private static final Logger LOGGER = PizzaDeliveryLogger.getLogger(AdminService.class.getName());
     private static final PizzaDAO pizzaDAO = new PizzaDAO();
     private static final DAO<Product> productDAO = new ProductDAO();
     private static final DAO<Drink> drinkDAO = new DrinkDAO();
     private static final DAO<Dessert> dessertDAO = new DessertDAO();
     private static final DAO<Customer> customerDAO = new CustomerDAO();
     private static final OrderDAO orderDAO = new OrderDAO();
-    private final AdminView adminView = new AdminView(this);
-    private final Admin adminModel;
+    private final Admin admin;
 
 
-    public AdminController(Admin admin) {
-        this.adminModel = new Admin();
+    public AdminService(Admin admin) {
+        this.admin = admin; // should it be this.admin = new Admin() since there should technically be only 1 admin ever?
     }
 
     public Map<Integer, Pizza> getAllPizzas() {
@@ -77,12 +75,12 @@ public class AdminController extends Controller {
                     .filter((d)->d.getId()==productId).findFirst().orElse(null);
             if(drink==null)
             {
-                transmitException(new IllegalArgumentException(),Level.WARNING,"No drink found with product ID of: '"+productId+"'");
+                LOGGER.log(Level.WARNING,"No drink found with product ID of: '"+productId+"'");
 
             }
             else if (isProductCurrentlyOrdered(drink.getId()))
             {
-                transmitException(new IllegalArgumentException(),Level.WARNING,"This product is currently in a delivery: '"+productId+"'");
+                LOGGER.log(Level.WARNING,"This product is currently in a delivery: '"+productId+"'");
 
             }
             else
@@ -93,9 +91,9 @@ public class AdminController extends Controller {
             }
         } catch (SQLException e) {
             if (e instanceof SQLDataException){
-                transmitException(e,Level.WARNING,e.getMessage());
+                LOGGER.log(Level.WARNING,e.getMessage());
             } else {
-                transmitException(e,Level.SEVERE,"Couldn't remove drink!");
+                LOGGER.log(Level.SEVERE,"Couldn't remove drink!");
             }
         }
     }
@@ -113,9 +111,9 @@ public class AdminController extends Controller {
                     .stream()
                     .filter((d)->d.getId()==productId).findFirst().orElse(null);
             if(dessert==null){
-                transmitException(new IllegalArgumentException(),Level.WARNING,"No dessert found with product ID of: '"+productId+"'");
+                LOGGER.log(Level.WARNING,"No dessert found with product ID of: '"+productId+"'");
             }else if (isProductCurrentlyOrdered(dessert.getId())){
-                transmitException(new IllegalArgumentException(),Level.WARNING,"This product is currently in a delivery: '"+productId+"'");
+                LOGGER.log(Level.WARNING,"This product is currently in a delivery: '"+productId+"'");
             }else
             {
                 dessertDAO.delete(productId);
@@ -125,9 +123,9 @@ public class AdminController extends Controller {
 
         } catch (SQLException e) {
             if (e instanceof SQLDataException){
-                transmitException(e,Level.WARNING,e.getMessage());
+                LOGGER.log(Level.WARNING,e.getMessage());
             } else {
-                transmitException(e,Level.SEVERE,"Couldn't remove dessert!");
+                LOGGER.log(Level.SEVERE,"Couldn't remove dessert!");
             }
         }
     }
@@ -145,10 +143,10 @@ public class AdminController extends Controller {
                     .filter((p)->p.getId()==productId).findFirst().orElse(null);
 
             if(pizza==null){
-                transmitException(new IllegalArgumentException(),Level.WARNING,"No pizza found with  product ID of: '"+productId+"'");
+                LOGGER.log(Level.WARNING,"No pizza found with  product ID of: '"+productId+"'");
             }
             else if (isProductCurrentlyOrdered(pizza.getId())){
-                transmitException(new IllegalArgumentException(),Level.WARNING,"This product is currently in a delivery: '"+productId+"'");
+                LOGGER.log(Level.WARNING,"This product is currently in a delivery: '"+productId+"'");
             }
             else
             {
@@ -159,9 +157,9 @@ public class AdminController extends Controller {
 
         } catch (SQLException e) {
             if (e instanceof SQLDataException){
-                transmitException(e,Level.WARNING,e.getMessage());
+                LOGGER.log(Level.WARNING,e.getMessage());
             } else {
-                transmitException(e,Level.SEVERE,"Couldn't remove pizza!");
+                LOGGER.log(Level.SEVERE,"Couldn't remove pizza!");
             }
         }
     }
@@ -179,7 +177,7 @@ public class AdminController extends Controller {
         try{
             customerDAO.create(customer);
         }catch (SQLException e) {
-            transmitException(e, Level.SEVERE, "Couldn't register customer!");
+            LOGGER.log(Level.SEVERE, "Couldn't register customer!");
         }
 
     }
@@ -190,11 +188,11 @@ public class AdminController extends Controller {
             if (customer != null ) {
                 customerDAO.delete(customer.getId());
             } else {
-                transmitException(new IllegalArgumentException(),Level.WARNING,"User with username: '"+customerUsername+"' does not exist!");
+                LOGGER.log(Level.WARNING,"User with username: '"+customerUsername+"' does not exist!");
             }
         } catch (SQLException e) {
             if (e instanceof SQLDataException) {
-                transmitException(e, Level.SEVERE, "Couldn't delete customer account!");
+                LOGGER.log(Level.SEVERE, "Couldn't delete customer account!");
             }
         }
     }
@@ -211,7 +209,7 @@ public class AdminController extends Controller {
         try{
             return pizzaDAO.readAllIngredients(tableName);
         } catch (SQLException e) {
-            transmitException(e, Level.SEVERE, "Couldn't read ingredients!");
+            LOGGER.log(Level.SEVERE, "Couldn't read ingredients!");
         }
         return  Collections.emptyMap();
     }
@@ -223,7 +221,7 @@ public class AdminController extends Controller {
             Product product = new Product(productId, name, price);
             productDAO.create(product);
         } catch (SQLException e) {
-            transmitException(e, Level.SEVERE, "Couldn't add pizza!");
+            LOGGER.log(Level.SEVERE, "Couldn't add pizza!");
         }
     }
 
@@ -232,7 +230,7 @@ public class AdminController extends Controller {
             Pizza pizza = new Pizza(productId, name, price, size, cheese, meat, sauce, addon);
             pizzaDAO.create(pizza);
         } catch (SQLException e) {
-            transmitException(e, Level.SEVERE, "Couldn't add pizza!");
+            LOGGER.log(Level.SEVERE, "Couldn't add pizza!");
         }
     }
     private void addDrink(int productId,String name, double price, boolean isDiet) {
@@ -240,7 +238,7 @@ public class AdminController extends Controller {
             Drink drink = new Drink(productId, name, price, isDiet);
             drinkDAO.create(drink);
         } catch (SQLException e) {
-            transmitException(e, Level.SEVERE, "Couldn't add drink!");
+            LOGGER.log(Level.SEVERE, "Couldn't add drink!");
         }
     }
 
@@ -249,7 +247,7 @@ public class AdminController extends Controller {
             Dessert dessert = new Dessert(productId, name, price, isVegan);
             dessertDAO.create(dessert);
         } catch (SQLException e) {
-            transmitException(e, Level.SEVERE, "Couldn't add dessert!");
+            LOGGER.log(Level.SEVERE, "Couldn't add dessert!");
         }
     }
 
@@ -264,8 +262,5 @@ public class AdminController extends Controller {
         return false;
     }
 
-    @Override
-    protected View getView() {
-        return adminView;
-    }
+
 }

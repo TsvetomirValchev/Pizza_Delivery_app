@@ -2,7 +2,7 @@ package Users.util;
 
 import Users.Admin;
 import Users.Customer;
-import db.AdminController;
+import db.AdminService;
 
 import java.util.regex.Pattern;
 
@@ -12,7 +12,7 @@ public class UserAccountValidator {
             + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     private static final String USERNAME_PATTERN = "^[a-zA-Z0-9]{3,30}$";
     private static final String PASSWORD_PATTERN = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$";
-    private static final AdminController adminController = new AdminController(new Admin());
+    private static final AdminService adminController = new AdminService(new Admin());
 
     private final Customer customer;
 
