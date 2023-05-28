@@ -16,11 +16,11 @@ import java.util.logging.Logger;
 
 public class CustomerService {
     private static final Logger LOGGER = PizzaDeliveryLogger.getLogger(CustomerService.class.getName());
-    private static final DAO<Pizza> pizzaDAO = new PizzaDAO();
-    private static final DAO<Dessert> dessertDAO = new DessertDAO();
-    private static final DAO<Drink> drinkDAO = new DrinkDAO();
-    private static final DAO<Product> productDAO = new ProductDAO();
-    private static final OrderDAO orderDAO = new OrderDAO();
+    private final DAO<Pizza> pizzaDAO = new PizzaDAO();
+    private final DAO<Dessert> dessertDAO = new DessertDAO();
+    private final DAO<Drink> drinkDAO = new DrinkDAO();
+    private final DAO<Product> productDAO = new ProductDAO();
+    private final OrderDAO orderDAO = new OrderDAO();
     private final Customer customer;
 
     public CustomerService(Customer customer){

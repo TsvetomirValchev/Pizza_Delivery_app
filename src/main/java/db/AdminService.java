@@ -28,11 +28,11 @@ public class AdminService {
     private static final DAO<Dessert> dessertDAO = new DessertDAO();
     private static final DAO<Customer> customerDAO = new CustomerDAO();
     private static final OrderDAO orderDAO = new OrderDAO();
-    private final Admin admin;
 
 
-    public AdminService(Admin admin) {
-        this.admin = admin; // should it be this.admin = new Admin() since there should technically be only 1 admin ever?
+
+    public AdminService() {
+
     }
 
     public Map<Integer, Pizza> getAllPizzas() {
@@ -233,7 +233,7 @@ public class AdminService {
             LOGGER.log(Level.SEVERE, "Couldn't add pizza!");
         }
     }
-    private void addDrink(int productId,String name, double price, boolean isDiet) {
+    private void addDrink(int productId, String name, double price, boolean isDiet) {
         try {
             Drink drink = new Drink(productId, name, price, isDiet);
             drinkDAO.insert(drink);

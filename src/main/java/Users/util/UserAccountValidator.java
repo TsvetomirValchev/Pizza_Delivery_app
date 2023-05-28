@@ -12,7 +12,7 @@ public class UserAccountValidator {
             + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     private static final String USERNAME_PATTERN = "^[a-zA-Z0-9]{3,30}$";
     private static final String PASSWORD_PATTERN = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$";
-    private static final AdminService adminController = new AdminService(new Admin());
+    private static final AdminService adminController = new AdminService();
 
     private final Customer customer;
 

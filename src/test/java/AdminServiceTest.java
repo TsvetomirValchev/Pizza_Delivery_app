@@ -11,7 +11,7 @@ import java.util.Comparator;
 
 public class AdminServiceTest {
 
-    AdminService adminService = new AdminService(new Admin());
+    AdminService adminService = new AdminService();
 
     @DisplayName("Should read all pizzas from the database")
     @Test
