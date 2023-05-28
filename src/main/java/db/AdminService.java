@@ -251,8 +251,6 @@ public class AdminService {
         }
     }
 
-
-
     public boolean isProductCurrentlyOrdered(int productId) throws SQLException {
         for (Order order : orderDAO.getOrderByProductId(productId)) {
             if (order.getDeliveredAt().isEmpty()) {

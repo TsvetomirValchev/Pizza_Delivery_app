@@ -11,7 +11,9 @@ import java.util.logging.SimpleFormatter;
 public class PizzaDeliveryLogger {
     private static FileHandler fileHandler;
     private static final Path logFilePath = Paths.get("errors.log");
-    //Static initialization block that runs before the main method.
+    /*Static initialization block that runs before the main method and gets called only once no matter how many instances of PizzaDeliveryLogger are made(there are a lot of those).
+    * also used to handle the IOException
+    * */
     static {
         try {
             fileHandler = new FileHandler(logFilePath.toString(), true);

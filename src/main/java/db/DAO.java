@@ -22,7 +22,6 @@ public abstract class DAO<T> {
      abstract String buildUpdateQuery(int variableIndex);
      abstract void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException;
 
-
      public void insert(Object object) throws SQLException {
           try (Connection connection = database.getConnection();
                PreparedStatement statement = connection.prepareStatement(buildInsertQuery(object))) {
@@ -54,9 +53,9 @@ public abstract class DAO<T> {
                statement.setObject(2, key);
                statement.executeUpdate();
           }
-     }
+    }
 
-     protected void delete(Object key) throws SQLException {
+    protected void delete(Object key) throws SQLException {
           String query = "DELETE FROM " + this.tableName + " WHERE " + this.tablePrimaryKey + "= ? ";
           try (Connection connection = database.getConnection();
                PreparedStatement statement = connection.prepareStatement(query)) {
@@ -66,5 +65,5 @@ public abstract class DAO<T> {
                     throw new SQLException("Entry with key " + key + " was not found!");
                }
           }
-     }
+    }
 }
