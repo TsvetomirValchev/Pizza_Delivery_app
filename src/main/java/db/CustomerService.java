@@ -28,7 +28,6 @@ public class CustomerService {
         this.customer = customer;
     }
 
-
     public boolean placeAnOrder(int productId){
         try {
             if (getProductByID(productId) == null) {
@@ -191,8 +190,6 @@ public class CustomerService {
         }
         return true;
     }
-
-
 
 }
 
