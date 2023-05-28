@@ -24,7 +24,7 @@ public class OrderDAO extends DAO<Order>{
     }
 
     @Override
-    protected void setValues(PreparedStatement statement, Object object) throws SQLException {
+    protected void setInsertValues(PreparedStatement statement, Object object) throws SQLException {
         if (object instanceof Order order) {
             statement.setInt(1, order.getCustomerId());
             if (order.getOrderedAt().isPresent()) {

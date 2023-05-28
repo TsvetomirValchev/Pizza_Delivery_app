@@ -20,7 +20,7 @@ public class ProductDAO extends DAO<Product>{
     }
 
     @Override
-    protected void setValues(PreparedStatement statement, Object object) throws SQLException {
+    protected void setInsertValues(PreparedStatement statement, Object object) throws SQLException {
         if (object instanceof Product product) {
             statement.setInt(1,product.getId());
             statement.setString(2, product.getName());

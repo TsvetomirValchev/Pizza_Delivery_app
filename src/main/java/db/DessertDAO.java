@@ -37,7 +37,7 @@ public class DessertDAO extends DAO<Dessert>{
     }
 
     @Override
-    protected void setValues(PreparedStatement statement, Object object) throws SQLException {
+    protected void setInsertValues(PreparedStatement statement, Object object) throws SQLException {
         if(object instanceof Dessert dessert){
             statement.setInt(1, dessert.getId());
             statement.setBoolean(2, dessert.isVegan());

@@ -20,7 +20,7 @@ public class CustomerDAO extends DAO<Customer>{
     }
 
     @Override
-    protected void setValues(PreparedStatement statement, Object object) throws SQLException {
+    protected void setInsertValues(PreparedStatement statement, Object object) throws SQLException {
         if (object instanceof Customer customer) {
             statement.setString(1, customer.getUsername());
             statement.setString(2, customer.getPassword());

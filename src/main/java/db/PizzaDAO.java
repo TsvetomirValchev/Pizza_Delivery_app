@@ -58,7 +58,7 @@ public class PizzaDAO extends DAO<Pizza>{
     }
 
     @Override
-    protected void setValues(PreparedStatement statement, Object object) throws SQLException {
+    protected void setInsertValues(PreparedStatement statement, Object object) throws SQLException {
         if(object instanceof Pizza pizza){
             statement.setInt(1, pizza.getId());
             statement.setInt(2, pizza.getSize().getId());

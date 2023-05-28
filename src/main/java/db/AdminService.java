@@ -175,7 +175,7 @@ public class AdminService {
 
     public void addCustomer(Customer customer){
         try{
-            customerDAO.create(customer);
+            customerDAO.insert(customer);
         }catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Couldn't register customer!");
         }
@@ -219,7 +219,7 @@ public class AdminService {
     private void addProduct(int productId,String name, double price) {
         try {
             Product product = new Product(productId, name, price);
-            productDAO.create(product);
+            productDAO.insert(product);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Couldn't add pizza!");
         }
@@ -228,7 +228,7 @@ public class AdminService {
     private void addPizza(int productId,String name, double price, Size size, Cheese cheese, Meat meat, Sauce sauce, Addon addon) {
         try {
             Pizza pizza = new Pizza(productId, name, price, size, cheese, meat, sauce, addon);
-            pizzaDAO.create(pizza);
+            pizzaDAO.insert(pizza);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Couldn't add pizza!");
         }
@@ -236,7 +236,7 @@ public class AdminService {
     private void addDrink(int productId,String name, double price, boolean isDiet) {
         try {
             Drink drink = new Drink(productId, name, price, isDiet);
-            drinkDAO.create(drink);
+            drinkDAO.insert(drink);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Couldn't add drink!");
         }
@@ -245,7 +245,7 @@ public class AdminService {
     private void addDessert(int productId,String name, double price, boolean isVegan) {
         try {
             Dessert dessert = new Dessert(productId, name, price, isVegan);
-            dessertDAO.create(dessert);
+            dessertDAO.insert(dessert);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Couldn't add dessert!");
         }

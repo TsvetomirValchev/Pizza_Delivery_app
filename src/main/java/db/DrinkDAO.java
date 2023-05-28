@@ -37,7 +37,7 @@ public class DrinkDAO extends DAO<Drink>{
     }
 
     @Override
-    protected void setValues(PreparedStatement statement, Object object) throws SQLException {
+    protected void setInsertValues(PreparedStatement statement, Object object) throws SQLException {
         if(object instanceof Drink drink){
             statement.setInt(1, drink.getId());
             statement.setBoolean(2, drink.isDiet());

@@ -6,7 +6,6 @@ import java.util.Map;
 
 
 public abstract class DAO<T> {
-
      Database database = new Database();
      protected final String tableName;
      protected final String tablePrimaryKey;
@@ -17,17 +16,17 @@ public abstract class DAO<T> {
      }
 
      protected abstract String buildInsertQuery(Object object);
-     protected abstract void setValues(PreparedStatement statement, Object object) throws SQLException;
+     protected abstract void setInsertValues(PreparedStatement statement, Object object) throws SQLException;
      protected abstract Integer getKey(T object);
      protected abstract T mapResultSetToModel(ResultSet resultSet) throws SQLException;
      abstract String buildUpdateQuery(int variableIndex);
      abstract void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException;
 
 
-     public void create(Object object) throws SQLException {
+     public void insert(Object object) throws SQLException {
           try (Connection connection = database.getConnection();
                PreparedStatement statement = connection.prepareStatement(buildInsertQuery(object))) {
-               setValues(statement, object);
+               setInsertValues(statement, object);
                statement.executeUpdate();
           }
      }

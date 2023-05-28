@@ -35,7 +35,7 @@ public class CustomerService {
                 return false;
             }
             if (isOrderFinalized()) {
-                orderDAO.create(new Order(null,
+                orderDAO.insert(new Order(null,
                         customer.getId(),
                        Optional.empty(),
                         Optional.empty()));

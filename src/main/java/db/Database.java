@@ -31,7 +31,7 @@ public class Database {
         }
     }
 
-    Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         try{
             return DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
         }catch (SQLException e){

@@ -9,10 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Comparator;
 
 public class CustomerServiceTest {
-
-
     CustomerService customerService = new CustomerService(new Customer("testCustomer","testPassword",1001,"test@email.com","TestAddress"));
-
 
     @DisplayName("Should read all pizzas from the database")
     @Test
