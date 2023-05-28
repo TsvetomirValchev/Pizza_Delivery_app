@@ -6,20 +6,16 @@ import Products.Drink;
 import Products.Pizza;
 import Products.Product;
 import Users.Customer;
-import logging.PizzaDeliveryLogger;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class CustomerService {
 
     /* making them static to ensure only 1 instance is ever created(so whenever an AdminService instance is created it will always be the same DAO objects) and final, so they are immutable
      * Should these be static? Is there any benefit from using dependency injection in my concrete scenario? Should I initialize them in the constructor instead? Is there benefit from that?
      * */
-    private static final Logger LOGGER = PizzaDeliveryLogger.getLogger(CustomerService.class.getName());
     private final DAO<Pizza> pizzaDAO = new PizzaDAO();
     private final DAO<Dessert> dessertDAO = new DessertDAO();
     private final DAO<Drink> drinkDAO = new DrinkDAO();
@@ -36,7 +32,7 @@ public class CustomerService {
     public boolean placeAnOrder(int productId){
         try {
             if (getProductByID(productId) == null) {
-                LOGGER.log(Level.WARNING,"There is no product with such id");
+                System.err.println("There is no product with such id");
                 return false;
             }
             if (isOrderFinalized()) {
@@ -50,11 +46,11 @@ public class CustomerService {
                 addProductToOrderCart(productId);
                 return true;
             }else {
-                LOGGER.log(Level.WARNING, "You cannot add a product to an order that is already waiting for delivery!");
+                System.err.println( "You cannot add a product to an order that is already waiting for delivery!");
             }
 
         }catch (SQLException e){
-            LOGGER.log(Level.SEVERE , "Couldn't place an order!");
+            System.err.println("Couldn't place an order!");
         }
         return false;
     }
@@ -62,7 +58,7 @@ public class CustomerService {
         try {
             orderDAO.InsertInOrderItemTable(productId, getCurrentOrderIdByCustomerId(customer.getId()));
         }catch (SQLException e){
-            LOGGER.log(Level.SEVERE, "Couldn't add product to cart!");
+            System.err.println( "Couldn't add product to cart!");
         }
     }
 
@@ -84,7 +80,7 @@ public class CustomerService {
             }
             catch (SQLException e)
             {
-                LOGGER.log(Level.SEVERE, "Couldn't get all product in the order cart!");
+                System.err.println( "Couldn't get all product in the order cart!");
             }
             return Collections.emptyList();
     }
@@ -95,10 +91,10 @@ public class CustomerService {
                 orderDAO.update(getCurrentOrderIdByCustomerId(customer.getId()),4,LocalDateTime.now());
 
             } else {
-                LOGGER.log(Level.WARNING,"You are not expecting delivery!");
+                System.err.println("You are not expecting delivery!");
             }
         }catch (SQLException e){
-            LOGGER.log(Level.SEVERE,"Couldn't update order status!");
+            System.err.println("Couldn't update order status!");
         }
 
     }
@@ -108,10 +104,10 @@ public class CustomerService {
             if (!isOrderFinalized()) {
                 orderDAO.update(getCurrentOrderIdByCustomerId(customer.getId()),3,LocalDateTime.now());
             } else {
-                LOGGER.log(Level.WARNING,"You do not have an order to finalize!");
+                System.err.println("You do not have an order to finalize!");
             }
         }catch (SQLException e){
-            LOGGER.log(Level.SEVERE,"Couldn't update order status!");
+            System.err.println("Couldn't update order status!");
         }
 
     }
@@ -152,7 +148,7 @@ public class CustomerService {
                 }
             }
         } catch (SQLException e) {
-           LOGGER.log(Level.SEVERE,"Couldn't find order!");
+           System.err.println("Couldn't find order!");
         }
         return 0;
     }
@@ -165,7 +161,7 @@ public class CustomerService {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE,"No product with such id exists.");
+            System.err.println("No product with such id exists.");
         }
         return null;
     }
@@ -178,7 +174,7 @@ public class CustomerService {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE,"Couldn't load order details!");
+            System.err.println("Couldn't load order details!");
         }
         return false;
     }
@@ -191,7 +187,7 @@ public class CustomerService {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE,"Couldn't load order details!");
+            System.err.println("Couldn't load order details!");
         }
         return true;
     }

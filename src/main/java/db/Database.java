@@ -1,18 +1,16 @@
 package db;
 
-import logging.PizzaDeliveryLogger;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.logging.Logger;
+
 /*Is this class useful? Should I just put it in the DAO since I couldn't think of a way to make it an interface(since i use the fields for tableName and tablePrimaryKey that are in the
  constructor of the abstract class)?*/
 public class Database {
-    private static final Logger LOGGER = PizzaDeliveryLogger.getLogger(DAO.class.getName());
+
     private final String DB_USERNAME ;
     private final String DB_PASSWORD;
     private final String DB_URL;
@@ -27,7 +25,6 @@ public class Database {
 
 
         } catch (IOException e) {
-            LOGGER.severe(e+ "Couldn't load properties!");
             throw new RuntimeException(e);
         }
     }
@@ -36,7 +33,6 @@ public class Database {
         try{
             return DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
         }catch (SQLException e){
-            LOGGER.severe(e.toString());
             throw e;
         }
     }
