@@ -1,7 +1,7 @@
-package Users.util;
+package users.util;
 
-import Users.Admin;
-import Users.Customer;
+import users.Admin;
+import users.Customer;
 import db.AdminService;
 
 import java.util.regex.Pattern;

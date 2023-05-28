@@ -1,4 +1,4 @@
-package Products;
+package products;
 
 public class Drink extends Product{
 private final boolean isDiet;

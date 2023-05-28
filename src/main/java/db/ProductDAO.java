@@ -1,6 +1,6 @@
 package db;
 
-import Products.Product;
+import products.Product;
 
 import java.sql.*;
 import java.util.Map;

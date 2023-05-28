@@ -1,7 +1,7 @@
 package db;
 
-import Order.Order;
-import Products.Product;
+import order.Order;
+import products.Product;
 
 import java.sql.*;
 import java.time.LocalDateTime;

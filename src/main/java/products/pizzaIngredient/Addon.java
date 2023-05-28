@@ -1,7 +1,7 @@
-package Products.PizzaIngredient;
+package products.pizzaIngredient;
 
 
-import Products.PizzaIngredient.abstraction.PizzaIngredient;
+import products.pizzaIngredient.abstraction.PizzaIngredient;
 
 public class Addon extends PizzaIngredient {
         public Addon(Integer id, String name) {

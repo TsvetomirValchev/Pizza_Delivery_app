@@ -1,4 +1,4 @@
-package Products;
+package products;
 
 public class Dessert extends Product{
     private final boolean isVegan;

@@ -1,4 +1,4 @@
-package Products.PizzaIngredient.abstraction;
+package products.pizzaIngredient.abstraction;
 
 public class PizzaIngredient { //ask about how to make it abstract
         final Integer id;

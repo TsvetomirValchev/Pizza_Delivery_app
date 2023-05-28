@@ -1,7 +1,7 @@
-import Products.Dessert;
-import Products.Drink;
-import Products.Pizza;
-import Users.Customer;
+import products.Dessert;
+import products.Drink;
+import products.Pizza;
+import users.Customer;
 import db.CustomerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

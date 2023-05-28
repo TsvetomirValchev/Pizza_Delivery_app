@@ -1,13 +1,13 @@
 package db;
 
-import Order.*;
-import Products.Dessert;
-import Products.Drink;
-import Products.Pizza;
-import Products.PizzaIngredient.*;
-import Products.PizzaIngredient.abstraction.PizzaIngredient;
-import Products.Product;
-import Users.Customer;
+import order.*;
+import products.Dessert;
+import products.Drink;
+import products.Pizza;
+import products.pizzaIngredient.*;
+import products.pizzaIngredient.abstraction.PizzaIngredient;
+import products.Product;
+import users.Customer;
 
 import java.sql.SQLDataException;
 import java.sql.SQLException;

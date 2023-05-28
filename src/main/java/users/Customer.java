@@ -1,4 +1,4 @@
-package Users;
+package users;
 
 public class Customer extends User{
     private final Integer id;

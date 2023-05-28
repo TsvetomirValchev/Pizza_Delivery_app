@@ -1,6 +1,6 @@
 package db;
 
-import Users.Customer;
+import users.Customer;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

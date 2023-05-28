@@ -1,6 +1,6 @@
-package Products;
+package products;
 
-import Products.PizzaIngredient.*;
+import products.pizzaIngredient.*;
 
 public class Pizza extends Product{
 

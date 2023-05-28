@@ -1,11 +1,11 @@
 package db;
 
-import Order.Order;
-import Products.Dessert;
-import Products.Drink;
-import Products.Pizza;
-import Products.Product;
-import Users.Customer;
+import order.Order;
+import products.Dessert;
+import products.Drink;
+import products.Pizza;
+import products.Product;
+import users.Customer;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;

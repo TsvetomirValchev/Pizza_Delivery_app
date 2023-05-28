@@ -1,6 +1,6 @@
 package db;
 
-import Products.Drink;
+import products.Drink;
 
 import java.sql.*;
 import java.util.HashMap;

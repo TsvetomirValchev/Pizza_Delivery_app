@@ -1,6 +1,6 @@
-package Products.PizzaIngredient;
+package products.pizzaIngredient;
 
-import Products.PizzaIngredient.abstraction.PizzaIngredient;
+import products.pizzaIngredient.abstraction.PizzaIngredient;
 
 public class Meat extends PizzaIngredient {
     public Meat(Integer id, String name) {
