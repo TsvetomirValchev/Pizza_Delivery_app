@@ -32,7 +32,6 @@ public class AdminService {
     public AdminService() {
             /*what should I put here? Since putting adminModel is not very useful because my idea is for there to be only 1 admin at all points and I cannot use it for filtering in the
             database because admins only exist in java...*/
-
     }
 
     public Map<Integer, Pizza> getAllPizzas() {
