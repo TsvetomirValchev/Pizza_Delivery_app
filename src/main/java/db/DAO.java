@@ -91,7 +91,7 @@ public abstract class DAO<T> {
                statement.setObject(1, key);
                int rowsAffected = statement.executeUpdate();
                if (rowsAffected == 0) {
-                    throw new SQLDataException("Entry with key " + key + " was not found!");
+                    throw new SQLException("Entry with key " + key + " was not found!");
                }
           }
      }
