@@ -7,7 +7,6 @@ import Products.Pizza;
 import Products.PizzaIngredient.*;
 import Products.PizzaIngredient.abstraction.PizzaIngredient;
 import Products.Product;
-import Users.Admin;
 import Users.Customer;
 import logging.PizzaDeliveryLogger;
 
@@ -20,7 +19,9 @@ import java.util.logging.Logger;
 
 public class AdminService {
 
-    // making them static to ensure only 1 instance is ever created and final, so they are immutable
+    /* making them static to ensure only 1 instance is ever created(so whenever an AdminService instance is created it will always be the same DAO objects) and final, so they are immutable
+    * Should these be static? Is there any benefit from using dependency injection in my concrete scenario? Should I initialize them in the constructor instead? Is there benefit from that?
+    * */
     private static final Logger LOGGER = PizzaDeliveryLogger.getLogger(AdminService.class.getName());
     private static final PizzaDAO pizzaDAO = new PizzaDAO();
     private static final DAO<Product> productDAO = new ProductDAO();
@@ -32,6 +33,8 @@ public class AdminService {
 
 
     public AdminService() {
+            /*what should I put here? Since putting adminModel is not very useful because my idea is for there to be only 1 admin at all points and I cannot use it for filtering in the
+            database because admins only exist in java...*/
 
     }
 
@@ -62,6 +65,10 @@ public class AdminService {
         return Collections.emptyMap();
     }
 
+    /*is there a way to make this without using two separate methods for adding into the product table and the drink table respectively? Should it be done that way or should the drinkDAO
+    * be modified to a point where it can insert in both the product table and drink table so that product Model can be made abstract since in won't need initialization?
+    * Is that even possible?
+    *  */
     public void createDrinkProduct(int productId,String name, double price,Boolean isDiet){
         addProduct(productId,name,price);
         addDrink(productId,name,price,isDiet);

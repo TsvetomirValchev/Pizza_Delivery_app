@@ -4,7 +4,6 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public abstract class DAO<T> {
      Database database = new Database();
      protected final String tableName;

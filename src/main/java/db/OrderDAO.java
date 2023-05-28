@@ -12,8 +12,7 @@ import java.util.Optional;
 
 public class OrderDAO extends DAO<Order>{
 
-    // TODO: MAKE PROTECTED AFTER TEST!
-    public OrderDAO() {
+    protected OrderDAO() {
         super("orders", "id");
     }
 

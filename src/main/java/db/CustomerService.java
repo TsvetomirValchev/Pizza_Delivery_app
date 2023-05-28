@@ -15,6 +15,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CustomerService {
+
+    /* making them static to ensure only 1 instance is ever created(so whenever an AdminService instance is created it will always be the same DAO objects) and final, so they are immutable
+     * Should these be static? Is there any benefit from using dependency injection in my concrete scenario? Should I initialize them in the constructor instead? Is there benefit from that?
+     * */
     private static final Logger LOGGER = PizzaDeliveryLogger.getLogger(CustomerService.class.getName());
     private final DAO<Pizza> pizzaDAO = new PizzaDAO();
     private final DAO<Dessert> dessertDAO = new DessertDAO();
@@ -23,6 +27,7 @@ public class CustomerService {
     private final OrderDAO orderDAO = new OrderDAO();
     private final Customer customer;
 
+    /*Making it take customer as a dependency because I want to be able to perform various checks using this specific customer's fields in the database...*/
     public CustomerService(Customer customer){
         this.customer = customer;
     }

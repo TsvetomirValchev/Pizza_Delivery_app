@@ -9,7 +9,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.logging.Logger;
-
+/*Is this class useful? Should I just put it in the DAO since I couldn't think of a way to make it an interface(since i use the fields for tableName and tablePrimaryKey that are in the
+ constructor of the abstract class)?*/
 public class Database {
     private static final Logger LOGGER = PizzaDeliveryLogger.getLogger(DAO.class.getName());
     private final String DB_USERNAME ;
