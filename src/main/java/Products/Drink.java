@@ -16,6 +16,6 @@ private final boolean isDiet;
     public String toString() {
         String isDiet = this.isDiet ? "Diet " : "";
         return  "№"+getId()+" "+
-                isDiet + getName()+ " cost: "+getPrice()+ " BGN";
+                isDiet + getName()+ "\ncost: "+getPrice()+ " BGN";
     }
 }

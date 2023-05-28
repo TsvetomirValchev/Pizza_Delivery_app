@@ -21,11 +21,11 @@ public class DrinkDAO extends DAO<Drink>{
                 drink.isDiet
                 FROM drink JOIN product  on product.id = drink.product_id""";
         Map<Integer, Drink> entries = new HashMap<>();
-        try (Connection connection = getConnection();
+        try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
-                Drink object = mapReadResultSetToObject(resultSet);
+                Drink object = mapResultSetToModel(resultSet);
                 entries.put(getKey(object), object);
             }
         }
@@ -50,7 +50,7 @@ public class DrinkDAO extends DAO<Drink>{
     }
 
     @Override
-    protected Drink mapReadResultSetToObject(ResultSet resultSet) throws SQLException {
+    protected Drink mapResultSetToModel(ResultSet resultSet) throws SQLException {
         return new Drink(
                 resultSet.getInt("id"),
                 resultSet.getString("name"),

@@ -21,11 +21,11 @@ public class DessertDAO extends DAO<Dessert>{
                 dessert.isVegan
                 FROM dessert JOIN product on product.id = dessert.product_id""";
         Map<Integer, Dessert> entries = new HashMap<>();
-        try (Connection connection = getConnection();
+        try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
-                Dessert object = mapReadResultSetToObject(resultSet);
+                Dessert object = mapResultSetToModel(resultSet);
                 entries.put(getKey(object), object);
             }
         }
@@ -50,7 +50,7 @@ public class DessertDAO extends DAO<Dessert>{
     }
 
     @Override
-    protected Dessert mapReadResultSetToObject(ResultSet resultSet) throws SQLException {
+    protected Dessert mapResultSetToModel(ResultSet resultSet) throws SQLException {
         return new Dessert(
                 resultSet.getInt("id"),
                 resultSet.getString("name"),

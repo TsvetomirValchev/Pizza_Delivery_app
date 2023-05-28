@@ -30,9 +30,8 @@ public class CustomerDAO extends DAO<Customer>{
     }
 
     @Override
-    protected Customer mapReadResultSetToObject(ResultSet resultSet) throws SQLException {
+    protected Customer mapResultSetToModel(ResultSet resultSet) throws SQLException {
         return new Customer(
-
                 resultSet.getString("username"),
                 resultSet.getString("password"),
                 resultSet.getInt(this.tablePrimaryKey),
@@ -49,21 +48,23 @@ public class CustomerDAO extends DAO<Customer>{
     @Override
     protected void setUpdatedValues(PreparedStatement statement, int propertyIndex, Object updatedValue) throws SQLException {
         switch (propertyIndex) {
-            case 1,2,3,4 -> statement.setString(1, (String) updatedValue);
+            case 1 -> statement.setInt(1, (int) updatedValue);
+            case 2,3,4,5 -> statement.setString(1, (String) updatedValue);
         }
     }
 
     @Override
     protected String buildUpdateQuery(int propertyIndex) {
         Map<Integer, String> columnMap = Map.of(
-                1, "username",
-                2, "password",
-                3, "email",
-                4, "address"
+                1, "id",
+                2, "username",
+                3, "password",
+                4, "email",
+                5, "address"
 
         );
         String columnName = columnMap.get(propertyIndex);
-        return "UPDATE " + this.tableName + " SET " + columnName + "=? WHERE email=?";
+        return "UPDATE " + this.tableName + " SET " + columnName + "=? WHERE id=?";
     }
 
 

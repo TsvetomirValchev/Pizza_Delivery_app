@@ -39,11 +39,11 @@ public class PizzaDAO extends DAO<Pizza>{
                 JOIN sauce ON sauce.id = pizza.sauce_id
                 JOIN addon ON addon.id = pizza.addon_id;""";
         Map<Integer, Pizza> entries = new HashMap<>();
-        try (Connection connection = getConnection();
+        try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
-                Pizza object = mapReadResultSetToObject(resultSet);
+                Pizza object = mapResultSetToModel(resultSet);
                 entries.put(getKey(object), object);
             }
         }
@@ -76,7 +76,7 @@ public class PizzaDAO extends DAO<Pizza>{
 
 
     @Override
-    protected Pizza mapReadResultSetToObject(ResultSet resultSet) throws SQLException {
+    protected Pizza mapResultSetToModel(ResultSet resultSet) throws SQLException {
         return new Pizza(
                 resultSet.getInt("id"),
                 resultSet.getString("name"),
@@ -114,7 +114,7 @@ public class PizzaDAO extends DAO<Pizza>{
         String query = "SELECT * FROM " + tableName;
 
         Map<Integer, PizzaIngredient> allIngredients = new HashMap<>();
-        try (Connection connection = getConnection();
+        try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {

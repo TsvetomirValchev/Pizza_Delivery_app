@@ -17,6 +17,6 @@ public class Dessert extends Product{
     public String toString() {
         String vegan = isVegan ? "Vegan " : "";
         return   "№"+getId()+" "+
-                vegan + getName()+ " cost: "+getPrice()+ " BGN";
+                vegan + getName()+ "\ncost: "+getPrice()+ " BGN";
     }
 }

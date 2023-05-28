@@ -35,7 +35,7 @@ public class ProductDAO extends DAO<Product>{
     }
 
     @Override
-    protected Product mapReadResultSetToObject(ResultSet resultSet) throws SQLException {
+    protected Product mapResultSetToModel(ResultSet resultSet) throws SQLException {
         return new Product(
                 resultSet.getInt("id"),
                 resultSet.getString("name"),

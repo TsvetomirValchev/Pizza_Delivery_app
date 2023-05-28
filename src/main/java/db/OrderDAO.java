@@ -41,7 +41,7 @@ public class OrderDAO extends DAO<Order>{
     }
 
     @Override
-    protected Order mapReadResultSetToObject(ResultSet resultSet) throws SQLException {
+    protected Order mapResultSetToModel(ResultSet resultSet) throws SQLException {
         LocalDateTime deliveryTime = getLocalDateTimeFromTimestamp(resultSet.getTimestamp("delivered_at"));
         LocalDateTime orderedAtTime = getLocalDateTimeFromTimestamp(resultSet.getTimestamp("ordered_at"));
 
@@ -89,7 +89,7 @@ public class OrderDAO extends DAO<Order>{
                 " WHERE order_id = " + OrderId ;
 
         List<Product> allProducts = new ArrayList<>();
-        try (Connection connection = getConnection();
+        try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
@@ -109,7 +109,7 @@ public class OrderDAO extends DAO<Order>{
                 "WHERE product_id = " + productId;
 
         List<Order> allOrdersWithProductInThem = new ArrayList<>();
-        try (Connection connection = getConnection();
+        try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
@@ -132,7 +132,7 @@ public class OrderDAO extends DAO<Order>{
 
     public void InsertInOrderItemTable(int productId, int orderId) throws SQLException {
         String query = "INSERT INTO order_item(order_id, product_id) VALUES(? , ?)";
-        try (Connection connection = getConnection();
+        try (Connection connection = database.getConnection();
                 PreparedStatement statement = connection.prepareStatement(query))
              {
                 statement.setInt(1, orderId);

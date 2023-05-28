@@ -10,22 +10,17 @@ import logging.PizzaDeliveryLogger;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CustomerService {
-
     private static final Logger LOGGER = PizzaDeliveryLogger.getLogger(CustomerService.class.getName());
     private static final DAO<Pizza> pizzaDAO = new PizzaDAO();
     private static final DAO<Dessert> dessertDAO = new DessertDAO();
     private static final DAO<Drink> drinkDAO = new DrinkDAO();
     private static final DAO<Product> productDAO = new ProductDAO();
     private static final OrderDAO orderDAO = new OrderDAO();
-    private static final DAO<Customer> customerDAO = new CustomerDAO();
     private final Customer customer;
 
     public CustomerService(Customer customer){
@@ -116,31 +111,31 @@ public class CustomerService {
 
     }
 
-    public List<Pizza> getPizzas() {
+    public Map<Integer, Pizza> getAllPizzas() {
         try {
-            return new ArrayList<>(pizzaDAO.readAll().values());
+            return pizzaDAO.readAll();
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE,"Couldn't load pizza list!");
+            e.printStackTrace();
         }
-        return Collections.emptyList();
+        return Collections.emptyMap();
     }
 
-    public List<Dessert> getDesserts() {
+    public Map<Integer, Dessert> getAllDesserts() {
         try {
-            return new ArrayList<>(dessertDAO.readAll().values());
+            return dessertDAO.readAll();
         } catch (SQLException e) {
-           LOGGER.log(Level.SEVERE,"Couldn't load dessert list!");
+            e.printStackTrace();
         }
-        return Collections.emptyList();
+        return Collections.emptyMap();
     }
 
-    public List<Drink> getDrinks() {
+    public Map<Integer, Drink> getAllDrinks() {
         try {
-            return new ArrayList<>(drinkDAO.readAll().values());
+            return drinkDAO.readAll();
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE,"Couldn't load drinks list!");
+            e.printStackTrace();
         }
-        return Collections.emptyList();
+        return Collections.emptyMap();
     }
 
     //utils
