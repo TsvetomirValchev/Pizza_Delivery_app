@@ -33,6 +33,7 @@ public class Database {
         try{
             return DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
         }catch (SQLException e){
+            System.err.println("Something went wrong with getting connection");
             throw e;
         }
     }
