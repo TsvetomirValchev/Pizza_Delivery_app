@@ -1,6 +1,7 @@
 import products.Dessert;
 import products.Drink;
 import products.Pizza;
+import products.ingredient.*;
 import users.Customer;
 import db.AdminService;
 import org.junit.jupiter.api.DisplayName;
@@ -12,9 +13,36 @@ public class AdminServiceTest {
 
     AdminService adminService = new AdminService();
 
+
+    @DisplayName("Should add a product with an id, name and price as well as a pizza that references the product with the ingredients choosen.")
+    @Test
+    public void testAddPizzaProduct(){
+        adminService.createPizzaProduct(1020,"chorizo pizza",19.99,
+                new Size(2,""),
+                new Cheese(2,""),
+                new Meat(10, ""),
+                new Sauce(1, ""),
+                new Addon(4,""));
+    }
+
+    @DisplayName("Should add a product with an id,name and price as well as a drink referencing the product with information about it being diet drink or not")
+    @Test
+    public void testAddDrinkProduct(){
+        adminService.createDrinkProduct(2020,"Sprite",2.89,false);
+    }
+
+
+    @DisplayName("Should add a product with an id,name and price as well as a dessert referencing the product with information about it being vegan drink or not")
+    @Test
+    public void testAddDessertProduct(){
+        adminService.createDessertProduct(3020,"cookie flavoured ice cream",4.55,false);
+    }
+
+
+
     @DisplayName("Should read all pizzas from the database")
     @Test
-    public void readAllPizzasFromDatabase(){
+    public void testReadAllPizzasFromDatabase(){
         adminService.getAllPizzas()
                 .values()
                 .stream()
@@ -24,7 +52,8 @@ public class AdminServiceTest {
 
     @DisplayName("Should read all customers from the database")
     @Test
-    public void readAllCustomersFromDatabase(){
+    public void testReadAllCustomersFromDatabase(){
+
         adminService.getAllCustomers()
                 .values()
                 .stream()
@@ -33,7 +62,7 @@ public class AdminServiceTest {
     }
     @DisplayName("Should read all drinks from the database")
     @Test
-    public void readAllDrinksFromDatabase(){
+    public void testReadAllDrinksFromDatabase(){
         adminService.getAllDrinks()
                 .values()
                 .stream()
@@ -43,7 +72,7 @@ public class AdminServiceTest {
 
     @DisplayName("Should read all desserts from the database")
     @Test
-    public void readAllDessertsFromDatabase(){
+    public void testReadAllDessertsFromDatabase(){
         adminService.getAllDesserts()
                 .values()
                 .stream()
@@ -51,5 +80,33 @@ public class AdminServiceTest {
                 .forEach(System.out::println);
     }
 
+    @DisplayName("Should delete a pizza and a product with specified id")
+    @Test
+    public void testDeletePizzaProduct(){
+        adminService.deletePizza(1020);
+    }
 
+    @DisplayName("Should delete a drink and a product with specified id")
+    @Test
+    public void testDeleteDrinkProduct(){
+        adminService.deleteDrink(2020);
+    }
+
+    @DisplayName("Should delete a pizza and a product with specified id")
+    @Test
+    public void testDeleteDessertProduct(){
+        adminService.deleteDessert(3020);
+    }
+
+    @DisplayName("Should add a customer account with the values provided")
+    @Test
+    public void testAddCustomer(){
+        adminService.addCustomer(new Customer("Peter","PeterPass123",null,"email@gmail.com","Peter str."));
+    }
+
+    @DisplayName("Should delete a customer by providing the account's username")
+    @Test
+    public void testDeleteCustomer(){
+        adminService.deleteCustomer("Peter");
+    }
 }

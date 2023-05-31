@@ -1,6 +1,10 @@
 package products;
 
-import products.pizzaIngredient.*;
+import products.ingredient.*;
+import products.ingredient.abstraction.PizzaIngredient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pizza extends Product{
 
@@ -10,7 +14,7 @@ private final Meat meat;
 private final Sauce sauce;
 private final Addon addon;
 
-
+List<PizzaIngredient> ingredients = new ArrayList<>();
     public Pizza(Integer id, String name, Double price,Size size, Cheese cheese, Meat meat, Sauce sauce, Addon addon) {
         super(id, name, price);
         this.size = size;

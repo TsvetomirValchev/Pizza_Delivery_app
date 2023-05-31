@@ -4,8 +4,8 @@ import order.*;
 import products.Dessert;
 import products.Drink;
 import products.Pizza;
-import products.pizzaIngredient.*;
-import products.pizzaIngredient.abstraction.PizzaIngredient;
+import products.ingredient.*;
+import products.ingredient.abstraction.PizzaIngredient;
 import products.Product;
 import users.Customer;
 
@@ -20,14 +20,12 @@ public class AdminService {
     /* making them static to ensure only 1 instance is ever created(so whenever an AdminService instance is created it will always be the same DAO objects) and final, so they are immutable
     * Should these be static? Is there any benefit from using dependency injection in my concrete scenario? Should I initialize them in the constructor instead? Is there benefit from that?
     * */
-    private static final PizzaDAO pizzaDAO = new PizzaDAO();
-    private static final DAO<Product> productDAO = new ProductDAO();
-    private static final DAO<Drink> drinkDAO = new DrinkDAO();
-    private static final DAO<Dessert> dessertDAO = new DessertDAO();
-    private static final DAO<Customer> customerDAO = new CustomerDAO();
-    private static final OrderDAO orderDAO = new OrderDAO();
-
-
+    private final PizzaDAO pizzaDAO = new PizzaDAO();
+    private final DAO<Product> productDAO = new ProductDAO();
+    private final DAO<Drink> drinkDAO = new DrinkDAO();
+    private final DAO<Dessert> dessertDAO = new DessertDAO();
+    private final DAO<Customer> customerDAO = new CustomerDAO();
+    private final OrderDAO orderDAO = new OrderDAO();
 
     public AdminService() {
             /*what should I put here? Since putting adminModel is not very useful because my idea is for there to be only 1 admin at all points and I cannot use it for filtering in the

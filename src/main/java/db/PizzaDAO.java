@@ -1,8 +1,8 @@
 package db;
 
 import products.Pizza;
-import products.pizzaIngredient.*;
-import products.pizzaIngredient.abstraction.PizzaIngredient;
+import products.ingredient.*;
+import products.ingredient.abstraction.PizzaIngredient;
 
 import java.sql.*;
 import java.util.HashMap;
