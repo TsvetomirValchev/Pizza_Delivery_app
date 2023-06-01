@@ -13,9 +13,6 @@ import java.util.*;
 
 public class CustomerService {
 
-    /* making them static to ensure only 1 instance is ever created(so whenever an AdminService instance is created it will always be the same DAO objects) and final, so they are immutable
-     * Should these be static? Is there any benefit from using dependency injection in my concrete scenario? Should I initialize them in the constructor instead? Is there benefit from that?
-     * */
     private final DAO<Pizza> pizzaDAO = new PizzaDAO();
     private final DAO<Dessert> dessertDAO = new DessertDAO();
     private final DAO<Drink> drinkDAO = new DrinkDAO();
@@ -23,34 +20,35 @@ public class CustomerService {
     private final OrderDAO orderDAO = new OrderDAO();
     private final Customer customer;
 
-    /*Making it take customer as a dependency because I want to be able to perform various checks using this specific customer's fields in the database...*/
     public CustomerService(Customer customer){
         this.customer = customer;
     }
 
-    public void placeAnOrder(int productId){
+    public boolean placeAnOrder(int productId){
         try {
             if (getProductByID(productId) == null) {
                 System.err.println("There is no product with such id");
-            }
-            if (isOrderFinalized()) {
-                orderDAO.insert(new Order(null,
-                        customer.getId(),
-                       Optional.empty(),
-                        Optional.empty()));
+                return false;
             }
             if(!isOrderFinalized())
             {
-                addProductToOrderCart(productId);
-            }else {
-                System.err.println( "You cannot add a product to an order that is already waiting for delivery!");
+                addProductToCart(productId);
+            }
+            else {
+                orderDAO.insert(new Order(null,
+                        customer.getId(),
+                        Optional.empty(),
+                        Optional.empty()));
+                addProductToCart(productId);
+                System.out.println("the product has been added to your cart");
             }
 
         }catch (SQLException e){
             System.err.println("Couldn't place an order!");
         }
+        return true;
     }
-    private void addProductToOrderCart(int productId){
+    private void addProductToCart(int productId){
         try {
             orderDAO.InsertInOrderItemTable(productId, getCartOrderIdByCustomerId(customer.getId()));
         }catch (SQLException e){
@@ -66,9 +64,9 @@ public class CustomerService {
         return orderTotal+" BGN";
     }
 
-    public String calculateCartOrderTotal(){
+    public String calculateCartTotal(){
         double orderTotal = 0;
-        for (Product product: getAllProductsInCartOrder()){
+        for (Product product: getAllProductsInCart()){
             orderTotal += product.getPrice();
         }
         return orderTotal+" BGN";
@@ -89,7 +87,7 @@ public class CustomerService {
             return Collections.emptyList();
     }
 
-    public List<Product> getAllProductsInCartOrder(){
+    public List<Product> getAllProductsInCart(){
         try{
             return new ArrayList<>(
                     orderDAO.getAllProductsInOrder

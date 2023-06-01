@@ -50,8 +50,8 @@ public class CustomerServiceTest {
     @DisplayName("Should give us all the products that are currently in the cart(an order without ordered_at value) and their total price")
     @Test
     public void testGetCartDetails(){
-        System.out.println(customerService.getAllProductsInCartOrder());
-        System.out.println(customerService.calculateCartOrderTotal());
+        System.out.println(customerService.getAllProductsInCart());
+        System.out.println(customerService.calculateCartTotal());
     }
     @DisplayName("Should finalize current order by giving it a ordered_at value")
     @Test

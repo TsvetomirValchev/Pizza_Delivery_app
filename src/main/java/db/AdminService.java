@@ -12,14 +12,13 @@ import users.Customer;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 
 public class AdminService {
 
-    /* making them static to ensure only 1 instance is ever created(so whenever an AdminService instance is created it will always be the same DAO objects) and final, so they are immutable
-    * Should these be static? Is there any benefit from using dependency injection in my concrete scenario? Should I initialize them in the constructor instead? Is there benefit from that?
-    * */
+
     private final PizzaDAO pizzaDAO = new PizzaDAO();
     private final DAO<Product> productDAO = new ProductDAO();
     private final DAO<Drink> drinkDAO = new DrinkDAO();
@@ -27,10 +26,7 @@ public class AdminService {
     private final DAO<Customer> customerDAO = new CustomerDAO();
     private final OrderDAO orderDAO = new OrderDAO();
 
-    public AdminService() {
-            /*what should I put here? Since putting adminModel is not very useful because my idea is for there to be only 1 admin at all points and I cannot use it for filtering in the
-            database because admins only exist in java...*/
-    }
+    public AdminService() {}
 
     public Map<Integer, Pizza> getAllPizzas() {
         try {
@@ -59,10 +55,6 @@ public class AdminService {
         return Collections.emptyMap();
     }
 
-    /*is there a way to make this without using two separate methods for adding into the product table and the drink table respectively? Should it be done that way or should the drinkDAO
-    * be modified to a point where it can insert in both the product table and drink table so that product Model can be made abstract since in won't need initialization?
-    * Is that even possible?
-    *  */
     public void createDrinkProduct(int productId,String name, double price,Boolean isDiet){
         addProduct(productId,name,price);
         addDrink(productId,name,price,isDiet);
@@ -123,9 +115,9 @@ public class AdminService {
         }
     }
 
-    public void createPizzaProduct(int productId,String name, double price, Size size, Cheese cheese, Meat meat, Sauce sauce, Addon addon){
+    public void createPizzaProduct(int productId,String name, double price, Size size,Sauce sauce,  List<Meat> meats, List<Cheese> cheese, List<Addon> addons){
         addProduct(productId,name,price);
-        addPizza(productId, name, price, size, cheese, meat, sauce, addon);
+        addPizza(productId, name, price, size,sauce,  meats, cheese, addons);
     }
 
     public void deletePizza(int productId){
@@ -210,16 +202,52 @@ public class AdminService {
             Product product = new Product(productId, name, price);
             productDAO.insert(product);
         } catch (SQLException e) {
+            System.err.println("Couldn't add product!");
+        }
+    }
+
+    private void addPizza(int productId, String name, double price, Size size, Sauce sauce, List<Meat> meats, List<Cheese> cheeses, List<Addon> addons) {
+        try {
+            Pizza pizza = new Pizza(productId, name, price, size,sauce,meats,cheeses,addons);
+            for (Addon addon : addons) {
+                pizzaDAO.insertInPizzaAddonTable(pizza.getId(), addon.getId());
+            }
+            pizzaDAO.insert(pizza);
+            addMeatsToPizza(pizza.getMeats(),pizza.getId());
+            addCheesesToPizza(pizza.getCheeses(),pizza.getId());
+            addAddonsToPizza(pizza.getAddons(),pizza.getId());
+        } catch (SQLException e) {
             System.err.println("Couldn't add pizza!");
         }
     }
 
-    private void addPizza(int productId,String name, double price, Size size, Cheese cheese, Meat meat, Sauce sauce, Addon addon) {
-        try {
-            Pizza pizza = new Pizza(productId, name, price, size, cheese, meat, sauce, addon);
-            pizzaDAO.insert(pizza);
-        } catch (SQLException e) {
-            System.err.println("Couldn't add pizza!");
+    private void addMeatsToPizza(List<Meat> meats, int pizzaId) throws SQLException {
+        try{
+        for (Meat meat : meats) {
+            pizzaDAO.insertInPizzaMeatTable(pizzaId, meat.getId());
+        }
+        }catch (SQLException e){
+            System.err.println("Something went wrong with adding Meats to the pizza");
+        }
+    }
+
+    private void addCheesesToPizza(List<Cheese> cheeses, int pizzaId) throws SQLException {
+        try{
+            for (Cheese cheese : cheeses) {
+                pizzaDAO.insertInPizzaCheeseTable(pizzaId, cheese.getId());
+            }
+        }catch (SQLException e){
+            System.err.println("Something went wrong with adding cheeses to the pizza");
+        }
+    }
+
+    private void addAddonsToPizza(List<Addon> addons, int pizzaId) throws SQLException {
+        try{
+            for (Addon addon : addons) {
+                pizzaDAO.insertInPizzaCheeseTable(pizzaId, addon.getId());
+            }
+        }catch (SQLException e){
+            System.err.println("Something went wrong with adding addons to the pizza");
         }
     }
     private void addDrink(int productId, String name, double price, boolean isDiet) {

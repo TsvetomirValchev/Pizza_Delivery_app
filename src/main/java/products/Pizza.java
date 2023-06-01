@@ -1,47 +1,44 @@
 package products;
 
 import products.ingredient.*;
-import products.ingredient.abstraction.PizzaIngredient;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Pizza extends Product{
-
 private final Size size;
-private final Cheese cheese;
-private final Meat meat;
+private final List<Cheese> cheeses;
+private final List<Meat> meats;
 private final Sauce sauce;
-private final Addon addon;
+private final List<Addon> addons;
 
-List<PizzaIngredient> ingredients = new ArrayList<>();
-    public Pizza(Integer id, String name, Double price,Size size, Cheese cheese, Meat meat, Sauce sauce, Addon addon) {
+    public Pizza(Integer id, String name, Double price,Size size,Sauce sauce, List<Meat> meats, List<Cheese> cheese, List<Addon> addons ) {
         super(id, name, price);
         this.size = size;
-        this.cheese = cheese;
-        this.meat = meat;
         this.sauce = sauce;
-        this.addon = addon;
+        this.meats = meats;
+        this.cheeses = cheese;
+        this.addons = addons;
     }
 
     public Size getSize() {
         return size;
     }
 
-    public Cheese getCheese() {
-        return cheese;
+    public List<Cheese> getCheeses() {
+        return cheeses;
     }
 
-    public Meat getMeat() {
-        return meat;
+    public List<Meat> getMeats() {
+        return meats;
     }
 
     public Sauce getSauce() {
         return sauce;
     }
 
-    public Addon getAddon() {
-        return addon;
+    public List<Addon> getAddons() {
+        return addons;
     }
 
 
@@ -50,9 +47,9 @@ List<PizzaIngredient> ingredients = new ArrayList<>();
         return   "№"+getId()+"."+
                 getName() +" pizza \ningredients:" +" "+
                 getSauce().getName()+","+
-                getCheese().getName()+","+
-                getMeat().getName()+","+
-                getAddon().getName()+
+                getMeats().stream().map(Meat::getName).collect(Collectors.joining(","))
+                + "," + getCheeses().stream().map(Cheese::getName).collect(Collectors.joining(","))
+                + "," + getAddons().stream().map(Addon::getName).collect(Collectors.joining(",")) +
                 "\ncosts:" +getPrice()+" BGN";
     }
 }

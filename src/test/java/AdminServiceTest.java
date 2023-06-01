@@ -7,7 +7,9 @@ import db.AdminService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class AdminServiceTest {
 
@@ -17,12 +19,26 @@ public class AdminServiceTest {
     @DisplayName("Should add a product with an id, name and price as well as a pizza that references the product with the ingredients choosen.")
     @Test
     public void testAddPizzaProduct(){
-        adminService.createPizzaProduct(1020,"chorizo pizza",19.99,
+        List<Meat> meats = new ArrayList<>();
+        List<Addon> addons = new ArrayList<>();
+        List<Cheese> cheeses = new ArrayList<>();
+
+        meats.add(new Meat(1,""));
+        meats.add(new Meat(2, ""));
+        cheeses.add(new Cheese(1,""));
+        cheeses.add(new Cheese(2,""));
+        addons.add(new Addon(1,""));
+        addons.add(new Addon(2,""));
+        adminService.createPizzaProduct(
+                1020,
+                "chorizo pizza",
+                19.99,
                 new Size(2,""),
-                new Cheese(2,""),
-                new Meat(10, ""),
                 new Sauce(1, ""),
-                new Addon(4,""));
+                meats,
+                cheeses,
+                addons
+        );
     }
 
     @DisplayName("Should add a product with an id,name and price as well as a drink referencing the product with information about it being diet drink or not")
