@@ -31,7 +31,7 @@ public class CustomerService {
     public boolean placeAnOrder(int productId){
         try {
             if (getProductByID(productId) == null) {
-                LOGGER.info("There is no product with such id");
+                LOGGER.error("There is no product with such id");
                 return false;
             }
             if(!isOrderFinalized())
@@ -49,7 +49,7 @@ public class CustomerService {
 
         }catch (SQLException e){
             LOGGER.debug(e.getMessage());
-            LOGGER.info("Couldn't place an order!");
+            LOGGER.error("Couldn't place an order!");
         }
         return true;
     }
@@ -58,7 +58,7 @@ public class CustomerService {
             orderDAO.InsertInOrderItemTable(productId, getCartOrderIdByCustomerId(customer.getId()));
         }catch (SQLException e){
             LOGGER.debug(e.getMessage());
-            LOGGER.info( "Couldn't add product to cart!");
+            LOGGER.error( "Couldn't add product to cart!");
         }
     }
 
@@ -89,7 +89,7 @@ public class CustomerService {
             catch (SQLException e)
             {
                 LOGGER.debug(e.getMessage());
-                LOGGER.info( "Couldn't get all product in the order cart!");
+                LOGGER.error( "Couldn't get all product in the order cart!");
             }
             return Collections.emptyList();
     }
@@ -104,7 +104,7 @@ public class CustomerService {
         catch (SQLException e)
         {
             LOGGER.debug(e.getMessage());
-            LOGGER.info( "Couldn't get all product in the order cart!");
+            LOGGER.error( "Couldn't get all product in the order cart!");
         }
         return Collections.emptyList();
     }
@@ -115,11 +115,11 @@ public class CustomerService {
                 orderDAO.update(getCurrentlyDeliveringOrderIdByCustomerId(customer.getId()),4,LocalDateTime.now());
 
             } else {
-                LOGGER.info("You are not expecting delivery!");
+                LOGGER.error("You are not expecting delivery!");
             }
         }catch (SQLException e){
             LOGGER.debug(e.getMessage());
-            LOGGER.info("Couldn't update order status!");
+            LOGGER.error("Couldn't update order status!");
         }
 
     }
@@ -129,10 +129,10 @@ public class CustomerService {
             if (!isOrderFinalized()) {
                 orderDAO.update(getCartOrderIdByCustomerId(customer.getId()),3,LocalDateTime.now());
             } else {
-                LOGGER.info("You do not have an order to finalize!");
+                LOGGER.error("You do not have an order to finalize!");
             }
         }catch (SQLException e){
-            LOGGER.info("Couldn't update order status!");
+            LOGGER.error("Couldn't update order status!");
         }
 
     }
@@ -174,7 +174,7 @@ public class CustomerService {
             }
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.info("Couldn't find order!");
+            LOGGER.error("Couldn't find order!");
         }
         return 0;
     }
@@ -188,7 +188,7 @@ public class CustomerService {
             }
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.info("Couldn't find order!");
+            LOGGER.error("Couldn't find order!");
         }
         return 0;
     }
@@ -202,7 +202,7 @@ public class CustomerService {
             }
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.info("No product with such id exists.");
+            LOGGER.error("No product with such id exists.");
         }
         return null;
     }
@@ -216,7 +216,7 @@ public class CustomerService {
             }
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.info("Couldn't load order details!");
+            LOGGER.error("Couldn't load order details!");
         }
         return false;
     }
@@ -230,7 +230,7 @@ public class CustomerService {
             }
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.info("Couldn't load order details!");
+            LOGGER.error("Couldn't load order details!");
         }
         return true;
     }

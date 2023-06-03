@@ -20,7 +20,7 @@ public class LoginView implements View {
     private static final Admin admin = new Admin();
     @Override
     public void printMenu() {
-        System.out.println("Welcome to our Pizza Restaurant!");
+        System.out.println("Welcome!");
         System.out.println("1.Login");
         System.out.println("2.Register");
     }
@@ -47,7 +47,7 @@ public class LoginView implements View {
                 }
             }while (choice!=0);
         }catch (InputMismatchException e){
-            LOGGER.warn(e.getMessage());
+            LOGGER.debug(e.getMessage());
             System.err.println("Invalid input");
             getChoice();
         }
@@ -68,7 +68,7 @@ public class LoginView implements View {
             password = scanner.nextLine();
 
         }catch (IllegalArgumentException e){
-            LOGGER.warn(e.getMessage());
+            LOGGER.debug(e.getMessage());
             System.err.println("Please enter valid account credentials");
             printLoginMenu();
         }
@@ -148,7 +148,7 @@ public class LoginView implements View {
             registrant.RegisterCustomer();
 
         }catch (InputMismatchException e){
-            LOGGER.warn(e.getMessage());
+            LOGGER.debug(e.getMessage());
             System.err.println("Invalid data entered");
             printRegistrationMenu();
         }

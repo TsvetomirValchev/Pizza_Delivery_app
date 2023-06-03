@@ -34,7 +34,7 @@ public class AdminService {
         try {
             return pizzaDAO.readAll();
         } catch (SQLException e) {
-            LOGGER.fatal(e);
+            LOGGER.debug(e);
         }
         return Collections.emptyMap();
     }
@@ -43,7 +43,7 @@ public class AdminService {
         try {
             return drinkDAO.readAll();
         } catch (SQLException e) {
-            LOGGER.fatal(e);
+            LOGGER.debug(e);
         }
         return Collections.emptyMap();
     }
@@ -52,7 +52,7 @@ public class AdminService {
         try {
             return dessertDAO.readAll();
         } catch (SQLException e) {
-            LOGGER.fatal(e);
+            LOGGER.debug(e);
         }
         return Collections.emptyMap();
     }
@@ -70,11 +70,11 @@ public class AdminService {
                     .filter((d)->d.getId()==productId).findFirst().orElse(null);
             if(drink==null)
             {
-                LOGGER.info("No drink found with product ID of: '"+productId+"'");
+                LOGGER.error("No drink found with product ID of: '"+productId+"'");
             }
             else if (isProductCurrentlyOrdered(drink.getId()))
             {
-                LOGGER.info("This product is currently in a delivery: '"+productId+"'");
+                LOGGER.error("This product is currently in a delivery: '"+productId+"'");
             }
             else
             {
@@ -83,8 +83,8 @@ public class AdminService {
                 System.out.println("Drink removed successfully!");
             }
         } catch (SQLException e) {
-            LOGGER.fatal(e.getMessage());
-            LOGGER.info("Couldn't remove drink!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Couldn't remove drink!");
         }
     }
 
@@ -101,9 +101,9 @@ public class AdminService {
                     .stream()
                     .filter((d)->d.getId()==productId).findFirst().orElse(null);
             if(dessert==null){
-                LOGGER.info("No dessert found with product ID of: '"+productId+"'");
+                LOGGER.error("No dessert found with product ID of: '"+productId+"'");
             }else if (isProductCurrentlyOrdered(dessert.getId())){
-                LOGGER.info("This product is currently in a delivery: '"+productId+"'");
+                LOGGER.error("This product is currently in a delivery: '"+productId+"'");
             }else
             {
                 dessertDAO.delete(productId);
@@ -112,8 +112,8 @@ public class AdminService {
             }
 
         } catch (SQLException e) {
-            LOGGER.fatal(e.getMessage());
-            LOGGER.info("Couldn't remove dessert!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Couldn't remove dessert!");
         }
     }
 
@@ -130,10 +130,10 @@ public class AdminService {
                     .filter((p)->p.getId()==productId).findFirst().orElse(null);
 
             if(pizza==null){
-                LOGGER.info("No pizza found with  product ID of: '"+productId+"'");
+                LOGGER.error("No pizza found with  product ID of: '"+productId+"'");
             }
             else if (isProductCurrentlyOrdered(pizza.getId())){
-                LOGGER.info("This product is currently in a delivery: '"+productId+"'");
+                LOGGER.error("This product is currently in a delivery: '"+productId+"'");
             }
             else
             {
@@ -146,8 +146,8 @@ public class AdminService {
             }
 
         } catch (SQLException e) {
-                LOGGER.fatal(e.getMessage());
-                LOGGER.info("Couldn't remove pizza!");
+                LOGGER.debug(e.getMessage());
+                LOGGER.error("Couldn't remove pizza!");
         }
     }
 
@@ -164,8 +164,8 @@ public class AdminService {
         try{
             customerDAO.insert(customer);
         }catch (SQLException e) {
-            LOGGER.fatal(e.getMessage());
-            LOGGER.info("Couldn't register customer!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Couldn't register customer!");
         }
 
     }
@@ -176,12 +176,12 @@ public class AdminService {
             if (customer != null ) {
                 customerDAO.delete(customer.getId());
             } else {
-                LOGGER.info("User with username: '"+customerUsername+"' does not exist!");
+                LOGGER.error("User with username: '"+customerUsername+"' does not exist!");
             }
         } catch (SQLException e) {
             if (e instanceof SQLDataException) {
-                LOGGER.fatal(e.getMessage());
-                LOGGER.info("Couldn't delete customer account!");
+                LOGGER.debug(e.getMessage());
+                LOGGER.error("Couldn't delete customer account!");
             }
         }
     }
@@ -198,8 +198,8 @@ public class AdminService {
         try{
             return pizzaDAO.readAllIngredients(tableName);
         } catch (SQLException e) {
-            LOGGER.fatal(e.getMessage());
-            LOGGER.info("Couldn't read ingredients!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Couldn't read ingredients!");
         }
         return  Collections.emptyMap();
     }
@@ -211,8 +211,8 @@ public class AdminService {
             Product product = new Product(productId, name, price);
             productDAO.insert(product);
         } catch (SQLException e) {
-            LOGGER.fatal(e.getMessage());
-            LOGGER.info("Couldn't add product!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Couldn't add product!");
         }
     }
 
@@ -224,8 +224,8 @@ public class AdminService {
             addCheesesToPizza(pizza.getCheeses(),pizza.getId());
             addAddonsToPizza(pizza.getAddons(),pizza.getId());
         } catch (SQLException e) {
-            LOGGER.fatal(e.getMessage());
-            LOGGER.info("Couldn't add pizza!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Couldn't add pizza!");
         }
     }
 
@@ -235,8 +235,8 @@ public class AdminService {
                 pizzaDAO.insertInPizzaMeatTable(pizzaId, meat.getId());
             }
         }catch (SQLException e){
-            LOGGER.fatal(e.getMessage());
-            LOGGER.info("Something went wrong with adding Meats to the pizza");
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Something went wrong with adding Meats to the pizza");
         }
     }
 
@@ -246,8 +246,8 @@ public class AdminService {
                 pizzaDAO.insertInPizzaCheeseTable(pizzaId, cheese.getId());
             }
         }catch (SQLException e){
-            LOGGER.fatal(e.getMessage());
-            LOGGER.info("Something went wrong with adding cheeses to the pizza");
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Something went wrong with adding cheeses to the pizza");
         }
     }
 
@@ -257,8 +257,8 @@ public class AdminService {
                 pizzaDAO.insertInPizzaCheeseTable(pizzaId, addon.getId());
             }
         }catch (SQLException e){
-            LOGGER.fatal(e.getMessage()+ "1");
-            LOGGER.info("Something went wrong with adding addons to the pizza");
+            LOGGER.debug(e.getMessage()+ "1");
+            LOGGER.error("Something went wrong with adding addons to the pizza");
         }
     }
 
@@ -268,8 +268,8 @@ public class AdminService {
             Drink drink = new Drink(productId, name, price, isDiet);
             drinkDAO.insert(drink);
         } catch (SQLException e) {
-            LOGGER.fatal(e.getMessage());
-            LOGGER.info("Couldn't add drink!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Couldn't add drink!");
         }
     }
 
@@ -278,8 +278,8 @@ public class AdminService {
             Dessert dessert = new Dessert(productId, name, price, isVegan);
             dessertDAO.insert(dessert);
         } catch (SQLException e) {
-            LOGGER.fatal(e.getMessage());
-            LOGGER.info("Couldn't add dessert!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Couldn't add dessert!");
         }
     }
 

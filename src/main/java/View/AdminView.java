@@ -182,24 +182,25 @@ public class AdminView implements View {
             printSeparator(100);
             List<Addon> addons = selectAddon();
             adminService.createPizzaProduct(product.getId(), product.getName(), product.getPrice(), size, sauce,meats,cheeses,addons);
-            System.out.println("Pizza has been created.");
+
         }catch (InputMismatchException | NumberFormatException e){
+
             LOGGER.debug(e.getMessage());
             if(e instanceof  NumberFormatException){
                 System.err.println("Invalid price!");
             }else{
                 System.err.println("Invalid input!");
+
             }
             addAPizzaMenu();
         }
-
     }
 
     private List<Meat> selectMeat() {
         Scanner scanner = new Scanner(System.in);
         printSeparator(100);
         List<Meat> meats = new ArrayList<>();
-        String input;
+        int input;
         do {
             System.out.println("Choose the meat(by entering it's id):");
             readAllIngredients("meat");
@@ -207,9 +208,9 @@ public class AdminView implements View {
             scanner.nextLine();
             Meat meat = new Meat(meatId,"");
             meats.add(meat);
-            System.out.println("Do you want to add more meat? (y/n)");
-            input = scanner.nextLine();
-        } while (input.equalsIgnoreCase("y"));
+            System.out.println("Do you want to add more meat? (1.yes/0.no)");
+            input = scanner.nextInt();
+        } while (input == 1);
         return meats;
     }
 
@@ -217,7 +218,7 @@ public class AdminView implements View {
         Scanner scanner = new Scanner(System.in);
         printSeparator(100);
         List<Cheese> cheeses = new ArrayList<>();
-        String input;
+        int input;
         do {
             System.out.println("Choose the cheese(by entering it's id):");
             readAllIngredients("cheese");
@@ -225,9 +226,9 @@ public class AdminView implements View {
             scanner.nextLine();
             Cheese cheese = new Cheese(cheeseId,"");
             cheeses.add(cheese);
-            System.out.println("Do you want to add more cheese? (y/n)");
-            input = scanner.nextLine();
-        } while (input.equalsIgnoreCase("y"));
+            System.out.println("Do you want to add more cheese? (1.yes/0.no)");
+            input = scanner.nextInt();
+        } while (input == 1);
         return cheeses;
     }
 
@@ -236,7 +237,7 @@ public class AdminView implements View {
         printSeparator(100);
 
         List<Addon> addons = new ArrayList<>();
-        String input;
+        int input;
         do {
             System.out.println("Choose the addon(by entering it's id):");
             readAllIngredients("addon");
@@ -244,9 +245,9 @@ public class AdminView implements View {
             scanner.nextLine();
             Addon addon = new Addon(addonId,"");
             addons.add(addon);
-            System.out.println("Do you want to add more cheese? (y/n)");
-            input = scanner.nextLine();
-        } while (input.equalsIgnoreCase("y"));
+            System.out.println("Do you want to add more addons? (1.y/0.n)");
+            input = scanner.nextInt();
+        } while (input == 1);
         return addons;
     }
 
@@ -271,10 +272,12 @@ public class AdminView implements View {
             LOGGER.debug(e.getMessage());
             if(e instanceof  NumberFormatException){
                 System.err.println("Invalid price!");
+
             }else{
                 System.err.println("Invalid input!");
-            }
 
+            }
+            createAProductMenu();
         }
         return new Product(id,productName,price);
     }
