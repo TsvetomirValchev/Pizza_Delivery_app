@@ -1,9 +1,9 @@
 package products.ingredient.abstraction;
 
-public class PizzaIngredient { //how do I make this abstract?
+public class Ingredient { //how do I make this abstract?
         final Integer id;
         final String name;
-        public PizzaIngredient(Integer id, String name) {
+        public Ingredient(Integer id, String name) {
             this.id = id;
             this.name = name;
         }

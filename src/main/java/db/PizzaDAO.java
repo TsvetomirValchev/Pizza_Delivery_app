@@ -2,7 +2,7 @@ package db;
 
 import products.Pizza;
 import products.ingredient.*;
-import products.ingredient.abstraction.PizzaIngredient;
+import products.ingredient.abstraction.Ingredient;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class PizzaDAO extends DAO<Pizza>{
     protected String buildInsertQuery(Object object) {
         return "INSERT INTO " + this.tableName
                 +"(product_id,size_id,sauce_id)"
-                +"VALUES(?, ?, ?, ?)";
+                +"VALUES(?, ?, ?)";
     }
 
     @Override
@@ -114,15 +114,15 @@ public class PizzaDAO extends DAO<Pizza>{
     }
 
     //Ingredients table utils
-    public Map<Integer, PizzaIngredient> readAllIngredients(String tableName) throws SQLException {
+    public Map<Integer, Ingredient> readAllIngredients(String tableName) throws SQLException {
         String query = "SELECT * FROM " + tableName;
 
-        Map<Integer, PizzaIngredient> allIngredients = new HashMap<>();
+        Map<Integer, Ingredient> allIngredients = new HashMap<>();
         try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
-                PizzaIngredient ingredient = (new PizzaIngredient(resultSet.getInt("id"),
+                Ingredient ingredient = (new Ingredient(resultSet.getInt("id"),
                         resultSet.getString(tableName + "_name")));
                 allIngredients.put(ingredient.getId(), ingredient);
             }
@@ -230,6 +230,18 @@ public class PizzaDAO extends DAO<Pizza>{
         }
 
         return cheese;
+    }
+
+    protected void deletePizzaIngredientList(String tableName, int pizzaId, String primaryKey) throws SQLException {
+        String query = "DELETE FROM " + tableName + " WHERE "+ primaryKey +"= ? ";
+        try (Connection connection = database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setObject(1, pizzaId);
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Entry with key " + pizzaId + " was not found!");
+            }
+        }
     }
 
 }

@@ -1,6 +1,9 @@
 package db;
 
+import View.AdminView;
 import order.Order;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import products.Dessert;
 import products.Drink;
 import products.Pizza;
@@ -13,6 +16,7 @@ import java.util.*;
 
 public class CustomerService {
 
+    private static final Logger LOGGER = LogManager.getLogger(CustomerService.class.getName());
     private final DAO<Pizza> pizzaDAO = new PizzaDAO();
     private final DAO<Dessert> dessertDAO = new DessertDAO();
     private final DAO<Drink> drinkDAO = new DrinkDAO();
@@ -27,7 +31,7 @@ public class CustomerService {
     public boolean placeAnOrder(int productId){
         try {
             if (getProductByID(productId) == null) {
-                System.err.println("There is no product with such id");
+                LOGGER.info("There is no product with such id");
                 return false;
             }
             if(!isOrderFinalized())
@@ -44,7 +48,8 @@ public class CustomerService {
             }
 
         }catch (SQLException e){
-            System.err.println("Couldn't place an order!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.info("Couldn't place an order!");
         }
         return true;
     }
@@ -52,7 +57,8 @@ public class CustomerService {
         try {
             orderDAO.InsertInOrderItemTable(productId, getCartOrderIdByCustomerId(customer.getId()));
         }catch (SQLException e){
-            System.err.println( "Couldn't add product to cart!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.info( "Couldn't add product to cart!");
         }
     }
 
@@ -82,7 +88,8 @@ public class CustomerService {
             }
             catch (SQLException e)
             {
-                System.err.println( "Couldn't get all product in the order cart!");
+                LOGGER.debug(e.getMessage());
+                LOGGER.info( "Couldn't get all product in the order cart!");
             }
             return Collections.emptyList();
     }
@@ -96,7 +103,8 @@ public class CustomerService {
         }
         catch (SQLException e)
         {
-            System.err.println( "Couldn't get all product in the order cart!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.info( "Couldn't get all product in the order cart!");
         }
         return Collections.emptyList();
     }
@@ -107,10 +115,11 @@ public class CustomerService {
                 orderDAO.update(getCurrentlyDeliveringOrderIdByCustomerId(customer.getId()),4,LocalDateTime.now());
 
             } else {
-                System.err.println("You are not expecting delivery!");
+                LOGGER.info("You are not expecting delivery!");
             }
         }catch (SQLException e){
-            System.err.println("Couldn't update order status!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.info("Couldn't update order status!");
         }
 
     }
@@ -120,10 +129,10 @@ public class CustomerService {
             if (!isOrderFinalized()) {
                 orderDAO.update(getCartOrderIdByCustomerId(customer.getId()),3,LocalDateTime.now());
             } else {
-                System.err.println("You do not have an order to finalize!");
+                LOGGER.info("You do not have an order to finalize!");
             }
         }catch (SQLException e){
-            System.err.println("Couldn't update order status!");
+            LOGGER.info("Couldn't update order status!");
         }
 
     }
@@ -164,7 +173,8 @@ public class CustomerService {
                 }
             }
         } catch (SQLException e) {
-           System.err.println("Couldn't find order!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.info("Couldn't find order!");
         }
         return 0;
     }
@@ -177,7 +187,8 @@ public class CustomerService {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Couldn't find order!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.info("Couldn't find order!");
         }
         return 0;
     }
@@ -190,7 +201,8 @@ public class CustomerService {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("No product with such id exists.");
+            LOGGER.debug(e.getMessage());
+            LOGGER.info("No product with such id exists.");
         }
         return null;
     }
@@ -203,7 +215,8 @@ public class CustomerService {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Couldn't load order details!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.info("Couldn't load order details!");
         }
         return false;
     }
@@ -216,7 +229,8 @@ public class CustomerService {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Couldn't load order details!");
+            LOGGER.debug(e.getMessage());
+            LOGGER.info("Couldn't load order details!");
         }
         return true;
     }
