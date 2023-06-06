@@ -136,7 +136,7 @@ public class CustomerService {
         try {
             return pizzaDAO.readAll();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.debug(e.getMessage());
         }
         return Collections.emptyMap();
     }
@@ -145,7 +145,7 @@ public class CustomerService {
         try {
             return dessertDAO.readAll();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.debug(e.getMessage());
         }
         return Collections.emptyMap();
     }
@@ -154,7 +154,7 @@ public class CustomerService {
         try {
             return drinkDAO.readAll();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.debug(e.getMessage());
         }
         return Collections.emptyMap();
     }

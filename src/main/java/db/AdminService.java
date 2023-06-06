@@ -11,7 +11,6 @@ import products.ingredient.abstraction.Ingredient;
 import products.Product;
 import users.Customer;
 
-import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
@@ -147,7 +146,7 @@ public class AdminService {
         try {
             return customerDAO.readAll();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.debug(e.getMessage());
         }
         return Collections.emptyMap();
     }
@@ -171,10 +170,10 @@ public class AdminService {
                 LOGGER.error("User with username: '" + customerUsername + "' does not exist!");
             }
         } catch (SQLException e) {
-            if (e instanceof SQLDataException) {
-                LOGGER.debug(e.getMessage());
-                LOGGER.error("Couldn't delete customer account!");
-            }
+
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Couldn't delete customer account!");
+
         }
     }
 

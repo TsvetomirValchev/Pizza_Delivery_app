@@ -75,7 +75,7 @@ public class UserAccountValidator {
         return false;
     }
 
-    boolean areCredentialsMatching() {
+    boolean DoesUserAccountAlreadyExist() {
         for (Customer c : adminController.getAllCustomers().values()) {
             if (c.getUsername().equals(customer.getUsername()) && c.getPassword().equals(customer.getPassword()) && c.getEmail().equals(customer.getEmail())) {
                 return true;

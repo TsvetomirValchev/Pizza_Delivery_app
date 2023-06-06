@@ -16,8 +16,8 @@ public class AdminView implements View {
     private static final Logger LOGGER = LogManager.getLogger(AdminView.class.getName());
     private final AdminService adminService;
 
-    public AdminView(AdminService adminController) {
-        this.adminService = adminController;
+    public AdminView(AdminService adminService) {
+        this.adminService = adminService;
     }
 
 
@@ -69,7 +69,6 @@ public class AdminView implements View {
         }
         System.out.println("Account deleted!");
     }
-
 
     private void addAProductMenu() {
         Scanner scanner = new Scanner(System.in);
@@ -184,7 +183,6 @@ public class AdminView implements View {
             adminService.createPizzaProduct(product.getId(), product.getName(), product.getPrice(), size, sauce, meats, cheeses, addons);
 
         } catch (InputMismatchException | NumberFormatException e) {
-
             LOGGER.debug(e.getMessage());
             if (e instanceof NumberFormatException) {
                 System.err.println("Invalid price!");

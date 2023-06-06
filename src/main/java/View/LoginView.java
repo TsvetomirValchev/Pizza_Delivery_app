@@ -122,7 +122,6 @@ public class LoginView implements View {
     private void printRegistrationMenu() {
         Scanner scanner = new Scanner(System.in);
 
-
         try {
             System.out.println("Please enter your e-mail address: ");
             String email = scanner.nextLine();
@@ -151,16 +150,16 @@ public class LoginView implements View {
 
     private void openAdminView() {
         System.out.println("Welcome, master!");
-        AdminService adminController = new AdminService();
-        View adminView = new AdminView(adminController);
+        AdminService adminService = new AdminService();
+        View adminView = new AdminView(adminService);
         adminView.getChoice();
 
     }
 
     private void openCustomerView(Customer customer) {
         System.out.println("Welcome, " + customer.getUsername());
-        CustomerService customerController = new CustomerService(customer);
-        View customerView = new CustomerView(customerController);
+        CustomerService customerService = new CustomerService(customer);
+        View customerView = new CustomerView(customerService);
         customerView.getChoice();
 
     }

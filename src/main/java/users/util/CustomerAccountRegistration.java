@@ -15,7 +15,7 @@ public class CustomerAccountRegistration {
     public void RegisterCustomer() {
         try {
             UserAccountValidator validator = new UserAccountValidator(customer);
-            if (!validator.areCredentialsMatching()) {
+            if (!validator.DoesUserAccountAlreadyExist()) {
                 validator.isValidUser();
                 buildCustomer();
             }
