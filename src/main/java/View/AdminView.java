@@ -46,7 +46,7 @@ public class AdminView implements View {
                 case 3 -> deleteAccountMenu();
                 case 4 -> readAllProductsInTheRestaurant();
                 case 5 -> readAllCustomers();
-                case 0 -> System.out.println("Exiting..");
+                case 0 -> System.out.println("Exiting...");
                 default -> System.err.println("Enter a valid option!");
             }
             if (choice != 0) {
@@ -378,7 +378,6 @@ public class AdminView implements View {
         printSeparator(100);
         System.out.println("All desserts in the restaurant:\n");
         readAllDesserts();
-
 
     }
 

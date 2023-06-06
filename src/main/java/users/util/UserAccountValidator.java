@@ -12,7 +12,7 @@ public class UserAccountValidator {
             + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     private static final String USERNAME_PATTERN = "^[a-zA-Z0-9]{3,30}$";
     private static final String PASSWORD_PATTERN = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$";
-    private static final AdminService adminController = new AdminService();
+    private final AdminService adminService = new AdminService();
 
     private final Customer customer;
 
@@ -58,7 +58,7 @@ public class UserAccountValidator {
     }
 
     public boolean isEmailTaken() {
-        for (Customer c : adminController.getAllCustomers().values()) {
+        for (Customer c : adminService.getAllCustomers().values()) {
             if (c.getEmail().equals(customer.getEmail())) {
                 return true;
             }
@@ -67,7 +67,7 @@ public class UserAccountValidator {
     }
 
     private boolean isUsernameTaken() {
-        for (Customer c : adminController.getAllCustomers().values()) {
+        for (Customer c : adminService.getAllCustomers().values()) {
             if (c.getUsername().equals(customer.getUsername())) {
                 return true;
             }
@@ -76,7 +76,7 @@ public class UserAccountValidator {
     }
 
     boolean DoesUserAccountAlreadyExist() {
-        for (Customer c : adminController.getAllCustomers().values()) {
+        for (Customer c : adminService.getAllCustomers().values()) {
             if (c.getUsername().equals(customer.getUsername()) && c.getPassword().equals(customer.getPassword()) && c.getEmail().equals(customer.getEmail())) {
                 return true;
             }

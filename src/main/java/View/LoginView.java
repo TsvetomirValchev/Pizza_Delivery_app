@@ -5,7 +5,7 @@ import db.AdminService;
 import db.CustomerService;
 import users.Admin;
 import users.Customer;
-import users.util.CustomerAccountRegistration;
+
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -137,8 +137,7 @@ public class LoginView implements View {
             String address = scanner.nextLine();
 
             Customer customer = new Customer(username, password, null, email, address);
-            CustomerAccountRegistration registrant = new CustomerAccountRegistration(customer);
-            registrant.RegisterCustomer();
+            //TODO: Call something to enter this customer account into the database
 
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());

@@ -50,7 +50,7 @@ public class CustomerView implements View {
                 case 2 -> printAllDrinks();
                 case 3 -> printAllDesserts();
                 case 4 -> printCartDetails();
-                case 5 -> AddAProductToShoppingCartMenu();
+                case 5 -> addAProductToShoppingCartMenu();
                 case 6 -> markOrderAsFinalizedMenu();
                 case 7 -> printCurrentOrderDetails();
                 case 8 -> markOrderAsReceivedMenu();
@@ -90,7 +90,7 @@ public class CustomerView implements View {
 
     }
 
-    private void AddAProductToShoppingCartMenu() {
+    private void addAProductToShoppingCartMenu() {
         try {
             Scanner scanner = new Scanner(System.in);
 
@@ -107,7 +107,7 @@ public class CustomerView implements View {
         } catch (InputMismatchException e) {
             LOGGER.warn(e.getMessage());
             System.err.println("Invalid input format!");
-            AddAProductToShoppingCartMenu();
+            addAProductToShoppingCartMenu();
         }
     }
 
