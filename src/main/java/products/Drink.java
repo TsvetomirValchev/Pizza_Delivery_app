@@ -1,7 +1,7 @@
 package products;
 
-public class Drink extends Product{
-private final boolean isDiet;
+public class Drink extends Product {
+    private final boolean isDiet;
 
     public Drink(Integer id, String name, Double price, boolean isCarbonated) {
         super(id, name, price);
@@ -15,7 +15,6 @@ private final boolean isDiet;
     @Override
     public String toString() {
         String isDiet = this.isDiet ? "Diet " : "";
-        return  "№"+getId()+" "+
-                isDiet + getName()+ "\ncost: "+getPrice()+ " BGN";
+        return "№" + getId() + " " + isDiet + getName() + "\ncost: " + getPrice() + " BGN";
     }
 }

@@ -24,21 +24,19 @@ public class CustomerService {
     private final OrderDAO orderDAO = new OrderDAO();
     private final Customer customer;
 
-    public CustomerService(Customer customer){
+    public CustomerService(Customer customer) {
         this.customer = customer;
     }
 
-    public boolean placeAnOrder(int productId){
+    public boolean placeAnOrder(int productId) {
         try {
             if (getProductByID(productId) == null) {
                 LOGGER.error("There is no product with such id");
                 return false;
             }
-            if(!isOrderFinalized())
-            {
+            if (!isOrderFinalized()) {
                 addProductToCart(productId);
-            }
-            else {
+            } else {
                 orderDAO.insert(new Order(null,
                         customer.getId(),
                         Optional.empty(),
@@ -47,91 +45,88 @@ public class CustomerService {
                 System.out.println("the product has been added to your cart");
             }
 
-        }catch (SQLException e){
+        } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Couldn't place an order!");
         }
         return true;
     }
-    private void addProductToCart(int productId){
+
+    private void addProductToCart(int productId) {
         try {
             orderDAO.InsertInOrderItemTable(productId, getCartOrderIdByCustomerId(customer.getId()));
-        }catch (SQLException e){
+        } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.error( "Couldn't add product to cart!");
+            LOGGER.error("Couldn't add product to cart!");
         }
     }
 
-    public String calculateCurrentOrderTotal(){
+    public String calculateCurrentOrderTotal() {
         double orderTotal = 0;
-        for (Product product: getAllProductsInCurrentlyDeliveringOrder()){
+        for (Product product : getAllProductsInCurrentlyDeliveringOrder()) {
             orderTotal += product.getPrice();
         }
-        return orderTotal+" BGN";
+        return orderTotal + " BGN";
     }
 
-    public String calculateCartTotal(){
+    public String calculateCartTotal() {
         double orderTotal = 0;
-        for (Product product: getAllProductsInCart()){
+        for (Product product : getAllProductsInCart()) {
             orderTotal += product.getPrice();
         }
-        return orderTotal+" BGN";
+        return orderTotal + " BGN";
     }
 
-    public List<Product> getAllProductsInCurrentlyDeliveringOrder(){
-            try{
-                return new ArrayList<>(
-                        orderDAO.getAllProductsInOrder
-                                (getCurrentlyDeliveringOrderIdByCustomerId(customer.getId())
-                        )
-                );
-            }
-            catch (SQLException e)
-            {
-                LOGGER.debug(e.getMessage());
-                LOGGER.error( "Couldn't get all product in the order cart!");
-            }
-            return Collections.emptyList();
-    }
-
-    public List<Product> getAllProductsInCart(){
-        try{
+    public List<Product> getAllProductsInCurrentlyDeliveringOrder() {
+        try {
             return new ArrayList<>(
                     orderDAO.getAllProductsInOrder
-                            (getCartOrderIdByCustomerId(customer.getId()))
+                            (getCurrentlyDeliveringOrderIdByCustomerId(customer.getId())
+                            )
             );
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.error( "Couldn't get all product in the order cart!");
+            LOGGER.error("Couldn't get all product in the order cart!");
         }
         return Collections.emptyList();
     }
 
-    public void markOrderAsReceived(){
-        try{
+    public List<Product> getAllProductsInCart() {
+        try {
+            return new ArrayList<>(
+                    orderDAO.getAllProductsInOrder
+                            (getCartOrderIdByCustomerId(customer.getId()))
+            );
+        } catch (SQLException e) {
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Couldn't get all product in the order cart!");
+        }
+        return Collections.emptyList();
+    }
+
+    public void markOrderAsReceived() {
+        try {
             if (isUserCurrentlyWaitingDelivery()) {
-                orderDAO.update(getCurrentlyDeliveringOrderIdByCustomerId(customer.getId()),4,LocalDateTime.now());
+                orderDAO.update(getCurrentlyDeliveringOrderIdByCustomerId(customer.getId()), 4, LocalDateTime.now());
 
             } else {
                 LOGGER.error("You are not expecting delivery!");
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Couldn't update order status!");
         }
 
     }
 
-    public void markOrderAsFinalized(){
-        try{
+    public void markOrderAsFinalized() {
+        try {
             if (!isOrderFinalized()) {
-                orderDAO.update(getCartOrderIdByCustomerId(customer.getId()),3,LocalDateTime.now());
+                orderDAO.update(getCartOrderIdByCustomerId(customer.getId()), 3, LocalDateTime.now());
             } else {
                 LOGGER.error("You do not have an order to finalize!");
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             LOGGER.error("Couldn't update order status!");
         }
 
@@ -210,7 +205,7 @@ public class CustomerService {
     private boolean isUserCurrentlyWaitingDelivery() {
         try {
             for (Order order : orderDAO.readAll().values()) {
-                if (order.getCustomerId()==(customer.getId()) && order.getOrderedAt().isPresent() && order.getDeliveredAt().isEmpty()) {
+                if (order.getCustomerId() == (customer.getId()) && order.getOrderedAt().isPresent() && order.getDeliveredAt().isEmpty()) {
                     return true;
                 }
             }
@@ -221,10 +216,10 @@ public class CustomerService {
         return false;
     }
 
-    private boolean isOrderFinalized(){
+    private boolean isOrderFinalized() {
         try {
             for (Order order : orderDAO.readAll().values()) {
-                if (order.getCustomerId()==(customer.getId()) && order.getOrderedAt().isEmpty()) {
+                if (order.getCustomerId() == (customer.getId()) && order.getOrderedAt().isEmpty()) {
                     return false;
                 }
             }

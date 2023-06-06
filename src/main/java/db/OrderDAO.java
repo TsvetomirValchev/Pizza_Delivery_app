@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class OrderDAO extends DAO<Order>{
+public class OrderDAO extends DAO<Order> {
 
     protected OrderDAO() {
         super("orders", "id");
@@ -55,7 +55,7 @@ public class OrderDAO extends DAO<Order>{
     @Override
     String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(
-                1,"id",
+                1, "id",
                 2, "customer_id",
                 3, "ordered_at",
                 4, "delivered_at"
@@ -67,9 +67,9 @@ public class OrderDAO extends DAO<Order>{
 
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
-        switch (variableIndex){
-            case 1,2-> statement.setInt(1,(Integer) updatedValue);
-            case 3,4 -> statement.setTimestamp(1, Timestamp.valueOf((LocalDateTime) updatedValue));
+        switch (variableIndex) {
+            case 1, 2 -> statement.setInt(1, (Integer) updatedValue);
+            case 3, 4 -> statement.setTimestamp(1, Timestamp.valueOf((LocalDateTime) updatedValue));
 
         }
     }
@@ -85,7 +85,7 @@ public class OrderDAO extends DAO<Order>{
         String query = "SELECT product_id, name, price FROM order_item " +
                 "JOIN orders ON order_id = orders.id " +
                 "JOIN product p on p.id = order_item.product_id" +
-                " WHERE order_id = " + OrderId ;
+                " WHERE order_id = " + OrderId;
 
         List<Product> allProducts = new ArrayList<>();
         try (Connection connection = database.getConnection();
@@ -132,15 +132,13 @@ public class OrderDAO extends DAO<Order>{
     public void InsertInOrderItemTable(int productId, int orderId) throws SQLException {
         String query = "INSERT INTO order_item(order_id, product_id) VALUES(? , ?)";
         try (Connection connection = database.getConnection();
-                PreparedStatement statement = connection.prepareStatement(query))
-             {
-                statement.setInt(1, orderId);
-                statement.setInt(2, productId);
-                statement.executeUpdate();
-            }
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, orderId);
+            statement.setInt(2, productId);
+            statement.executeUpdate();
+        }
 
     }
-
 
 
 }

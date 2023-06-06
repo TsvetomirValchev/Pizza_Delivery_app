@@ -11,36 +11,36 @@ import java.util.List;
 import java.util.Map;
 
 
-public class PizzaDAO extends DAO<Pizza>{
+public class PizzaDAO extends DAO<Pizza> {
 
-    public PizzaDAO(){
+    public PizzaDAO() {
         super("pizza", "product_id");
     }
 
     @Override
     protected Map<Integer, Pizza> readAll() throws SQLException {
         String query = """
-                SELECT product.id,
-                product.name,
-                product.price,
-                p.product_id,
-                p.size_id,
-                p.sauce_id,
-                size.size_name,
-                c.cheese_name,
-                m.meat_name,
-                sauce.sauce_name,
-                a.addon_name FROM pizza p
-                JOIN product ON p.product_id = product.id
-                JOIN size ON size.id = p.size_id
-                JOIN sauce ON sauce.id = p.sauce_id
-                JOIN pizza_addon pa on p.product_id = pa.pizza_id
-                JOIN addon a on a.id = pa.addon_id
-                JOIN pizza_cheese pc on p.product_id = pc.pizza_id
-                JOIN cheese c on pc.cheese_id = c.id
-                JOIN pizza_meat pm on p.product_id = pm.pizza_id
-                JOIN meat m on pm.meat_id = m.id
-               ;""";
+                 SELECT product.id,
+                 product.name,
+                 product.price,
+                 p.product_id,
+                 p.size_id,
+                 p.sauce_id,
+                 size.size_name,
+                 c.cheese_name,
+                 m.meat_name,
+                 sauce.sauce_name,
+                 a.addon_name FROM pizza p
+                 JOIN product ON p.product_id = product.id
+                 JOIN size ON size.id = p.size_id
+                 JOIN sauce ON sauce.id = p.sauce_id
+                 JOIN pizza_addon pa on p.product_id = pa.pizza_id
+                 JOIN addon a on a.id = pa.addon_id
+                 JOIN pizza_cheese pc on p.product_id = pc.pizza_id
+                 JOIN cheese c on pc.cheese_id = c.id
+                 JOIN pizza_meat pm on p.product_id = pm.pizza_id
+                 JOIN meat m on pm.meat_id = m.id
+                ;""";
         Map<Integer, Pizza> entries = new HashMap<>();
         try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();
@@ -56,16 +56,16 @@ public class PizzaDAO extends DAO<Pizza>{
     @Override
     protected String buildInsertQuery(Object object) {
         return "INSERT INTO " + this.tableName
-                +"(product_id,size_id,sauce_id)"
-                +"VALUES(?, ?, ?)";
+                + "(product_id,size_id,sauce_id)"
+                + "VALUES(?, ?, ?)";
     }
 
     @Override
     protected void setInsertValues(PreparedStatement statement, Object object) throws SQLException {
-        if (object instanceof Pizza pizza){
-            statement.setInt(1,pizza.getId());
+        if (object instanceof Pizza pizza) {
+            statement.setInt(1, pizza.getId());
             statement.setInt(2, pizza.getSize().getId());
-            statement.setInt(3,pizza.getSauce().getId());
+            statement.setInt(3, pizza.getSauce().getId());
         }
     }
 
@@ -109,7 +109,7 @@ public class PizzaDAO extends DAO<Pizza>{
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         switch (variableIndex) {
-            case 1,2,3-> statement.setInt(1, (Integer) updatedValue);
+            case 1, 2, 3 -> statement.setInt(1, (Integer) updatedValue);
         }
     }
 
@@ -127,14 +127,13 @@ public class PizzaDAO extends DAO<Pizza>{
                 allIngredients.put(ingredient.getId(), ingredient);
             }
         }
-       return allIngredients;
+        return allIngredients;
     }
 
     public void insertInPizzaMeatTable(int pizzaId, int meatId) throws SQLException {
         String query = "INSERT INTO pizza_meat (pizza_id, meat_id) VALUES(? , ?)";
         try (Connection connection = database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query))
-        {
+             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, pizzaId);
             statement.setInt(2, meatId);
             statement.executeUpdate();
@@ -145,8 +144,7 @@ public class PizzaDAO extends DAO<Pizza>{
     public void insertInPizzaCheeseTable(int pizzaId, int cheeseId) throws SQLException {
         String query = "INSERT INTO pizza_cheese (pizza_id, cheese_id) VALUES(? , ?)";
         try (Connection connection = database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query))
-        {
+             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, pizzaId);
             statement.setInt(2, cheeseId);
             statement.executeUpdate();
@@ -157,8 +155,7 @@ public class PizzaDAO extends DAO<Pizza>{
     public void insertInPizzaAddonTable(int pizzaId, int addonId) throws SQLException {
         String query = "INSERT INTO pizza_addon (pizza_id, addon_id) VALUES(? , ?)";
         try (Connection connection = database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query))
-        {
+             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, pizzaId);
             statement.setInt(2, addonId);
             statement.executeUpdate();
@@ -188,27 +185,26 @@ public class PizzaDAO extends DAO<Pizza>{
     }
 
 
+    private List<Addon> fetchAddonForPizza(int pizzaId) throws SQLException {
+        List<Addon> addons = new ArrayList<>();
+        String query = "SELECT addon_name, addon.id FROM addon " +
+                "INNER JOIN pizza_addon " +
+                "ON addon.id = pizza_addon.addon_id " +
+                "WHERE pizza_addon.pizza_id = ?";
+        try (Connection connection = database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, pizzaId);
+            ResultSet resultSet = statement.executeQuery();
 
-        private List<Addon> fetchAddonForPizza(int pizzaId) throws SQLException {
-            List<Addon> addons = new ArrayList<>();
-            String query = "SELECT addon_name, addon.id FROM addon " +
-                    "INNER JOIN pizza_addon " +
-                    "ON addon.id = pizza_addon.addon_id " +
-                    "WHERE pizza_addon.pizza_id = ?";
-            try (Connection connection = database.getConnection();
-                 PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setInt(1, pizzaId);
-                ResultSet resultSet = statement.executeQuery();
-
-                while (resultSet.next()) {
-                    String addonName = resultSet.getString("addon_name");
-                    int addonId = resultSet.getInt("id");
-                    addons.add(new Addon(addonId, addonName));
-                }
+            while (resultSet.next()) {
+                String addonName = resultSet.getString("addon_name");
+                int addonId = resultSet.getInt("id");
+                addons.add(new Addon(addonId, addonName));
             }
-
-            return addons;
         }
+
+        return addons;
+    }
 
 
     private List<Cheese> fetchCheeseForPizza(int pizzaId) throws SQLException {
@@ -233,7 +229,7 @@ public class PizzaDAO extends DAO<Pizza>{
     }
 
     protected void deletePizzaIngredientList(String tableName, int pizzaId, String primaryKey) throws SQLException {
-        String query = "DELETE FROM " + tableName + " WHERE "+ primaryKey +"= ? ";
+        String query = "DELETE FROM " + tableName + " WHERE " + primaryKey + "= ? ";
         try (Connection connection = database.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setObject(1, pizzaId);

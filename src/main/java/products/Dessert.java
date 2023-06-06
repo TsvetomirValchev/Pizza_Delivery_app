@@ -1,6 +1,6 @@
 package products;
 
-public class Dessert extends Product{
+public class Dessert extends Product {
     private final boolean isVegan;
 
     public Dessert(Integer id, String name, Double price, boolean isVegan) {
@@ -16,7 +16,7 @@ public class Dessert extends Product{
     @Override
     public String toString() {
         String vegan = isVegan ? "Vegan " : "";
-        return   "№"+getId()+" "+
-                vegan + getName()+ "\ncost: "+getPrice()+ " BGN";
+        return "№" + getId() + " " +
+                vegan + getName() + "\ncost: " + getPrice() + " BGN";
     }
 }

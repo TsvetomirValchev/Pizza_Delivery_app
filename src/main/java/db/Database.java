@@ -11,12 +11,12 @@ import java.util.Properties;
  constructor of the abstract class)?*/
 public class Database {
 
-    private final String DB_USERNAME ;
+    private final String DB_USERNAME;
     private final String DB_PASSWORD;
     private final String DB_URL;
 
-    public Database(){
-        try(FileInputStream is = new FileInputStream("db.properties")) {
+    public Database() {
+        try (FileInputStream is = new FileInputStream("db.properties")) {
             Properties props = new Properties();
             props.load(is);
             DB_URL = props.getProperty("db.url");
@@ -30,9 +30,9 @@ public class Database {
     }
 
     public Connection getConnection() throws SQLException {
-        try{
+        try {
             return DriverManager.getConnection(DB_URL, DB_USERNAME, DB_PASSWORD);
-        }catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println("Something went wrong with getting connection");
             throw e;
         }

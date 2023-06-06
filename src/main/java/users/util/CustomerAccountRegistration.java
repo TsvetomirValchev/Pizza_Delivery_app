@@ -12,22 +12,21 @@ public class CustomerAccountRegistration {
         this.customer = customer;
     }
 
-   public void RegisterCustomer(){
+    public void RegisterCustomer() {
         try {
             UserAccountValidator validator = new UserAccountValidator(customer);
-                if(!validator.areCredentialsMatching()) {
-                        validator.isValidUser();
-                        buildCustomer();
-                }
+            if (!validator.areCredentialsMatching()) {
+                validator.isValidUser();
+                buildCustomer();
             }
-        catch (IllegalArgumentException e)
-            {
-                System.err.println(e.getMessage());
-            }
-        }
-        private void buildCustomer(){
-            new AdminService().addCustomer(customer);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
         }
     }
+
+    private void buildCustomer() {
+        new AdminService().addCustomer(customer);
+    }
+}
 
 

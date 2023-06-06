@@ -5,14 +5,14 @@ import products.ingredient.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Pizza extends Product{
-private final Size size;
-private final List<Cheese> cheeses;
-private final List<Meat> meats;
-private final Sauce sauce;
-private final List<Addon> addons;
+public class Pizza extends Product {
+    private final Size size;
+    private final List<Cheese> cheeses;
+    private final List<Meat> meats;
+    private final Sauce sauce;
+    private final List<Addon> addons;
 
-    public Pizza(Integer id, String name, Double price,Size size,Sauce sauce, List<Meat> meats, List<Cheese> cheese, List<Addon> addons ) {
+    public Pizza(Integer id, String name, Double price, Size size, Sauce sauce, List<Meat> meats, List<Cheese> cheese, List<Addon> addons) {
         super(id, name, price);
         this.size = size;
         this.sauce = sauce;
@@ -44,13 +44,13 @@ private final List<Addon> addons;
 
     @Override
     public String toString() {
-        return   "№"+getId()+"."+
-                getName() +" pizza \ningredients:" +" "+
-                getSauce().getName()+","+
+        return "№" + getId() + "." +
+                getName() + " pizza \ningredients:" + " " +
+                getSauce().getName() + "," +
                 getMeats().stream().map(Meat::getName).collect(Collectors.joining(","))
                 + "," + getCheeses().stream().map(Cheese::getName).collect(Collectors.joining(","))
                 + "," + getAddons().stream().map(Addon::getName).collect(Collectors.joining(",")) +
-                "\ncosts:" +getPrice()+" BGN";
+                "\ncosts:" + getPrice() + " BGN";
     }
 }
 

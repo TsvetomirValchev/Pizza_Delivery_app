@@ -5,7 +5,7 @@ import products.Product;
 import java.sql.*;
 import java.util.Map;
 
-public class ProductDAO extends DAO<Product>{
+public class ProductDAO extends DAO<Product> {
 
     public ProductDAO() {
         super("product", "id");
@@ -14,14 +14,14 @@ public class ProductDAO extends DAO<Product>{
     @Override
     protected String buildInsertQuery(Object object) {
         return "INSERT INTO " + this.tableName
-                +"(id,name,price)"
-                +"VALUES(?, ?, ?)";
+                + "(id,name,price)"
+                + "VALUES(?, ?, ?)";
     }
 
     @Override
     protected void setInsertValues(PreparedStatement statement, Object object) throws SQLException {
         if (object instanceof Product product) {
-            statement.setInt(1,product.getId());
+            statement.setInt(1, product.getId());
             statement.setString(2, product.getName());
             statement.setDouble(3, product.getPrice());
         }
@@ -45,7 +45,7 @@ public class ProductDAO extends DAO<Product>{
     @Override
     String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(
-                1,"id",
+                1, "id",
                 2, "name",
                 3, "price"
         );
@@ -56,10 +56,10 @@ public class ProductDAO extends DAO<Product>{
 
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
-        switch (variableIndex){
+        switch (variableIndex) {
             case 1 -> statement.setInt(1, (Integer) updatedValue);
-            case 2 -> statement.setString(2,(String) updatedValue);
-            case 3 -> statement.setDouble(3,(Double) updatedValue);
+            case 2 -> statement.setString(2, (String) updatedValue);
+            case 3 -> statement.setDouble(3, (Double) updatedValue);
         }
     }
 }

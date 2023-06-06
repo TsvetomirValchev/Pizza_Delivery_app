@@ -1,11 +1,11 @@
 package users;
 
-public class Customer extends User{
+public class Customer extends User {
     private final Integer id;
     private final String email;
     private final String address;
 
-    public Customer(String username, String password,Integer id,String email,String address) {
+    public Customer(String username, String password, Integer id, String email, String address) {
         super(username, password);
         this.id = id;
         this.email = email;
@@ -28,8 +28,8 @@ public class Customer extends User{
 
     @Override
     public String toString() {
-        return   " | username: "+ getUsername()
-                +" | e-mail: " + getEmail()
-                +" | delivery address: "+ getAddress()+" |";
+        return " | username: " + getUsername()
+                + " | e-mail: " + getEmail()
+                + " | delivery address: " + getAddress() + " |";
     }
 }

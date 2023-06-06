@@ -8,16 +8,16 @@ import products.Product;
 import java.util.Comparator;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 
 public class CustomerView implements View {
 
     private static final Logger LOGGER = LogManager.getLogger(CustomerView.class.getName());
     private final CustomerService customerService;
 
-    public CustomerView(CustomerService customerService){
+    public CustomerView(CustomerService customerService) {
         this.customerService = customerService;
     }
 
@@ -29,9 +29,10 @@ public class CustomerView implements View {
         System.out.println("2. View all drinks");
         System.out.println("3. View all desserts");
         System.out.println("4. View your cart details");
-        System.out.println("5. Place an order");
-        System.out.println("6. Check order waiting for delivery details");
-        System.out.println("7. Mark your order as received");
+        System.out.println("5. Add a product to your cart");
+        System.out.println("6. Finalize order");
+        System.out.println("7. Check order details");
+        System.out.println("8. Mark your order as received");
         System.out.println("0. Exit");
 
     }
@@ -40,29 +41,30 @@ public class CustomerView implements View {
     public void getChoice() {
         Scanner scan = new Scanner(System.in);
         int choice;
-        do{
+        do {
             printMenu();
             choice = scan.nextInt();
             printSeparator(80);
-            switch (choice){
+            switch (choice) {
                 case 1 -> printAllPizzas();
                 case 2 -> printAllDrinks();
                 case 3 -> printAllDesserts();
                 case 4 -> printCartDetails();
                 case 5 -> AddAProductToShoppingCartMenu();
-                case 6 -> printCurrentOrderDetails();
-                case 7 -> markOrderAsReceivedMenu();
-                case 0-> System.out.println("Exiting..");
+                case 6 -> markOrderAsFinalizedMenu();
+                case 7 -> printCurrentOrderDetails();
+                case 8 -> markOrderAsReceivedMenu();
+                case 0 -> System.out.println("Exiting..");
                 default -> System.err.println("Enter a valid option!");
             }
-            if(choice!=0){
+            if (choice != 0) {
                 printSeparator(80);
             }
-        }while (choice!=0);
+        } while (choice != 0);
 
     }
 
-    private void markOrderAsReceivedMenu(){
+    private void markOrderAsReceivedMenu() {
         try {
             Scanner scanner = new Scanner(System.in);
 
@@ -70,7 +72,7 @@ public class CustomerView implements View {
             System.out.println("1.Yes\n2.No");
             int choice = scanner.nextInt();
 
-            switch (choice){
+            switch (choice) {
                 case 1 -> {
                     customerService.markOrderAsReceived();
                     System.out.println("Order has been delivered, thank you for choosing our restaurant!");
@@ -79,7 +81,7 @@ public class CustomerView implements View {
                 case 2 -> getChoice();
             }
 
-        }catch (InputMismatchException e) {
+        } catch (InputMismatchException e) {
             LOGGER.warn(e.getMessage());
             System.err.println("Please select one of the options");
             markOrderAsReceivedMenu();
@@ -88,8 +90,8 @@ public class CustomerView implements View {
 
     }
 
-    private void AddAProductToShoppingCartMenu(){
-        try{
+    private void AddAProductToShoppingCartMenu() {
+        try {
             Scanner scanner = new Scanner(System.in);
 
             printAllProductsInTheRestaurant();
@@ -102,14 +104,14 @@ public class CustomerView implements View {
                 System.out.println("Product has been added to your order");
             }
             markOrderAsFinalizedMenu();
-        }catch (InputMismatchException e){
+        } catch (InputMismatchException e) {
             LOGGER.warn(e.getMessage());
             System.err.println("Invalid input format!");
             AddAProductToShoppingCartMenu();
         }
     }
 
-    private void markOrderAsFinalizedMenu(){
+    private void markOrderAsFinalizedMenu() {
         try {
             Scanner scanner = new Scanner(System.in);
 
@@ -117,7 +119,7 @@ public class CustomerView implements View {
             System.out.println("1.Yes\n2.No");
             int choice = scanner.nextInt();
 
-            switch (choice){
+            switch (choice) {
                 case 1 -> {
                     customerService.markOrderAsFinalized();
                     System.out.println("Order has been finalized and is waiting for delivery...");
@@ -126,7 +128,7 @@ public class CustomerView implements View {
                 case 2 -> getChoice();
             }
 
-        }catch (InputMismatchException e) {
+        } catch (InputMismatchException e) {
             LOGGER.warn(e.getMessage());
             System.err.println("Please select one of the options");
             markOrderAsReceivedMenu();
@@ -135,20 +137,25 @@ public class CustomerView implements View {
 
     }
 
-    private void printCurrentOrderDetails(){
+    private void printCurrentOrderDetails() {
         System.out.println("All products in your order:");
-        customerService.getAllProductsInCurrentlyDeliveringOrder();
+        customerService.getAllProductsInCurrentlyDeliveringOrder().stream()
+                .sorted(Comparator.comparing(Product::getPrice))
+                .forEach(System.out::println);
         System.out.println("Order total: " + customerService.calculateCurrentOrderTotal());
     }
 
-    private void printCartDetails(){
+    private void printCartDetails() {
         System.out.println("All products in your order:");
-        customerService.getAllProductsInCart();
+        customerService.getAllProductsInCart()
+                .stream()
+                .sorted(Comparator.comparing(Product::getPrice))
+                .forEach(System.out::println);
         System.out.println("Order total: " + customerService.calculateCartTotal());
     }
 
 
-    private void printAllProductsInTheRestaurant(){
+    private void printAllProductsInTheRestaurant() {
         printSeparator(100);
         printAllPizzas();
         printSeparator(100);
@@ -157,7 +164,7 @@ public class CustomerView implements View {
         printAllDesserts();
     }
 
-    private void printAllPizzas(){
+    private void printAllPizzas() {
         System.out.println("All pizzas in our restaurant:");
         customerService.getAllPizzas()
                 .values()
@@ -166,16 +173,17 @@ public class CustomerView implements View {
                 .forEach(System.out::println);
     }
 
-    private void printAllDesserts(){
+    private void printAllDesserts() {
         System.out.println("All desserts in our restaurant:");
         customerService.getAllDesserts()
                 .values()
                 .stream()
                 .sorted(Comparator.comparing(Product::getId))
-                .forEach(System.out::println);;
+                .forEach(System.out::println);
+        ;
     }
 
-    private void printAllDrinks(){
+    private void printAllDrinks() {
         System.out.println("All drinks in our restaurant:");
         customerService.getAllDrinks()
                 .values()

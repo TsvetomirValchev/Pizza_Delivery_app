@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class CustomerDAO extends DAO<Customer>{
+public class CustomerDAO extends DAO<Customer> {
 
     protected CustomerDAO() {
         super("customer", "id");
@@ -49,7 +49,7 @@ public class CustomerDAO extends DAO<Customer>{
     protected void setUpdatedValues(PreparedStatement statement, int propertyIndex, Object updatedValue) throws SQLException {
         switch (propertyIndex) {
             case 1 -> statement.setInt(1, (int) updatedValue);
-            case 2,3,4,5 -> statement.setString(1, (String) updatedValue);
+            case 2, 3, 4, 5 -> statement.setString(1, (String) updatedValue);
         }
     }
 
@@ -66,8 +66,6 @@ public class CustomerDAO extends DAO<Customer>{
         String columnName = columnMap.get(propertyIndex);
         return "UPDATE " + this.tableName + " SET " + columnName + "=? WHERE id=?";
     }
-
-
 
 
 }

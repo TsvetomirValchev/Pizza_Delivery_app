@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DrinkDAO extends DAO<Drink>{
+public class DrinkDAO extends DAO<Drink> {
 
     protected DrinkDAO() {
         super("drink", "product_id");
@@ -31,14 +31,15 @@ public class DrinkDAO extends DAO<Drink>{
         }
         return entries;
     }
+
     @Override
     protected String buildInsertQuery(Object object) {
-        return "INSERT INTO " + this.tableName + "(product_id, isDiet)"+ "VALUES(?, ?)";
+        return "INSERT INTO " + this.tableName + "(product_id, isDiet)" + "VALUES(?, ?)";
     }
 
     @Override
     protected void setInsertValues(PreparedStatement statement, Object object) throws SQLException {
-        if(object instanceof Drink drink){
+        if (object instanceof Drink drink) {
             statement.setInt(1, drink.getId());
             statement.setBoolean(2, drink.isDiet());
         }
@@ -61,9 +62,9 @@ public class DrinkDAO extends DAO<Drink>{
 
     @Override
     String buildUpdateQuery(int variableIndex) {
-       Map<Integer, String> columnMap = Map.of(
-               1,"product_id",
-               2, "isDiet"
+        Map<Integer, String> columnMap = Map.of(
+                1, "product_id",
+                2, "isDiet"
         );
         String columnName = columnMap.get(variableIndex);
         return "UPDATE " + this.tableName + " SET " + columnName + "=? WHERE product_id=?";
@@ -73,7 +74,7 @@ public class DrinkDAO extends DAO<Drink>{
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         switch (variableIndex) {
             case 1 -> statement.setInt(1, (Integer) updatedValue);
-            case 2 -> statement.setBoolean(1,(boolean) updatedValue);
+            case 2 -> statement.setBoolean(1, (boolean) updatedValue);
         }
     }
 }
