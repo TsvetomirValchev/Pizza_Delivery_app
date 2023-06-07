@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 public class LoginView extends View {
 
     private static final Logger LOGGER = LogManager.getLogger(LoginView.class.getName());
-    private static final Admin admin = new Admin();
+    private final Admin admin = new Admin();
 
     @Override
     public void printMenu() {
