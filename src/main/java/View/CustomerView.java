@@ -172,11 +172,15 @@ public class CustomerView extends View {
                 .stream()
                 .sorted(Comparator.comparing(Product::getId))
                 .forEach(System.out::println);
-        ;
+
     }
 
     private void printAllDrinks() {
-
+        customerService.getAllDrinks()
+                .values()
+                .stream()
+                .sorted(Comparator.comparing(Product::getId))
+                .forEach(System.out::println);
     }
 
 
