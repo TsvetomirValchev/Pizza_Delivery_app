@@ -3,7 +3,6 @@ package View;
 import products.ingredient.*;
 import products.Product;
 import users.Customer;
-import View.abstraction.View;
 import db.AdminService;
 
 import java.util.*;
@@ -11,7 +10,7 @@ import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AdminView implements View {
+public class AdminView extends View {
 
     private static final Logger LOGGER = LogManager.getLogger(AdminView.class.getName());
     private final AdminService adminService;
@@ -23,6 +22,7 @@ public class AdminView implements View {
 
     @Override
     public void printMenu() {
+        System.out.println("-------------------------------------------------------------------------------------");
         System.out.println("What would you like to do?");
         System.out.println("1. Add a new product to the menu");
         System.out.println("2. Delete a product from the menu");
@@ -30,6 +30,7 @@ public class AdminView implements View {
         System.out.println("4. View all products offered by the restaurant");
         System.out.println("5. View all customers");
         System.out.println("0. Exit");
+        System.out.println("-------------------------------------------------------------------------------------");
     }
 
     @Override
@@ -39,18 +40,14 @@ public class AdminView implements View {
         do {
             printMenu();
             choice = scan.nextInt();
-            printSeparator(80);
             switch (choice) {
                 case 1 -> addAProductMenu();
                 case 2 -> deleteAProductMenu();
                 case 3 -> deleteAccountMenu();
-                case 4 -> readAllProductsInTheRestaurant();
+                case 4 -> printAllProductsInTheRestaurant();
                 case 5 -> readAllCustomers();
                 case 0 -> System.out.println("Exiting...");
                 default -> LOGGER.error("Enter a valid option!");
-            }
-            if (choice != 0) {
-                printSeparator(80);
             }
         } while (choice != 0);
     }
@@ -58,7 +55,6 @@ public class AdminView implements View {
     private void deleteAccountMenu() {
         try {
             readAllCustomers();
-            printSeparator(100);
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the username of the account you want to delete: ");
             String username = scanner.nextLine();
@@ -74,14 +70,11 @@ public class AdminView implements View {
         Scanner scanner = new Scanner(System.in);
         int choice;
         do {
-            printSeparator(100);
             System.out.println("What product do you want to add?");
-            printSeparator(100);
             System.out.println("1. Pizza");
             System.out.println("2. Drink");
             System.out.println("3. Dessert");
             System.out.println("0. Do something else ");
-            printSeparator(100);
             choice = scanner.nextInt();
             switch (choice) {
                 case 1 -> addAPizzaMenu();
@@ -98,14 +91,11 @@ public class AdminView implements View {
         Scanner scanner = new Scanner(System.in);
         int choice;
         do {
-            printSeparator(100);
             System.out.println("What product do you want to remove?");
-            printSeparator(100);
             System.out.println("1. Pizza");
             System.out.println("2. Drink");
             System.out.println("3. Dessert");
             System.out.println("0. Do something else ");
-            printSeparator(100);
             choice = scanner.nextInt();
             switch (choice) {
                 case 1 -> deleteAPizzaMenu();
@@ -163,22 +153,17 @@ public class AdminView implements View {
             Scanner scanner = new Scanner(System.in);
             Product product = createAProductMenu();
             readAllIngredients("size");
-            printSeparator(100);
             System.out.println("Choose the size of the pizza(by entering it's id):");
             int sizeId = scanner.nextInt();
             scanner.nextLine();
             Size size = new Size(sizeId, "");
             readAllIngredients("sauce");
-            printSeparator(100);
             System.out.println("Choose the sauce(by entering it's id):");
             int sauceId = scanner.nextInt();
             scanner.nextLine();
             Sauce sauce = new Sauce(sauceId, "");
-            printSeparator(100);
             List<Cheese> cheeses = selectCheese();
-            printSeparator(100);
             List<Meat> meats = selectMeat();
-            printSeparator(100);
             List<Addon> addons = selectAddon();
             adminService.createPizzaProduct(product.getId(), product.getName(), product.getPrice(), size, sauce, meats, cheeses, addons);
 
@@ -196,7 +181,6 @@ public class AdminView implements View {
 
     private List<Meat> selectMeat() {
         Scanner scanner = new Scanner(System.in);
-        printSeparator(100);
         List<Meat> meats = new ArrayList<>();
         int input;
         do {
@@ -214,7 +198,6 @@ public class AdminView implements View {
 
     private List<Cheese> selectCheese() {
         Scanner scanner = new Scanner(System.in);
-        printSeparator(100);
         List<Cheese> cheeses = new ArrayList<>();
         int input;
         do {
@@ -232,7 +215,6 @@ public class AdminView implements View {
 
     private List<Addon> selectAddon() {
         Scanner scanner = new Scanner(System.in);
-        printSeparator(100);
 
         List<Addon> addons = new ArrayList<>();
         int input;
@@ -258,19 +240,15 @@ public class AdminView implements View {
             System.out.println("Enter the identification number of the product");
             id = scanner.nextInt();
             scanner.nextLine();
-            printSeparator(100);
             System.out.println("Enter the name of the product");
             productName = scanner.nextLine();
-            printSeparator(100);
             System.out.println("Enter the price of the product");
             price = scanner.nextDouble();
-            printSeparator(100);
 
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
             if (e instanceof NumberFormatException) {
                 LOGGER.error("Invalid price!");
-
             } else {
                 LOGGER.error("Invalid input!");
 
@@ -282,8 +260,7 @@ public class AdminView implements View {
 
     private void deleteAPizzaMenu() {
         try {
-            readAllPizzas();
-            printSeparator(100);
+            printAllPizzas();
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the product id of the pizza you want to delete: ");
             int productId = scanner.nextInt();
@@ -298,8 +275,7 @@ public class AdminView implements View {
 
     private void deleteADrinkMenu() {
         try {
-            readAllDrinks();
-            printSeparator(100);
+            printAllDrinks();
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the product id of the drink you want to delete: ");
             int productId = scanner.nextInt();
@@ -316,8 +292,7 @@ public class AdminView implements View {
 
     private void deleteADessertMenu() {
         try {
-            readAllDesserts();
-            printSeparator(100);
+            printAllDesserts();
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the product id of the dessert you want to delete: ");
             int productId = scanner.nextInt();
@@ -344,7 +319,7 @@ public class AdminView implements View {
                 .forEach(System.out::println);
     }
 
-    private void readAllPizzas() {
+    private void printAllPizzas() {
         adminService.getAllPizzas()
                 .values()
                 .stream()
@@ -353,7 +328,7 @@ public class AdminView implements View {
     }
 
 
-    private void readAllDrinks() {
+    private void printAllDrinks() {
         adminService.getAllDrinks()
                 .values()
                 .stream()
@@ -361,7 +336,7 @@ public class AdminView implements View {
                 .forEach(System.out::println);
     }
 
-    private void readAllDesserts() {
+    private void printAllDesserts() {
         adminService.getAllDesserts()
                 .values()
                 .stream()
@@ -369,15 +344,13 @@ public class AdminView implements View {
                 .forEach(System.out::println);
     }
 
-    private void readAllProductsInTheRestaurant() {
+    private void printAllProductsInTheRestaurant() {
         System.out.println("All pizzas in the restaurant:\n");
-        readAllPizzas();
-        printSeparator(100);
+        printAllPizzas();
         System.out.println("All drinks in the restaurant:\n");
-        readAllDrinks();
-        printSeparator(100);
+        printAllDrinks();
         System.out.println("All desserts in the restaurant:\n");
-        readAllDesserts();
+        printAllDesserts();
 
     }
 

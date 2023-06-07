@@ -1,6 +1,5 @@
 package View;
 
-import View.abstraction.View;
 import db.CustomerService;
 import products.Pizza;
 import products.Product;
@@ -12,7 +11,7 @@ import java.util.Scanner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class CustomerView implements View {
+public class CustomerView extends View {
 
     private static final Logger LOGGER = LogManager.getLogger(CustomerView.class.getName());
     private final CustomerService customerService;
@@ -24,6 +23,7 @@ public class CustomerView implements View {
 
     @Override
     public void printMenu() {
+        System.out.println("-------------------------------------------------------------------------------------");
         System.out.println("\nWelcome to the imaginary pizza restaurant!\n");
         System.out.println("1. View all pizzas");
         System.out.println("2. View all drinks");
@@ -34,7 +34,7 @@ public class CustomerView implements View {
         System.out.println("7. Check order details");
         System.out.println("8. Mark your order as received");
         System.out.println("0. Exit");
-
+        System.out.println("-------------------------------------------------------------------------------------");
     }
 
     @Override
@@ -44,7 +44,6 @@ public class CustomerView implements View {
         do {
             printMenu();
             choice = scan.nextInt();
-            printSeparator(80);
             switch (choice) {
                 case 1 -> printAllPizzas();
                 case 2 -> printAllDrinks();
@@ -56,9 +55,6 @@ public class CustomerView implements View {
                 case 8 -> markOrderAsReceivedMenu();
                 case 0 -> System.out.println("Exiting..");
                 default -> LOGGER.error("Enter a valid option!");
-            }
-            if (choice != 0) {
-                printSeparator(80);
             }
         } while (choice != 0);
 
@@ -95,7 +91,6 @@ public class CustomerView implements View {
             Scanner scanner = new Scanner(System.in);
 
             printAllProductsInTheRestaurant();
-            printSeparator(100);
 
             System.out.println("Enter the ID of the product you wish to add to your cart:  ");
             int productId = scanner.nextInt();
@@ -156,11 +151,8 @@ public class CustomerView implements View {
 
 
     private void printAllProductsInTheRestaurant() {
-        printSeparator(100);
         printAllPizzas();
-        printSeparator(100);
         printAllDrinks();
-        printSeparator(100);
         printAllDesserts();
     }
 
@@ -184,12 +176,7 @@ public class CustomerView implements View {
     }
 
     private void printAllDrinks() {
-        System.out.println("All drinks in our restaurant:");
-        customerService.getAllDrinks()
-                .values()
-                .stream()
-                .sorted(Comparator.comparing(Product::getId))
-                .forEach(System.out::println);
+
     }
 
 

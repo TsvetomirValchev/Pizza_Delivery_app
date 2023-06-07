@@ -1,7 +1,6 @@
 package View;
 
 import Registration.RegistrationService;
-import View.abstraction.View;
 import db.AdminService;
 import db.CustomerService;
 import users.Admin;
@@ -14,17 +13,19 @@ import java.util.Scanner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class LoginView implements View {
+public class LoginView extends View {
 
     private static final Logger LOGGER = LogManager.getLogger(LoginView.class.getName());
     private static final Admin admin = new Admin();
 
     @Override
     public void printMenu() {
+        System.out.println("-------------------------------------------------------------------------------------");
         System.out.println("Welcome!");
         System.out.println("1.Login");
         System.out.println("2.Register");
         System.out.println("0.Exit");
+        System.out.println("-------------------------------------------------------------------------------------");
     }
 
     @Override
@@ -36,14 +37,8 @@ public class LoginView implements View {
                 printMenu();
                 choice = scanner.nextInt();
                 switch (choice) {
-                    case 1 -> {
-                        printSeparator(100);
-                        printLoginMenu();
-                    }
-                    case 2 -> {
-                        printSeparator(100);
-                        accountCreationChoice();
-                    }
+                    case 1 -> printLoginMenu();
+                    case 2 -> accountCreationChoice();
                     case 0 -> System.out.println("Exiting!");
                     default -> LOGGER.error("Invalid account details!");
                 }
@@ -81,7 +76,6 @@ public class LoginView implements View {
                 openCustomerView(customer);
             } else if (customer != null) {
                 LOGGER.error("Wrong password!");
-                printSeparator(100);
                 printLoginMenu();
             } else {
                 LOGGER.error("No account found with this username");
@@ -102,13 +96,11 @@ public class LoginView implements View {
         switch (choice) {
             case 1 -> {
                 printRegistrationMenu();
-                printSeparator(100);
                 System.out.println("Account created!");
                 getChoice();
             }
             case 2 -> {
                 System.out.println("Account creation canceled!");
-                printSeparator(100);
                 getChoice();
             }
             default -> {
@@ -154,7 +146,6 @@ public class LoginView implements View {
         AdminService adminService = new AdminService();
         View adminView = new AdminView(adminService);
         adminView.getChoice();
-
     }
 
     private void openCustomerView(Customer customer) {
@@ -162,7 +153,6 @@ public class LoginView implements View {
         CustomerService customerService = new CustomerService(customer);
         View customerView = new CustomerView(customerService);
         customerView.getChoice();
-
     }
 
 
