@@ -113,7 +113,7 @@ public class PizzaDAO extends DAO<Pizza> {
         }
     }
 
-    //Ingredients table utils
+
     public Map<Integer, Ingredient> readAllIngredients(String tableName) throws SQLException {
         String query = "SELECT * FROM " + tableName;
 

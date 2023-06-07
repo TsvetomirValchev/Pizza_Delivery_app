@@ -79,8 +79,6 @@ public class OrderDAO extends DAO<Order> {
         return object.getId();
     }
 
-
-    //utils for order_item
     public List<Product> getAllProductsInOrder(int OrderId) throws SQLException {
         String query = "SELECT product_id, name, price FROM order_item " +
                 "JOIN orders ON order_id = orders.id " +
