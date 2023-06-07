@@ -55,7 +55,7 @@ public class CustomerView implements View {
                 case 7 -> printCurrentOrderDetails();
                 case 8 -> markOrderAsReceivedMenu();
                 case 0 -> System.out.println("Exiting..");
-                default -> System.err.println("Enter a valid option!");
+                default -> LOGGER.error("Enter a valid option!");
             }
             if (choice != 0) {
                 printSeparator(80);
@@ -83,7 +83,7 @@ public class CustomerView implements View {
 
         } catch (InputMismatchException e) {
             LOGGER.warn(e.getMessage());
-            System.err.println("Please select one of the options");
+            LOGGER.error("Please select one of the options");
             markOrderAsReceivedMenu();
 
         }
@@ -106,7 +106,7 @@ public class CustomerView implements View {
             markOrderAsFinalizedMenu();
         } catch (InputMismatchException e) {
             LOGGER.warn(e.getMessage());
-            System.err.println("Invalid input format!");
+            LOGGER.error("Invalid input format!");
             addAProductToShoppingCartMenu();
         }
     }
@@ -130,7 +130,7 @@ public class CustomerView implements View {
 
         } catch (InputMismatchException e) {
             LOGGER.warn(e.getMessage());
-            System.err.println("Please select one of the options");
+            LOGGER.error("Please select one of the options");
             markOrderAsReceivedMenu();
 
         }

@@ -45,12 +45,12 @@ public class LoginView implements View {
                         accountCreationChoice();
                     }
                     case 0 -> System.out.println("Exiting!");
-                    default -> System.err.println("Invalid account details!");
+                    default -> LOGGER.error("Invalid account details!");
                 }
             } while (choice != 0);
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());
-            System.err.println("Invalid input");
+            LOGGER.error("Invalid input");
             getChoice();
         }
 
@@ -69,7 +69,7 @@ public class LoginView implements View {
 
         } catch (IllegalArgumentException e) {
             LOGGER.debug(e.getMessage());
-            System.err.println("Please enter valid account credentials");
+            LOGGER.error("Please enter valid account credentials");
             printLoginMenu();
         }
 
@@ -80,11 +80,11 @@ public class LoginView implements View {
             if (customer != null && customer.getPassword().equals(password)) {
                 openCustomerView(customer);
             } else if (customer != null) {
-                System.err.println("Wrong password!");
+                LOGGER.error("Wrong password!");
                 printSeparator(100);
                 printLoginMenu();
             } else {
-                System.err.println("No account found with this username");
+                LOGGER.error("No account found with this username");
                 accountCreationChoice();
             }
 
@@ -143,7 +143,7 @@ public class LoginView implements View {
 
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());
-            System.err.println("Invalid data entered");
+            LOGGER.error("Invalid data entered");
             printRegistrationMenu();
         }
 

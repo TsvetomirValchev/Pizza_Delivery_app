@@ -47,7 +47,7 @@ public class AdminView implements View {
                 case 4 -> readAllProductsInTheRestaurant();
                 case 5 -> readAllCustomers();
                 case 0 -> System.out.println("Exiting...");
-                default -> System.err.println("Enter a valid option!");
+                default -> LOGGER.error("Enter a valid option!");
             }
             if (choice != 0) {
                 printSeparator(80);
@@ -129,9 +129,9 @@ public class AdminView implements View {
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
             if (e instanceof NumberFormatException) {
-                System.err.println("Invalid price!");
+                LOGGER.error("Invalid price!");
             } else {
-                System.err.println("Invalid input!");
+                LOGGER.error("Invalid input!");
             }
             addADrinkMenu();
         }
@@ -149,9 +149,9 @@ public class AdminView implements View {
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
             if (e instanceof NumberFormatException) {
-                System.err.println("Invalid price!");
+                LOGGER.error("Invalid price!");
             } else {
-                System.err.println("Invalid input!");
+                LOGGER.error("Invalid input!");
             }
             addADessertMenu();
         }
@@ -185,9 +185,9 @@ public class AdminView implements View {
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
             if (e instanceof NumberFormatException) {
-                System.err.println("Invalid price!");
+                LOGGER.error("Invalid price!");
             } else {
-                System.err.println("Invalid input!");
+                LOGGER.error("Invalid input!");
 
             }
             addAPizzaMenu();
@@ -269,10 +269,10 @@ public class AdminView implements View {
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
             if (e instanceof NumberFormatException) {
-                System.err.println("Invalid price!");
+                LOGGER.error("Invalid price!");
 
             } else {
-                System.err.println("Invalid input!");
+                LOGGER.error("Invalid input!");
 
             }
             createAProductMenu();
@@ -290,7 +290,7 @@ public class AdminView implements View {
             adminService.deletePizza(productId);
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());
-            System.err.println("Something went wrong with deleting the pizza.");
+            LOGGER.error("Something went wrong with deleting the pizza.");
             deleteAPizzaMenu();
         }
 
@@ -307,7 +307,7 @@ public class AdminView implements View {
 
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());
-            System.err.println(e.getMessage());
+            LOGGER.error(e.getMessage());
             deleteADrinkMenu();
         }
 
@@ -324,7 +324,7 @@ public class AdminView implements View {
             adminService.deleteDessert(productId);
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());
-            System.err.println(e.getMessage());
+            LOGGER.error(e.getMessage());
             deleteADessertMenu();
         }
 
