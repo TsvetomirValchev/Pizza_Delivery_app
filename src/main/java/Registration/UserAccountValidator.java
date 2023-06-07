@@ -1,4 +1,4 @@
-package users.util;
+package Registration;
 
 import users.Admin;
 import users.Customer;

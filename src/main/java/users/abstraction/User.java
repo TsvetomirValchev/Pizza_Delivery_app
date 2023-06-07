@@ -1,4 +1,4 @@
-package users;
+package users.abstraction;
 
 public abstract class User {
     private final String username;

@@ -1,5 +1,6 @@
 package View;
 
+import Registration.RegistrationService;
 import View.abstraction.View;
 import db.AdminService;
 import db.CustomerService;
@@ -137,7 +138,8 @@ public class LoginView implements View {
             String address = scanner.nextLine();
 
             Customer customer = new Customer(username, password, null, email, address);
-            //TODO: Call something to enter this customer account into the database
+            RegistrationService registrationService = new RegistrationService(customer);
+            registrationService.signUp();
 
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());

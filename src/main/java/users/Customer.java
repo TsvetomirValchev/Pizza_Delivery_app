@@ -1,5 +1,7 @@
 package users;
 
+import users.abstraction.User;
+
 public class Customer extends User {
     private final Integer id;
     private final String email;
