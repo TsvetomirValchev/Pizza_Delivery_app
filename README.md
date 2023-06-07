@@ -3,7 +3,8 @@ A console application that performs various CRUD operations on a mySQL 8.0 datab
 
 This is the most recent schema of the database: 
 
-![image](https://github.com/TsvetomirValchev/Pizza_Delivery_app/assets/92424452/59482964-3f3c-46f8-87de-977e90c0c2a0)
+![image](https://github.com/TsvetomirValchev/Pizza_Delivery_app/assets/92424452/01f41ea8-d78d-41a4-b3f5-6f28eaebc606)
+
 
 There are 2 types of users in the app
 
