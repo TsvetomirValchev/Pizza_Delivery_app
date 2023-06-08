@@ -23,7 +23,7 @@ public class RegistrationService {
                 new AdminService().addCustomer(customer);
             }
 
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalStateException e) {
             LOGGER.error(e.getMessage());
         }
 

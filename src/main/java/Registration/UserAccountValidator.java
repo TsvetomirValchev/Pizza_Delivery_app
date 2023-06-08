@@ -22,19 +22,19 @@ public class UserAccountValidator {
 
     void isValidUser() {
         if (!isValidEmail()) {
-            throw new IllegalArgumentException("Invalid email");
+            throw new IllegalStateException("Invalid email");
         }
         if (isEmailTaken()) {
-            throw new IllegalArgumentException("There is already an account with that email!");
+            throw new IllegalStateException("There is already an account with that email!");
         }
         if (!isValidUsername()) {
-            throw new IllegalArgumentException("Invalid username!");
+            throw new IllegalStateException("Invalid username!");
         }
         if (isUsernameTaken()) {
-            throw new IllegalArgumentException("This username is taken!");
+            throw new IllegalStateException("This username is taken!");
         }
         if (!isValidPassword()) {
-            throw new IllegalArgumentException("\"Invalid password!\\nPassword must include:\\nat least 1 uppercase letter,\\nat least 1 lowercase letter,\\nat least 1 number.\"");
+            throw new IllegalStateException("\"Invalid password!\\nPassword must include:\\nat least 1 uppercase letter,\\nat least 1 lowercase letter,\\nat least 1 number.\"");
         }
 
     }

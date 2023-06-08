@@ -1,6 +1,5 @@
 package db;
 
-import View.AdminView;
 import order.Order;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,7 +13,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public class CustomerService {
+public class CustomerService extends Service {
 
     private static final Logger LOGGER = LogManager.getLogger(CustomerService.class.getName());
     private final DAO<Pizza> pizzaDAO = new PizzaDAO();
@@ -130,33 +129,6 @@ public class CustomerService {
             LOGGER.error("Couldn't update order status!");
         }
 
-    }
-
-    public Map<Integer, Pizza> getAllPizzas() {
-        try {
-            return pizzaDAO.readAll();
-        } catch (SQLException e) {
-            LOGGER.debug(e.getMessage());
-        }
-        return Collections.emptyMap();
-    }
-
-    public Map<Integer, Dessert> getAllDesserts() {
-        try {
-            return dessertDAO.readAll();
-        } catch (SQLException e) {
-            LOGGER.debug(e.getMessage());
-        }
-        return Collections.emptyMap();
-    }
-
-    public Map<Integer, Drink> getAllDrinks() {
-        try {
-            return drinkDAO.readAll();
-        } catch (SQLException e) {
-            LOGGER.debug(e.getMessage());
-        }
-        return Collections.emptyMap();
     }
 
     //utils

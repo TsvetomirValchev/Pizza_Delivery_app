@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class AdminService {
+public class AdminService extends Service {
 
     private static final Logger LOGGER = LogManager.getLogger(AdminService.class.getName());
     private final PizzaDAO pizzaDAO = new PizzaDAO();
@@ -26,36 +26,6 @@ public class AdminService {
     private final DAO<Dessert> dessertDAO = new DessertDAO();
     private final DAO<Customer> customerDAO = new CustomerDAO();
     private final OrderDAO orderDAO = new OrderDAO();
-
-    public AdminService() {
-    }
-
-    public Map<Integer, Pizza> getAllPizzas() {
-        try {
-            return pizzaDAO.readAll();
-        } catch (SQLException e) {
-            LOGGER.debug(e);
-        }
-        return Collections.emptyMap();
-    }
-
-    public Map<Integer, Drink> getAllDrinks() {
-        try {
-            return drinkDAO.readAll();
-        } catch (SQLException e) {
-            LOGGER.debug(e);
-        }
-        return Collections.emptyMap();
-    }
-
-    public Map<Integer, Dessert> getAllDesserts() {
-        try {
-            return dessertDAO.readAll();
-        } catch (SQLException e) {
-            LOGGER.debug(e);
-        }
-        return Collections.emptyMap();
-    }
 
     public void createDrinkProduct(int productId, String name, double price, Boolean isDiet) {
         addProduct(productId, name, price);
