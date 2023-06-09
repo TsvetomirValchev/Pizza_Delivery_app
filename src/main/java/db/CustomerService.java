@@ -3,9 +3,6 @@ package db;
 import order.Order;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import products.Dessert;
-import products.Drink;
-import products.Pizza;
 import products.Product;
 import users.Customer;
 
@@ -16,9 +13,6 @@ import java.util.*;
 public class CustomerService extends Service {
 
     private static final Logger LOGGER = LogManager.getLogger(CustomerService.class.getName());
-    private final DAO<Pizza> pizzaDAO = new PizzaDAO();
-    private final DAO<Dessert> dessertDAO = new DessertDAO();
-    private final DAO<Drink> drinkDAO = new DrinkDAO();
     private final DAO<Product> productDAO = new ProductDAO();
     private final OrderDAO orderDAO = new OrderDAO();
     private final Customer customer;
@@ -33,7 +27,7 @@ public class CustomerService extends Service {
                 LOGGER.error("There is no product with such id");
                 return false;
             }
-            if (!isOrderFinalized()) {
+            if (isOrderFinalized()) {
                 addProductToCart(productId);
             } else {
                 orderDAO.insert(new Order(null,
@@ -120,7 +114,7 @@ public class CustomerService extends Service {
 
     public void markOrderAsFinalized() {
         try {
-            if (!isOrderFinalized()) {
+            if (isOrderFinalized()) {
                 orderDAO.update(getCartOrderIdByCustomerId(customer.getId()), 3, LocalDateTime.now());
             } else {
                 LOGGER.error("You do not have an order to finalize!");
@@ -191,15 +185,15 @@ public class CustomerService extends Service {
     private boolean isOrderFinalized() {
         try {
             for (Order order : orderDAO.readAll().values()) {
-                if (order.getCustomerId() == (customer.getId()) && order.getOrderedAt().isEmpty()) {
-                    return false;
+                if (order.getCustomerId() == (customer.getId()) && order.getOrderedAt().isPresent()) {
+                    return true;
                 }
             }
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Couldn't load order details!");
         }
-        return true;
+        return false;
     }
 
 }

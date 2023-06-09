@@ -103,7 +103,7 @@ public class AdminService extends Service {
                 pizzaDAO.deletePizzaIngredientList("addon", productId, "pizza_id");
                 pizzaDAO.delete(productId);
                 productDAO.delete(productId);
-                System.out.println("Pizza removed successfully! ");
+                System.out.println("Pizza removed successfully!");
             }
 
         } catch (SQLException e) {
@@ -215,7 +215,7 @@ public class AdminService extends Service {
     private void addAddonsToPizza(List<Addon> addons, int pizzaId) throws SQLException {
         try {
             for (Addon addon : addons) {
-                pizzaDAO.insertInPizzaCheeseTable(pizzaId, addon.getId());
+                pizzaDAO.insertInPizzaAddonTable(pizzaId, addon.getId());
             }
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage() + "1");
