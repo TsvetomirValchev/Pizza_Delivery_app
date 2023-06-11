@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Map;
 
-public abstract class Service {
+public class Service {
     private static final Logger LOGGER = LogManager.getLogger(Service.class.getName());
     private final PizzaDAO pizzaDAO = new PizzaDAO();
     private final DAO<Drink> drinkDAO = new DrinkDAO();

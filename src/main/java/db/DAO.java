@@ -48,7 +48,7 @@ public abstract class DAO<T> {
         return entries;
     }
 
-    protected void update(Object key, int variableIndex, Object updatedValue) throws SQLException {
+    protected void update(Integer key, int variableIndex, Object updatedValue) throws SQLException {
         String query = buildUpdateQuery(variableIndex);
         try (Connection connection = database.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -58,7 +58,7 @@ public abstract class DAO<T> {
         }
     }
 
-    protected void delete(Object key) throws SQLException {
+    protected void delete(Integer key) throws SQLException {
         String query = "DELETE FROM " + this.tableName + " WHERE " + this.tablePrimaryKey + "= ? ";
         try (Connection connection = database.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {

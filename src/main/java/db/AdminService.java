@@ -121,16 +121,6 @@ public class AdminService extends Service {
         return Collections.emptyMap();
     }
 
-    public void addCustomer(Customer customer) {
-        try {
-            customerDAO.insert(customer);
-        } catch (SQLException e) {
-            LOGGER.debug(e.getMessage());
-            LOGGER.error("Couldn't register customer!");
-        }
-
-    }
-
     public void deleteCustomer(String customerUsername) {
         try {
             Customer customer = getCustomerByUsername(customerUsername);
@@ -166,7 +156,6 @@ public class AdminService extends Service {
     }
 
 
-    //utils
     private void addProduct(int productId, String name, double price) {
         try {
             Product product = new Product(productId, name, price);

@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class CustomerDAO extends DAO<Customer> {
 
-    protected CustomerDAO() {
+    public CustomerDAO() {
         super("customer", "id");
     }
 
