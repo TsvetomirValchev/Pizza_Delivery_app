@@ -77,14 +77,14 @@ public class PizzaDAO extends DAO<Pizza> {
 
     @Override
     protected Pizza mapResultSetToModel(ResultSet resultSet) throws SQLException {
-        int pizzaId = resultSet.getInt("product_id");
+        int pizzaId = resultSet.getInt("id");
 
         List<Meat> meats = fetchMeatForPizza(pizzaId);
         List<Addon> addons = fetchAddonForPizza(pizzaId);
         List<Cheese> cheese = fetchCheeseForPizza(pizzaId);
 
         return new Pizza(
-                resultSet.getInt("id"),
+                resultSet.getInt("product_id"),
                 resultSet.getString("name"),
                 resultSet.getDouble("price"),
                 new Size(resultSet.getInt("size_id"), resultSet.getString("size_name")),
@@ -228,8 +228,8 @@ public class PizzaDAO extends DAO<Pizza> {
         return cheese;
     }
 
-    protected void deletePizzaIngredientList(String tableName, int pizzaId, String primaryKey) throws SQLException {
-        String query = "DELETE FROM " + tableName + " WHERE " + primaryKey + "= ? ";
+    protected void deletePizzaIngredientList(String tableName, int pizzaId) throws SQLException {
+        String query = "DELETE FROM " + tableName + " WHERE " + "pizza_id" + "= ? ";
         try (Connection connection = database.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setObject(1, pizzaId);

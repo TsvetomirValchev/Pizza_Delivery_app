@@ -3,7 +3,10 @@ package products;
 import products.ingredient.*;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Pizza extends Product {
     private final Size size;
@@ -44,13 +47,32 @@ public class Pizza extends Product {
 
     @Override
     public String toString() {
-        return "№" + getId() + "." +
-                getName() + " pizza \ningredients:" + " " +
-                getSauce().getName() + "," +
-                getMeats().stream().map(Meat::getName).collect(Collectors.joining(","))
-                + "," + getCheeses().stream().map(Cheese::getName).collect(Collectors.joining(","))
-                + "," + getAddons().stream().map(Addon::getName).collect(Collectors.joining(",")) +
-                "\ncosts:" + getPrice() + " BGN";
+        StringJoiner ingredientJoiner = new StringJoiner(",");
+
+        ingredientJoiner.add(getSauce().getName());
+
+        getMeats().stream()
+                .map(Meat::getName)
+                .filter(Objects::nonNull)
+                .forEach(ingredientJoiner::add);
+
+        getCheeses().stream()
+                .map(Cheese::getName)
+                .filter(Objects::nonNull)
+                .forEach(ingredientJoiner::add);
+
+        getAddons().stream()
+                .map(Addon::getName)
+                .filter(Objects::nonNull)
+                .forEach(ingredientJoiner::add);
+
+        return "\n№" + getId() + "." +
+                getName() + " pizza \ningredients: " +
+                ingredientJoiner +
+                "\ncosts: " + getPrice() + " BGN";
+
     }
+
+
 }
 

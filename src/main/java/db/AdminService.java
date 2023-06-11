@@ -98,9 +98,9 @@ public class AdminService extends Service {
             } else if (isProductCurrentlyOrdered(pizza.getId())) {
                 LOGGER.error("This product is currently in a delivery: '" + productId + "'");
             } else {
-                pizzaDAO.deletePizzaIngredientList("cheese", productId, "pizza_id");
-                pizzaDAO.deletePizzaIngredientList("meat", productId, "pizza_id");
-                pizzaDAO.deletePizzaIngredientList("addon", productId, "pizza_id");
+                pizzaDAO.deletePizzaIngredientList("pizza_cheese", productId);
+                pizzaDAO.deletePizzaIngredientList("pizza_meat", productId);
+                pizzaDAO.deletePizzaIngredientList("pizza_addon", productId);
                 pizzaDAO.delete(productId);
                 productDAO.delete(productId);
                 System.out.println("Pizza removed successfully!");

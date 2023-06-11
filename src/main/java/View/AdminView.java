@@ -47,7 +47,7 @@ public class AdminView extends View {
                 case 4 -> printAllProductsInTheRestaurant();
                 case 5 -> readAllCustomers();
                 case 0 -> System.out.println("Exiting...");
-                default -> LOGGER.error("Enter a valid option!");
+                default -> System.err.println("Enter a valid option!");
             }
         } while (choice != 0);
     }
@@ -110,6 +110,8 @@ public class AdminView extends View {
 
     private void addADrinkMenu() {
         try {
+            System.out.println("All currently available drinks:");
+            printAllDrinks();
             Scanner scanner = new Scanner(System.in);
             Product product = createAProductMenu();
             System.out.println("Is the drink Diet friendly?");
@@ -119,9 +121,9 @@ public class AdminView extends View {
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
             if (e instanceof NumberFormatException) {
-                LOGGER.error("Invalid price!");
+                System.err.println("Invalid price!");
             } else {
-                LOGGER.error("Invalid input!");
+                System.err.println("Invalid input!");
             }
             addADrinkMenu();
         }
@@ -130,6 +132,8 @@ public class AdminView extends View {
 
     private void addADessertMenu() {
         try {
+            System.out.println("All currently available desserts:");
+            printAllDesserts();
             Scanner scanner = new Scanner(System.in);
             Product product = createAProductMenu();
             System.out.println("Is the dessert vegan?");
@@ -139,9 +143,9 @@ public class AdminView extends View {
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
             if (e instanceof NumberFormatException) {
-                LOGGER.error("Invalid price!");
+                System.err.println("Invalid price!");
             } else {
-                LOGGER.error("Invalid input!");
+                System.err.println("Invalid input!");
             }
             addADessertMenu();
         }
@@ -150,7 +154,11 @@ public class AdminView extends View {
 
     private void addAPizzaMenu() {
         try {
+            System.out.println("All currently available pizzas:");
+            printAllPizzas();
             Scanner scanner = new Scanner(System.in);
+            System.out.println();
+            System.out.println();
             Product product = createAProductMenu();
             readAllIngredients("size");
             System.out.println("Choose the size of the pizza(by entering it's id):");
@@ -170,9 +178,9 @@ public class AdminView extends View {
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
             if (e instanceof NumberFormatException) {
-                LOGGER.error("Invalid price!");
+                System.err.println("Invalid price!");
             } else {
-                LOGGER.error("Invalid input!");
+                System.err.println("Invalid input!");
 
             }
             addAPizzaMenu();
@@ -237,21 +245,20 @@ public class AdminView extends View {
         int id = 0;
         try {
             Scanner scanner = new Scanner(System.in);
-            System.out.println("Enter the identification number of the product");
+            System.out.println("Enter the identification number of the product:");
             id = scanner.nextInt();
             scanner.nextLine();
-            System.out.println("Enter the name of the product");
+            System.out.println("Enter the name of the product:");
             productName = scanner.nextLine();
-            System.out.println("Enter the price of the product");
+            System.out.println("Enter the price of the product:");
             price = scanner.nextDouble();
 
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
             if (e instanceof NumberFormatException) {
-                LOGGER.error("Invalid price!");
+                System.err.println("Invalid price!");
             } else {
-                LOGGER.error("Invalid input!");
-
+                System.err.println("Invalid input!");
             }
             createAProductMenu();
         }
@@ -262,12 +269,12 @@ public class AdminView extends View {
         try {
             printAllPizzas();
             Scanner scanner = new Scanner(System.in);
-            System.out.println("Enter the product id of the pizza you want to delete: ");
+            System.out.println("Enter the product id of the pizza you want to delete:");
             int productId = scanner.nextInt();
             adminService.deletePizza(productId);
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.error("Something went wrong with deleting the pizza.");
+            System.err.println("Something went wrong with deleting the pizza.");
             deleteAPizzaMenu();
         }
 
@@ -283,7 +290,7 @@ public class AdminView extends View {
 
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.error(e.getMessage());
+            System.err.println(e.getMessage());
             deleteADrinkMenu();
         }
 
@@ -299,7 +306,7 @@ public class AdminView extends View {
             adminService.deleteDessert(productId);
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.error(e.getMessage());
+            System.err.println(e.getMessage());
             deleteADessertMenu();
         }
 
@@ -347,8 +354,10 @@ public class AdminView extends View {
     private void printAllProductsInTheRestaurant() {
         System.out.println("All pizzas in the restaurant:\n");
         printAllPizzas();
+        System.out.println();
         System.out.println("All drinks in the restaurant:\n");
         printAllDrinks();
+        System.out.println();
         System.out.println("All desserts in the restaurant:\n");
         printAllDesserts();
 

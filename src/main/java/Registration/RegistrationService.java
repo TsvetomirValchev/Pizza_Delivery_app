@@ -38,6 +38,7 @@ public class RegistrationService {
     private void createAccount() {
         try {
             customerDAO.insert(customer);
+            //    new CustomerDAO().insert(customer); //  Which is better?
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Something went wrong with making an account");

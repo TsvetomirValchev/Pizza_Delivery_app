@@ -11,7 +11,7 @@ public class UserAccountValidator {
     private static final String EMAIL_PATTERN = "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
             + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     private static final String USERNAME_PATTERN = "^[a-zA-Z0-9]{3,30}$";
-    private static final String PASSWORD_PATTERN = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$";
+    private static final String PASSWORD_PATTERN = "^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{3,20}$";
     private final AdminService adminService = new AdminService();
 
     private final Customer customer;
@@ -34,7 +34,7 @@ public class UserAccountValidator {
             throw new IllegalStateException("This username is taken!");
         }
         if (!isValidPassword()) {
-            throw new IllegalStateException("\"Invalid password!\\nPassword must include:\\nat least 1 uppercase letter,\\nat least 1 lowercase letter,\\nat least 1 number.\"");
+            throw new IllegalStateException("Invalid password!\nPassword must include:\nat least 1 uppercase letter,\nat least 1 lowercase letter,\nat least 1 number.");
         }
 
     }

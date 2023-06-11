@@ -21,7 +21,7 @@ public class Ingredient { //how do I make this abstract?
 
     @Override
     public String toString() {
-        return "id:" + getId() + " " + getName();
+        return "id:" + getId() + " " + (getName() != null ? getName() : "none");
     }
 
 }

@@ -15,6 +15,6 @@ public class Drink extends Product {
     @Override
     public String toString() {
         String isDiet = this.isDiet ? "Diet " : "";
-        return "№" + getId() + " " + isDiet + getName() + "\ncost: " + getPrice() + " BGN";
+        return "\n№" + getId() + " " + isDiet + getName() + "\ncost: " + getPrice() + " BGN";
     }
 }
