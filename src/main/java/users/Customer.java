@@ -1,37 +1,19 @@
 package users;
 
-import users.abstraction.User;
-
 public class Customer extends User {
-    private final Integer id;
-    private final String email;
-    private final String address;
 
-    public Customer(String username, String password, Integer id, String email, String address) {
-        super(username, password);
-        this.id = id;
-        this.email = email;
-        this.address = address;
-
+    public Customer(Integer id, String username, String password, String email) {
+        super(id, username, password, email, AccountType.CUSTOMER);
     }
 
-    public Integer getId() {
-        return id;
+    public Customer(User user) {
+        super(user.getId(), user.getUsername(), user.getPassword(), user.getEmail(), AccountType.CUSTOMER);
     }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
 
     @Override
     public String toString() {
-        return " | username: " + getUsername()
-                + " | e-mail: " + getEmail()
-                + " | delivery address: " + getAddress() + " |";
+        return " | username: " + getUsername() +
+                " | e-mail: " + getEmail() +
+                " | accountType: " + getAccountType().toString() + "|";
     }
 }

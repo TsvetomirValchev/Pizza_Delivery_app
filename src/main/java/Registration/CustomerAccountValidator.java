@@ -1,12 +1,12 @@
 package Registration;
 
-import users.Admin;
 import users.Customer;
 import db.AdminService;
+import users.User;
 
 import java.util.regex.Pattern;
 
-public class UserAccountValidator {
+public class CustomerAccountValidator {
 
     private static final String EMAIL_PATTERN = "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
             + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
@@ -16,7 +16,7 @@ public class UserAccountValidator {
 
     private final Customer customer;
 
-    public UserAccountValidator(Customer customer) {
+    public CustomerAccountValidator(Customer customer) {
         this.customer = customer;
     }
 
@@ -45,9 +45,6 @@ public class UserAccountValidator {
     }
 
     private boolean isValidUsername() {
-        if (customer.getUsername().equals(new Admin().getUsername())) {
-            return false;
-        }
         Pattern pattern = Pattern.compile(USERNAME_PATTERN);
         return pattern.matcher(customer.getUsername()).matches();
     }
@@ -58,8 +55,8 @@ public class UserAccountValidator {
     }
 
     public boolean isEmailTaken() {
-        for (Customer c : adminService.getAllCustomers().values()) {
-            if (c.getEmail().equals(customer.getEmail())) {
+        for (User u : adminService.getAllUsers().values()) {
+            if (u.getEmail().equals(customer.getEmail())) {
                 return true;
             }
         }
@@ -67,8 +64,8 @@ public class UserAccountValidator {
     }
 
     private boolean isUsernameTaken() {
-        for (Customer c : adminService.getAllCustomers().values()) {
-            if (c.getUsername().equals(customer.getUsername())) {
+        for (User u : adminService.getAllUsers().values()) {
+            if (u.getUsername().equals(customer.getUsername())) {
                 return true;
             }
         }
@@ -76,8 +73,8 @@ public class UserAccountValidator {
     }
 
     boolean DoesUserAccountAlreadyExist() {
-        for (Customer c : adminService.getAllCustomers().values()) {
-            if (c.getUsername().equals(customer.getUsername()) && c.getPassword().equals(customer.getPassword()) && c.getEmail().equals(customer.getEmail())) {
+        for (User u : adminService.getAllUsers().values()) {
+            if (u.getUsername().equals(customer.getUsername()) && u.getPassword().equals(customer.getPassword()) && u.getEmail().equals(customer.getEmail())) {
                 return true;
             }
         }

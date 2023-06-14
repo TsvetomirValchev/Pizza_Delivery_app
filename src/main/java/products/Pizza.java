@@ -6,26 +6,27 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 public class Pizza extends Product {
-    private final Size size;
-    private final List<Cheese> cheeses;
-    private final List<Meat> meats;
+
     private final Sauce sauce;
     private final List<Addon> addons;
+    private final List<Size> sizes;
+    private final List<Cheese> cheeses;
+    private final List<Meat> meats;
 
-    public Pizza(Integer id, String name, Double price, Size size, Sauce sauce, List<Meat> meats, List<Cheese> cheese, List<Addon> addons) {
+    public Pizza(Integer id, String name, Double price, Sauce sauce, List<Size> sizes, List<Meat> meats, List<Cheese> cheese, List<Addon> addons) {
         super(id, name, price);
-        this.size = size;
         this.sauce = sauce;
+        this.sizes = sizes;
         this.meats = meats;
         this.cheeses = cheese;
         this.addons = addons;
     }
 
-    public Size getSize() {
-        return size;
+    public List<Size> getSizes() {
+        return sizes;
     }
 
     public List<Cheese> getCheeses() {
@@ -66,9 +67,13 @@ public class Pizza extends Product {
                 .filter(Objects::nonNull)
                 .forEach(ingredientJoiner::add);
 
+        String sizes = getSizes().stream()
+                .map(Size::getName)
+                .collect(Collectors.joining(", "));
+
         return "\n№" + getId() + "." +
                 getName() + " pizza \ningredients: " +
-                ingredientJoiner +
+                ingredientJoiner + "\navailable sizes: " + sizes +
                 "\ncosts: " + getPrice() + " BGN";
 
     }

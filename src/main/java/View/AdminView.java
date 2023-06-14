@@ -2,13 +2,13 @@ package View;
 
 import products.ingredient.*;
 import products.Product;
-import users.Customer;
 import db.AdminService;
 
 import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import users.User;
 
 public class AdminView extends View {
 
@@ -27,8 +27,9 @@ public class AdminView extends View {
         System.out.println("1. Add a new product to the menu");
         System.out.println("2. Delete a product from the menu");
         System.out.println("3. Delete a customer's account");
-        System.out.println("4. View all products offered by the restaurant");
-        System.out.println("5. View all customers");
+        System.out.println("4. Add a new admin account");
+        System.out.println("5. View all products offered by the restaurant");
+        System.out.println("6. View all accounts");
         System.out.println("0. Exit");
         System.out.println("-------------------------------------------------------------------------------------");
     }
@@ -44,21 +45,45 @@ public class AdminView extends View {
                 case 1 -> addAProductMenu();
                 case 2 -> deleteAProductMenu();
                 case 3 -> deleteAccountMenu();
-                case 4 -> printAllProductsInTheRestaurant();
-                case 5 -> readAllCustomers();
+                case 4 -> addNewAdminAccountMenu();
+                case 5 -> printAllProductsInTheRestaurant();
+                case 6 -> printAllUsers();
                 case 0 -> System.out.println("Exiting...");
                 default -> System.err.println("Enter a valid option!");
             }
         } while (choice != 0);
     }
 
+
+    private void addNewAdminAccountMenu() {
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            System.out.println("Please enter your e-mail address: ");
+            String email = scanner.nextLine();
+
+            System.out.println("Please enter your username(at least 3 characters long): ");
+            String username = scanner.nextLine();
+
+            System.out.println("Please enter your password(1 uppercase letter,1 lowercase letter,1 number): ");
+            String password = scanner.nextLine();
+
+            adminService.createAdminAccount(username, password, email);
+
+        } catch (InputMismatchException e) {
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Invalid data entered");
+
+        }
+    }
+
     private void deleteAccountMenu() {
         try {
-            readAllCustomers();
+            printAllUsers();
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the username of the account you want to delete: ");
             String username = scanner.nextLine();
-            adminService.deleteCustomer(username);
+            adminService.deleteUser(username);
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());
             deleteAccountMenu();
@@ -160,20 +185,16 @@ public class AdminView extends View {
             System.out.println();
             System.out.println();
             Product product = createAProductMenu();
-            readAllIngredients("size");
-            System.out.println("Choose the size of the pizza(by entering it's id):");
-            int sizeId = scanner.nextInt();
-            scanner.nextLine();
-            Size size = new Size(sizeId, "");
-            readAllIngredients("sauce");
+            printAllIngredients("sauce");
             System.out.println("Choose the sauce(by entering it's id):");
             int sauceId = scanner.nextInt();
             scanner.nextLine();
             Sauce sauce = new Sauce(sauceId, "");
+            List<Size> sizes = selectSizes();
             List<Cheese> cheeses = selectCheese();
             List<Meat> meats = selectMeat();
             List<Addon> addons = selectAddon();
-            adminService.createPizzaProduct(product.getId(), product.getName(), product.getPrice(), size, sauce, meats, cheeses, addons);
+            adminService.createPizzaProduct(product.getId(), product.getName(), product.getPrice(), sauce, sizes, meats, cheeses, addons);
 
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
@@ -193,7 +214,7 @@ public class AdminView extends View {
         int input;
         do {
             System.out.println("Choose the meat(by entering it's id):");
-            readAllIngredients("meat");
+            printAllIngredients("meat");
             int meatId = scanner.nextInt();
             scanner.nextLine();
             Meat meat = new Meat(meatId, "");
@@ -210,7 +231,7 @@ public class AdminView extends View {
         int input;
         do {
             System.out.println("Choose the cheese(by entering it's id):");
-            readAllIngredients("cheese");
+            printAllIngredients("cheese");
             int cheeseId = scanner.nextInt();
             scanner.nextLine();
             Cheese cheese = new Cheese(cheeseId, "");
@@ -228,7 +249,7 @@ public class AdminView extends View {
         int input;
         do {
             System.out.println("Choose the addon(by entering it's id):");
-            readAllIngredients("addon");
+            printAllIngredients("addon");
             int addonId = scanner.nextInt();
             scanner.nextLine();
             Addon addon = new Addon(addonId, "");
@@ -237,6 +258,23 @@ public class AdminView extends View {
             input = scanner.nextInt();
         } while (input == 1);
         return addons;
+    }
+
+    private List<Size> selectSizes() {
+        Scanner scanner = new Scanner(System.in);
+        List<Size> sizes = new ArrayList<>();
+        int input;
+        do {
+            System.out.println("Choose the size(by entering it's id):");
+            printAllIngredients("size");
+            int sizeId = scanner.nextInt();
+            scanner.nextLine();
+            Size size = new Size(sizeId, "");
+            sizes.add(size);
+            System.out.println("Do you want to add more sizes? (1.y/0.n)");
+            input = scanner.nextInt();
+        } while (input == 1);
+        return sizes;
     }
 
     private Product createAProductMenu() {
@@ -312,17 +350,17 @@ public class AdminView extends View {
 
     }
 
-    private void readAllIngredients(String tableName) {
+    private void printAllIngredients(String tableName) {
         adminService.getAllIngredients(tableName)
                 .values()
                 .forEach(System.out::println);
     }
 
-    private void readAllCustomers() {
-        adminService.getAllCustomers()
+    private void printAllUsers() {
+        adminService.getAllUsers()
                 .values()
                 .stream()
-                .sorted(Comparator.comparing(Customer::getUsername))
+                .sorted(Comparator.comparing(User::getUsername))
                 .forEach(System.out::println);
     }
 

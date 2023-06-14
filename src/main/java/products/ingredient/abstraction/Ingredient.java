@@ -1,6 +1,6 @@
 package products.ingredient.abstraction;
 
-public class Ingredient { //how do I make this abstract?
+public class Ingredient {
     final Integer id;
     final String name;
 

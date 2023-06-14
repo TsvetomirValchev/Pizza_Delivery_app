@@ -1,7 +1,7 @@
 package Registration;
 
 import db.AdminService;
-import db.CustomerDAO;
+import db.UserDAO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import users.Customer;
@@ -13,7 +13,7 @@ public class RegistrationService {
 
     private static final Logger LOGGER = LogManager.getLogger(AdminService.class.getName());
     private final Customer customer;
-    CustomerDAO customerDAO = new CustomerDAO();
+
 
     public RegistrationService(Customer customer) {
         this.customer = customer;
@@ -21,7 +21,7 @@ public class RegistrationService {
     }
 
     public void signUp() {
-        UserAccountValidator Validator = new UserAccountValidator(customer);
+        CustomerAccountValidator Validator = new CustomerAccountValidator(customer);
         try {
             if (!Validator.DoesUserAccountAlreadyExist()) {
                 Validator.isValidUser();
@@ -37,8 +37,7 @@ public class RegistrationService {
 
     private void createAccount() {
         try {
-            customerDAO.insert(customer);
-            //    new CustomerDAO().insert(customer); //  Which is better?
+            new UserDAO().insert(customer);
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Something went wrong with making an account");

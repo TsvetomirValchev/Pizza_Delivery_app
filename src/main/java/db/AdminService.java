@@ -9,7 +9,9 @@ import products.Pizza;
 import products.ingredient.*;
 import products.ingredient.abstraction.Ingredient;
 import products.Product;
+import users.Admin;
 import users.Customer;
+import users.User;
 
 import java.sql.SQLException;
 import java.util.Collections;
@@ -24,8 +26,9 @@ public class AdminService extends Service {
     private final DAO<Product> productDAO = new ProductDAO();
     private final DAO<Drink> drinkDAO = new DrinkDAO();
     private final DAO<Dessert> dessertDAO = new DessertDAO();
-    private final DAO<Customer> customerDAO = new CustomerDAO();
+    private final UserDAO userDAO = new UserDAO();
     private final OrderDAO orderDAO = new OrderDAO();
+
 
     public void createDrinkProduct(int productId, String name, double price, Boolean isDiet) {
         addProduct(productId, name, price);
@@ -81,9 +84,9 @@ public class AdminService extends Service {
         }
     }
 
-    public void createPizzaProduct(int productId, String name, double price, Size size, Sauce sauce, List<Meat> meats, List<Cheese> cheese, List<Addon> addons) {
+    public void createPizzaProduct(int productId, String name, double price, Sauce sauce, List<Size> sizes, List<Meat> meats, List<Cheese> cheese, List<Addon> addons) {
         addProduct(productId, name, price);
-        addPizza(productId, name, price, size, sauce, meats, cheese, addons);
+        addPizza(productId, name, price, sauce, sizes, meats, cheese, addons);
     }
 
     public void deletePizza(int productId) {
@@ -112,22 +115,32 @@ public class AdminService extends Service {
         }
     }
 
-    public Map<Integer, Customer> getAllCustomers() {
+    public Map<Integer, User> getAllUsers() {
         try {
-            return customerDAO.readAll();
+            return userDAO.readAll();
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
         }
         return Collections.emptyMap();
     }
 
-    public void deleteCustomer(String customerUsername) {
+
+    public Map<Integer, Customer> getAllCustomers() {
         try {
-            Customer customer = getCustomerByUsername(customerUsername);
-            if (customer != null) {
-                customerDAO.delete(customer.getId());
+            return userDAO.readOnlyCustomers();
+        } catch (SQLException e) {
+            LOGGER.debug(e.getMessage());
+        }
+        return Collections.emptyMap();
+    }
+
+    public void deleteUser(String Username) {
+        try {
+            User user = getUserByUsername(Username);
+            if (user != null) {
+                userDAO.delete(user.getId());
             } else {
-                LOGGER.error("User with username: '" + customerUsername + "' does not exist!");
+                LOGGER.error("User with username: '" + Username + "' does not exist!");
             }
         } catch (SQLException e) {
 
@@ -137,10 +150,11 @@ public class AdminService extends Service {
         }
     }
 
-    public Customer getCustomerByUsername(String customerUsername) {
-        Map<Integer, Customer> customers = getAllCustomers();
-        return customers.values().stream()
-                .filter(c -> c.getUsername().equals(customerUsername))
+    public User getUserByUsername(String Username) {
+        Map<Integer, User> users = getAllUsers();
+        return users.values()
+                .stream()
+                .filter(u -> u.getUsername().equals(Username))
                 .findFirst()
                 .orElse(null);
     }
@@ -166,10 +180,11 @@ public class AdminService extends Service {
         }
     }
 
-    private void addPizza(int productId, String name, double price, Size size, Sauce sauce, List<Meat> meats, List<Cheese> cheeses, List<Addon> addons) {
+    private void addPizza(int productId, String name, double price, Sauce sauce, List<Size> sizes, List<Meat> meats, List<Cheese> cheeses, List<Addon> addons) {
         try {
-            Pizza pizza = new Pizza(productId, name, price, size, sauce, meats, cheeses, addons);
+            Pizza pizza = new Pizza(productId, name, price, sauce, sizes, meats, cheeses, addons);
             pizzaDAO.insert(pizza);
+            addSizesToPizza(pizza.getSizes(), pizza.getId());
             addMeatsToPizza(pizza.getMeats(), pizza.getId());
             addCheesesToPizza(pizza.getCheeses(), pizza.getId());
             addAddonsToPizza(pizza.getAddons(), pizza.getId());
@@ -207,11 +222,21 @@ public class AdminService extends Service {
                 pizzaDAO.insertInPizzaAddonTable(pizzaId, addon.getId());
             }
         } catch (SQLException e) {
-            LOGGER.debug(e.getMessage() + "1");
+            LOGGER.debug(e.getMessage());
             LOGGER.error("Something went wrong with adding addons to the pizza");
         }
     }
 
+    private void addSizesToPizza(List<Size> sizes, int pizzaId) throws SQLException {
+        try {
+            for (Size size : sizes) {
+                pizzaDAO.insertInPizzaSizeTable(pizzaId, size.getId());
+            }
+        } catch (SQLException e) {
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Something went wrong with adding sizes to the pizza");
+        }
+    }
 
     private void addDrink(int productId, String name, double price, boolean isDiet) {
         try {
@@ -233,7 +258,7 @@ public class AdminService extends Service {
         }
     }
 
-    public boolean isProductCurrentlyOrdered(int productId) throws SQLException {
+    private boolean isProductCurrentlyOrdered(int productId) throws SQLException {
         for (Order order : orderDAO.getOrderByProductId(productId)) {
             if (order.getDeliveredAt().isEmpty()) {
                 return true;
@@ -242,5 +267,13 @@ public class AdminService extends Service {
         return false;
     }
 
-
+    public void createAdminAccount(String username, String password, String email) {
+        try {
+            Admin admin = new Admin(null, username, password, email);
+            userDAO.insert(admin);
+        } catch (SQLException e) {
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Couldn't create admin account");
+        }
+    }
 }

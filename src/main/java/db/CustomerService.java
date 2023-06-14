@@ -27,7 +27,7 @@ public class CustomerService extends Service {
                 LOGGER.error("There is no product with such id");
                 return false;
             }
-            if (isOrderFinalized()) {
+            if (!isOrderFinalized()) {
                 addProductToCart(productId);
             } else {
                 orderDAO.insert(new Order(null,
@@ -114,7 +114,7 @@ public class CustomerService extends Service {
 
     public void markOrderAsFinalized() {
         try {
-            if (isOrderFinalized()) {
+            if (!isOrderFinalized()) {
                 orderDAO.update(getCartOrderIdByCustomerId(customer.getId()), 3, LocalDateTime.now());
             } else {
                 LOGGER.error("You do not have an order to finalize!");
@@ -125,7 +125,6 @@ public class CustomerService extends Service {
 
     }
 
-    //utils
     private int getCurrentlyDeliveringOrderIdByCustomerId(int customerId) {
         try {
             for (Order order : orderDAO.readAll().values()) {
@@ -185,16 +184,17 @@ public class CustomerService extends Service {
     private boolean isOrderFinalized() {
         try {
             for (Order order : orderDAO.readAll().values()) {
-                if (order.getCustomerId() == (customer.getId()) && order.getOrderedAt().isPresent()) {
-                    return true;
+                if (order.getCustomerId() == (customer.getId()) && order.getOrderedAt().isEmpty()) {
+                    return false;
                 }
             }
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Couldn't load order details!");
         }
-        return false;
+        return true;
     }
+
 
 }
 

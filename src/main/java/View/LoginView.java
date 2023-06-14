@@ -3,7 +3,7 @@ package View;
 import Registration.RegistrationService;
 import db.AdminService;
 import db.CustomerService;
-import users.Admin;
+import users.AccountType;
 import users.Customer;
 
 
@@ -12,11 +12,13 @@ import java.util.Scanner;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import users.User;
+
 
 public class LoginView extends View {
 
     private static final Logger LOGGER = LogManager.getLogger(LoginView.class.getName());
-    private final Admin admin = new Admin();
+
 
     @Override
     public void printMenu() {
@@ -56,6 +58,7 @@ public class LoginView extends View {
 
         String username = null;
         String password = null;
+
         try {
             System.out.println("Enter username: ");
             username = scanner.nextLine();
@@ -68,22 +71,22 @@ public class LoginView extends View {
             printLoginMenu();
         }
 
-        if (username.equals(admin.getUsername()) && password.equals(admin.getPassword())) {
+        User user = new AdminService().getUserByUsername(username);
+        if (user != null && user.getPassword().equals(password) && user.getAccountType().equals(AccountType.ADMIN)) {
             openAdminView();
+        } else if (user != null && user.getPassword().equals(password) && user.getAccountType().equals(AccountType.CUSTOMER)) {
+            Customer customer = new Customer(user);
+            openCustomerView(customer);
+        } else if (user != null) {
+            LOGGER.error("Wrong password!");
+            printLoginMenu();
         } else {
-            Customer customer = new AdminService().getCustomerByUsername(username);
-            if (customer != null && customer.getPassword().equals(password)) {
-                openCustomerView(customer);
-            } else if (customer != null) {
-                LOGGER.error("Wrong password!");
-                printLoginMenu();
-            } else {
-                LOGGER.error("No account found with this username");
-                accountCreationChoice();
-            }
-
+            LOGGER.error("No account found with this username");
+            accountCreationChoice();
         }
+
     }
+
 
     private void accountCreationChoice() {
         Scanner scanner = new Scanner(System.in);
@@ -126,10 +129,7 @@ public class LoginView extends View {
             System.out.println("Please enter your password(1 uppercase letter,1 lowercase letter,1 number): ");
             String password = scanner.nextLine();
 
-            System.out.println("Please enter delivery address: ");
-            String address = scanner.nextLine();
-
-            Customer customer = new Customer(username, password, null, email, address);
+            Customer customer = new Customer(null, username, password, email);
             RegistrationService registrationService = new RegistrationService(customer);
             registrationService.signUp();
 
