@@ -18,7 +18,7 @@ public class Product {
         this.availableSizes = availableSizes;
     }
 
-    //
+
     public Integer getId() {
         return id;
     }

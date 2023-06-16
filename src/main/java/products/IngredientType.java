@@ -13,7 +13,7 @@ public class IngredientType {
         return id;
     }
 
-    //
+
     public String getName() {
         return name;
     }

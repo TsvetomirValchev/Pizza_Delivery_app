@@ -13,7 +13,7 @@ public class Ingredient {
         this.ingredientType = ingredientType;
     }
 
-    //
+
     public Integer getId() {
         return id;
     }

@@ -87,7 +87,7 @@ public abstract class DAO<T> {
 
     }
 
-    //
+
     public List<Size> readAllAvailableSizes(Integer product_id) throws SQLException {
         String query = "SELECT s.id,s.size_name FROM product_size ps " +
                 "JOIN product p ON p.id = ps.product_id " +

@@ -18,7 +18,7 @@ public class Size {
         return name;
     }
 
-    //
+
     @Override
     public String toString() {
         return getName();

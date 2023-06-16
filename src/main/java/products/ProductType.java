@@ -18,7 +18,7 @@ public class ProductType {
         return name;
     }
 
-    //
+
     @Override
     public String toString() {
         return getName();

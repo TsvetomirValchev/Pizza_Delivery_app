@@ -83,7 +83,7 @@ public class DessertDAO extends DAO<Dessert> {
         );
     }
 
-    //
+
     @Override
     String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(
