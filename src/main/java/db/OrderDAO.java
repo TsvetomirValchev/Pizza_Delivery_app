@@ -52,6 +52,7 @@ public class OrderDAO extends DAO<Order> {
         );
     }
 
+    //
     @Override
     String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(

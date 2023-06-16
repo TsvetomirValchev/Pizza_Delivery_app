@@ -82,6 +82,7 @@ public class DrinkDAO extends DAO<Drink> {
         );
     }
 
+    //
     @Override
     String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(

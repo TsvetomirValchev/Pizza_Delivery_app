@@ -129,6 +129,7 @@ public class PizzaDAO extends DAO<Pizza> {
         return allIngredients;
     }
 
+    //
     public Map<Integer, Ingredient> readAllIngredientsAvailable() throws SQLException {
         String query = "SELECT i.ingredient_name, i.id FROM ingredient i ";
 
