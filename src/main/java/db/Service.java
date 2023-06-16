@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import products.Dessert;
 import products.Drink;
 import products.Pizza;
+import products.Product;
 
 import java.sql.SQLException;
 import java.util.Collections;
@@ -42,4 +43,5 @@ public class Service {
         }
         return Collections.emptyMap();
     }
+
 }

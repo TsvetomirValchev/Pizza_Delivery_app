@@ -3,6 +3,9 @@ package db;
 import order.Order;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import products.Dessert;
+import products.Drink;
+import products.Pizza;
 import products.Product;
 import users.Customer;
 
@@ -13,7 +16,9 @@ import java.util.*;
 public class CustomerService extends Service {
 
     private static final Logger LOGGER = LogManager.getLogger(CustomerService.class.getName());
-    private final DAO<Product> productDAO = new ProductDAO();
+    private final PizzaDAO pizzaDAO = new PizzaDAO();
+    private final DAO<Drink> drinkDAO = new DrinkDAO();
+    private final DAO<Dessert> dessertDAO = new DessertDAO();
     private final OrderDAO orderDAO = new OrderDAO();
     private final Customer customer;
 
@@ -23,7 +28,7 @@ public class CustomerService extends Service {
 
     public boolean placeAnOrder(int productId) {
         try {
-            if (getProductByID(productId) == null) {
+            if (getProductById(productId) == null) {
                 LOGGER.error("There is no product with such id");
                 return false;
             }
@@ -153,11 +158,23 @@ public class CustomerService extends Service {
         return 0;
     }
 
-    private Product getProductByID(int productId) {
+    private Product getProductById(int productId) {
         try {
-            for (Product product : productDAO.readAll().values()) {
-                if (product.getId() == productId) {
-                    return product;
+            for (Pizza pizza : pizzaDAO.readAll().values()) {
+                if (pizza.getId() == productId) {
+                    return pizza;
+                }
+            }
+
+            for (Drink drink : drinkDAO.readAll().values()) {
+                if (drink.getId() == productId) {
+                    return drink;
+                }
+            }
+
+            for (Dessert dessert : dessertDAO.readAll().values()) {
+                if (dessert.getId() == productId) {
+                    return dessert;
                 }
             }
         } catch (SQLException e) {

@@ -90,10 +90,7 @@ public class OrderDAO extends DAO<Order> {
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
-                allProducts.add(new Product(
-                        resultSet.getInt("product_id"),
-                        resultSet.getString("name"),
-                        resultSet.getDouble("price")));
+
             }
         }
         return allProducts;

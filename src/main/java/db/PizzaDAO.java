@@ -1,8 +1,6 @@
 package db;
 
-import products.Pizza;
-import products.ingredient.*;
-import products.ingredient.abstraction.Ingredient;
+import products.*;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,33 +12,30 @@ import java.util.Map;
 public class PizzaDAO extends DAO<Pizza> {
 
     public PizzaDAO() {
-        super("pizza", "product_id");
+        super("product", "id");
     }
 
     @Override
     protected Map<Integer, Pizza> readAll() throws SQLException {
         String query = """
-                 SELECT product.id,
-                 product.name,
-                 product.price,
-                 p.product_id,
+                 SELECT p.id,
+                 p.name,
+                 p.type_id,
+                 pt.type_name,
+                 pi.ingredient_id,
+                 i.ingredient_name,
+                 i.ingredient_type_id,
+                 it.ingredient_type_name,
+                 ps.price,
                  ps.size_id,
-                 p.sauce_id,
-                 s.size_name,
-                 c.cheese_name,
-                 m.meat_name,
-                 sauce.sauce_name,
-                 a.addon_name FROM pizza p
-                 JOIN product ON p.product_id = product.id
-                 JOIN sauce ON sauce.id = p.sauce_id
-                 JOIN pizza_size ps on p.product_id = ps.pizza_id
-                 JOIN size s ON s.id = ps.size_id
-                 JOIN pizza_addon pa on p.product_id = pa.pizza_id
-                 JOIN addon a on a.id = pa.addon_id
-                 JOIN pizza_cheese pc on p.product_id = pc.pizza_id
-                 JOIN cheese c on pc.cheese_id = c.id
-                 JOIN pizza_meat pm on p.product_id = pm.pizza_id
-                 JOIN meat m on pm.meat_id = m.id
+                 s.size_name
+                 FROM product p JOIN product_type pt on p.type_id = pt.id
+                 JOIN product_ingredient pi on p.id = pi.product_id
+                 JOIN ingredient i on pi.ingredient_id = i.id
+                 JOIN ingredient_type it on i.ingredient_type_id = it.id
+                 JOIN product_size ps on pi.product_id = ps.product_id
+                 JOIN size s on ps.size_id = s.id
+                 WHERE pt.type_name = 'pizza';
                 ;""";
         Map<Integer, Pizza> entries = new HashMap<>();
         try (Connection connection = database.getConnection();
@@ -57,15 +52,16 @@ public class PizzaDAO extends DAO<Pizza> {
     @Override
     protected String buildInsertQuery(Object object) {
         return "INSERT INTO " + this.tableName
-                + "(product_id,sauce_id)"
-                + "VALUES(?, ?)";
+                + "(id,name,type_id)"
+                + "VALUES(?, ?, ?)";
     }
 
     @Override
     protected void setInsertValues(PreparedStatement statement, Object object) throws SQLException {
         if (object instanceof Pizza pizza) {
             statement.setInt(1, pizza.getId());
-            statement.setInt(2, pizza.getSauce().getId());
+            statement.setString(2, pizza.getName());
+            statement.setInt(3, pizza.getProductType().getId());
         }
     }
 
@@ -78,29 +74,26 @@ public class PizzaDAO extends DAO<Pizza> {
     @Override
     protected Pizza mapResultSetToModel(ResultSet resultSet) throws SQLException {
         int pizzaId = resultSet.getInt("id");
-
-        List<Meat> meats = fetchMeatForPizza(pizzaId);
-        List<Addon> addons = fetchAddonForPizza(pizzaId);
-        List<Cheese> cheese = fetchCheeseForPizza(pizzaId);
-        List<Size> sizes = fetchSizeForPizza(pizzaId);
+        List<Ingredient> ingredients = readAllIngredientsInsideProduct(pizzaId);
+        List<Size> availableSizes = readAllAvailableSizes(pizzaId);
 
         return new Pizza(
-                resultSet.getInt("product_id"),
+                pizzaId,
                 resultSet.getString("name"),
                 resultSet.getDouble("price"),
-                new Sauce(resultSet.getInt("sauce_id"), resultSet.getString("sauce_name")),
-                sizes,
-                meats,
-                cheese,
-                addons
+                new ProductType(resultSet.getInt("type_id"), resultSet.getString("type_name")),
+                availableSizes,
+                ingredients
         );
+
     }
 
     @Override
     protected String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(
-                1, "product_id",
-                2, "sauce_id"
+                1, "id",
+                2, "name",
+                3, "type_id"
 
         );
         String columnName = columnMap.get(variableIndex);
@@ -110,13 +103,34 @@ public class PizzaDAO extends DAO<Pizza> {
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         switch (variableIndex) {
-            case 1, 2 -> statement.setInt(1, (Integer) updatedValue);
+            case 1, 3 -> statement.setInt(1, (Integer) updatedValue);
+            case 2 -> statement.setString(1, (String) updatedValue);
         }
     }
 
 
-    public Map<Integer, Ingredient> readAllIngredients(String tableName) throws SQLException {
-        String query = "SELECT * FROM " + tableName;
+    public List<Ingredient> readAllIngredientsInsideProduct(Integer productId) throws SQLException {
+        String query = "SELECT i.ingredient_name, i.id FROM product_ingredient " +
+                "JOIN ingredient i ON i.id = product_ingredient.ingredient_id " +
+                "WHERE product_id =" + productId;
+
+        List<Ingredient> allIngredients = new ArrayList<>();
+        try (Connection connection = database.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                Ingredient ingredient = (new Ingredient(resultSet.getInt("id"),
+                        resultSet.getString("ingredient_name"),
+                        new IngredientType(resultSet.getInt("ingredient_type_id"),
+                                resultSet.getString("ingredient_type_name"))));
+                allIngredients.add(ingredient);
+            }
+        }
+        return allIngredients;
+    }
+
+    public Map<Integer, Ingredient> readAllIngredientsAvailable() throws SQLException {
+        String query = "SELECT i.ingredient_name, i.id FROM ingredient i ";
 
         Map<Integer, Ingredient> allIngredients = new HashMap<>();
         try (Connection connection = database.getConnection();
@@ -124,151 +138,24 @@ public class PizzaDAO extends DAO<Pizza> {
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
                 Ingredient ingredient = (new Ingredient(resultSet.getInt("id"),
-                        resultSet.getString(tableName + "_name")));
+                        resultSet.getString("ingredient_name"),
+                        new IngredientType(resultSet.getInt("ingredient_type_id"),
+                                resultSet.getString("ingredient_type_name"))));
+
                 allIngredients.put(ingredient.getId(), ingredient);
             }
         }
         return allIngredients;
     }
 
-    public void insertInPizzaMeatTable(int pizzaId, int meatId) throws SQLException {
-        String query = "INSERT INTO pizza_meat (pizza_id, meat_id) VALUES(? , ?)";
+    protected void deletePizzaIngredientList(int productId) throws SQLException {
+        String query = "DELETE FROM product_ingredient WHERE product_id" + "= ? ";
         try (Connection connection = database.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, pizzaId);
-            statement.setInt(2, meatId);
-            statement.executeUpdate();
-        }
-
-    }
-
-    public void insertInPizzaCheeseTable(int pizzaId, int cheeseId) throws SQLException {
-        String query = "INSERT INTO pizza_cheese (pizza_id, cheese_id) VALUES(? , ?)";
-        try (Connection connection = database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, pizzaId);
-            statement.setInt(2, cheeseId);
-            statement.executeUpdate();
-        }
-
-    }
-
-    public void insertInPizzaAddonTable(int pizzaId, int addonId) throws SQLException {
-        String query = "INSERT INTO pizza_addon (pizza_id, addon_id) VALUES(? , ?)";
-        try (Connection connection = database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, pizzaId);
-            statement.setInt(2, addonId);
-            statement.executeUpdate();
-        }
-
-    }
-
-    public void insertInPizzaSizeTable(int pizzaId, int sizeId) throws SQLException {
-        String query = "INSERT INTO pizza_size (pizza_id, size_id) VALUES(? , ?)";
-        try (Connection connection = database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, pizzaId);
-            statement.setInt(2, sizeId);
-            statement.executeUpdate();
-        }
-
-    }
-
-
-    private List<Meat> fetchMeatForPizza(int pizzaId) throws SQLException {
-        List<Meat> meats = new ArrayList<>();
-        String query = "SELECT meat_name, meat.id FROM meat " +
-                "INNER JOIN pizza_meat " +
-                "ON meat.id = pizza_meat.meat_id " +
-                "WHERE pizza_meat.pizza_id = ?";
-        try (Connection connection = database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, pizzaId);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                String meatName = resultSet.getString("meat_name");
-                int meatId = resultSet.getInt("id");
-                meats.add(new Meat(meatId, meatName));
-            }
-        }
-
-        return meats;
-    }
-
-
-    private List<Addon> fetchAddonForPizza(int pizzaId) throws SQLException {
-        List<Addon> addons = new ArrayList<>();
-        String query = "SELECT addon_name, addon.id FROM addon " +
-                "INNER JOIN pizza_addon " +
-                "ON addon.id = pizza_addon.addon_id " +
-                "WHERE pizza_addon.pizza_id = ?";
-        try (Connection connection = database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, pizzaId);
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                String addonName = resultSet.getString("addon_name");
-                int addonId = resultSet.getInt("id");
-                addons.add(new Addon(addonId, addonName));
-            }
-        }
-
-        return addons;
-    }
-
-
-    private List<Cheese> fetchCheeseForPizza(int pizzaId) throws SQLException {
-        List<Cheese> cheese = new ArrayList<>();
-        String query = "SELECT cheese_name, cheese.id FROM cheese " +
-                "INNER JOIN pizza_cheese " +
-                "ON cheese.id = pizza_cheese.cheese_id " +
-                "WHERE pizza_cheese.pizza_id = ?";
-        try (Connection connection = database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, pizzaId);
-            ResultSet resultSet = statement.executeQuery();
-
-            while (resultSet.next()) {
-                String cheeseName = resultSet.getString("cheese_name");
-                int cheeseId = resultSet.getInt("id");
-                cheese.add(new Cheese(cheeseId, cheeseName));
-            }
-        }
-
-        return cheese;
-    }
-
-
-    private List<Size> fetchSizeForPizza(int pizzaId) throws SQLException {
-        List<Size> sizes = new ArrayList<>();
-        String query = "SELECT size_name, size.id FROM size " +
-                "INNER JOIN pizza_size " +
-                "ON size.id = pizza_size.size_id " +
-                "WHERE pizza_size.pizza_id = ?";
-        try (Connection connection = database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, pizzaId);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                String sizeName = resultSet.getString("size_name");
-                int sizeId = resultSet.getInt("id");
-                sizes.add(new Size(sizeId, sizeName));
-            }
-        }
-
-        return sizes;
-    }
-
-    protected void deletePizzaIngredientList(String tableName, int pizzaId) throws SQLException {
-        String query = "DELETE FROM " + tableName + " WHERE " + "pizza_id" + "= ? ";
-        try (Connection connection = database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setObject(1, pizzaId);
+            statement.setObject(1, productId);
             int rowsAffected = statement.executeUpdate();
             if (rowsAffected == 0) {
-                throw new SQLException("Entry with key " + pizzaId + " was not found!");
+                throw new SQLException("Entry with key " + productId + " was not found!");
             }
         }
     }

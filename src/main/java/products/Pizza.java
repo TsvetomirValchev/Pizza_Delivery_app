@@ -1,79 +1,33 @@
 package products;
 
-import products.ingredient.*;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 
 public class Pizza extends Product {
 
-    private final Sauce sauce;
-    private final List<Addon> addons;
-    private final List<Size> sizes;
-    private final List<Cheese> cheeses;
-    private final List<Meat> meats;
 
-    public Pizza(Integer id, String name, Double price, Sauce sauce, List<Size> sizes, List<Meat> meats, List<Cheese> cheese, List<Addon> addons) {
-        super(id, name, price);
-        this.sauce = sauce;
-        this.sizes = sizes;
-        this.meats = meats;
-        this.cheeses = cheese;
-        this.addons = addons;
+    List<Ingredient> ingredients;
+
+
+    public Pizza(Integer id, String name, Double price, ProductType productType, List<Size> size, List<Ingredient> ingredients) {
+        super(id, name, price, productType, size);
+        this.ingredients = ingredients;
     }
 
-    public List<Size> getSizes() {
-        return sizes;
-    }
 
-    public List<Cheese> getCheeses() {
-        return cheeses;
-    }
-
-    public List<Meat> getMeats() {
-        return meats;
-    }
-
-    public Sauce getSauce() {
-        return sauce;
-    }
-
-    public List<Addon> getAddons() {
-        return addons;
+    public List<Ingredient> getIngredients() {
+        return ingredients;
     }
 
 
     @Override
     public String toString() {
-        StringJoiner ingredientJoiner = new StringJoiner(",");
 
-        ingredientJoiner.add(getSauce().getName());
-
-        getMeats().stream()
-                .map(Meat::getName)
-                .filter(Objects::nonNull)
-                .forEach(ingredientJoiner::add);
-
-        getCheeses().stream()
-                .map(Cheese::getName)
-                .filter(Objects::nonNull)
-                .forEach(ingredientJoiner::add);
-
-        getAddons().stream()
-                .map(Addon::getName)
-                .filter(Objects::nonNull)
-                .forEach(ingredientJoiner::add);
-
-        String sizes = getSizes().stream()
-                .map(Size::getName)
-                .collect(Collectors.joining(", "));
 
         return "\n№" + getId() + "." +
                 getName() + " pizza \ningredients: " +
-                ingredientJoiner + "\navailable sizes: " + sizes +
+                getIngredients() + "\navailable sizes: " +
                 "\ncosts: " + getPrice() + " BGN";
 
     }

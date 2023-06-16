@@ -1,7 +1,12 @@
 package db;
 
+import products.Ingredient;
+import products.Size;
+
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class DAO<T> {
@@ -68,5 +73,36 @@ public abstract class DAO<T> {
                 throw new SQLException("Entry with key " + key + " was not found!");
             }
         }
+    }
+
+    public void insertInProductSizeTable(int productId, int sizeId, double price) throws SQLException {
+        String query = "INSERT INTO product_size (product_id, size_id, price) VALUES(? , ?, ?)";
+        try (Connection connection = database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, productId);
+            statement.setInt(2, sizeId);
+            statement.setDouble(3, price);
+            statement.executeUpdate();
+        }
+
+    }
+    
+    public List<Size> readAllAvailableSizes(Integer product_id) throws SQLException {
+        String query = "SELECT s.id,s.size_name FROM product_size ps " +
+                "JOIN product p ON p.id = ps.product_id " +
+                "JOIN size s ON s.id = ps.size_id " +
+                "WHERE product_id =" + product_id;
+
+        List<Size> allAvailableSizes = new ArrayList<>();
+        try (Connection connection = database.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                Size size = (new Size(resultSet.getInt("id"),
+                        resultSet.getString("ingredient_name")));
+                allAvailableSizes.add(size.getId(), size);
+            }
+        }
+        return allAvailableSizes;
     }
 }

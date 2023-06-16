@@ -1,9 +1,13 @@
 package db;
 
 import products.Drink;
+import products.Ingredient;
+import products.ProductType;
+import products.Size;
 
 import java.sql.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DrinkDAO extends DAO<Drink> {
@@ -15,11 +19,23 @@ public class DrinkDAO extends DAO<Drink> {
     @Override
     protected Map<Integer, Drink> readAll() throws SQLException {
         String query = """
-                SELECT product.id,
-                product.name,
-                product.price,
-                drink.isDiet
-                FROM drink JOIN product  on product.id = drink.product_id""";
+                SELECT p.id,
+                p.name,
+                p.type_id,
+                p.isDiet,
+                pt.type_name,
+                it.ingredient_type_name,
+                ps.price,
+                ps.size_id,
+                s.size_name
+                FROM product p JOIN product_type pt on p.type_id = pt.id
+                JOIN product_ingredient pi on p.id = pi.product_id
+                JOIN ingredient i on pi.ingredient_id = i.id
+                JOIN ingredient_type it on i.ingredient_type_id = it.id
+                JOIN product_size ps on pi.product_id = ps.product_id
+                JOIN size s on ps.size_id = s.id
+                WHERE type_name = 'drink'
+                """;
         Map<Integer, Drink> entries = new HashMap<>();
         try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();
@@ -34,14 +50,16 @@ public class DrinkDAO extends DAO<Drink> {
 
     @Override
     protected String buildInsertQuery(Object object) {
-        return "INSERT INTO " + this.tableName + "(product_id, isDiet)" + "VALUES(?, ?)";
+        return "INSERT INTO " + this.tableName + "(id,name,type_id,isDiet) VALUES(?,?,?,?)";
     }
 
     @Override
     protected void setInsertValues(PreparedStatement statement, Object object) throws SQLException {
         if (object instanceof Drink drink) {
             statement.setInt(1, drink.getId());
-            statement.setBoolean(2, drink.isDiet());
+            statement.setString(2, drink.getName());
+            statement.setInt(3, drink.getProductType().getId());
+            statement.setBoolean(4, drink.isDiet());
         }
     }
 
@@ -52,10 +70,14 @@ public class DrinkDAO extends DAO<Drink> {
 
     @Override
     protected Drink mapResultSetToModel(ResultSet resultSet) throws SQLException {
+        int pizzaId = resultSet.getInt("id");
+        List<Size> availableSizes = readAllAvailableSizes(pizzaId);
         return new Drink(
                 resultSet.getInt("id"),
                 resultSet.getString("name"),
                 resultSet.getDouble("price"),
+                new ProductType(resultSet.getInt("type_id"), resultSet.getString("type_name")),
+                availableSizes,
                 resultSet.getBoolean("isDiet")
         );
     }
@@ -64,7 +86,9 @@ public class DrinkDAO extends DAO<Drink> {
     String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(
                 1, "product_id",
-                2, "isDiet"
+                2, "name",
+                3, "type_id",
+                4, "isDiet"
         );
         String columnName = columnMap.get(variableIndex);
         return "UPDATE " + this.tableName + " SET " + columnName + "=? WHERE product_id=?";
@@ -73,8 +97,9 @@ public class DrinkDAO extends DAO<Drink> {
     @Override
     void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         switch (variableIndex) {
-            case 1 -> statement.setInt(1, (Integer) updatedValue);
-            case 2 -> statement.setBoolean(1, (boolean) updatedValue);
+            case 1, 3 -> statement.setInt(1, (Integer) updatedValue);
+            case 2 -> statement.setString(1, (String) updatedValue);
+            case 4 -> statement.setBoolean(1, (boolean) updatedValue);
         }
     }
 }

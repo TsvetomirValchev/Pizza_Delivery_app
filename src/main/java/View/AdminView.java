@@ -1,6 +1,7 @@
 package View;
 
-import products.ingredient.*;
+import products.Ingredient;
+import products.IngredientType;
 import products.Product;
 import db.AdminService;
 
@@ -8,6 +9,7 @@ import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import products.Size;
 import users.User;
 
 public class AdminView extends View {
@@ -140,8 +142,8 @@ public class AdminView extends View {
             Scanner scanner = new Scanner(System.in);
             Product product = createAProductMenu();
             System.out.println("Is the drink Diet friendly?");
-            boolean diet = scanner.nextBoolean();
-            adminService.createDrinkProduct(product.getId(), product.getName(), product.getPrice(), diet);
+            boolean isDiet = scanner.nextBoolean();
+            adminService.addDrink(product.getId(), product.getName(), product.getPrice(), product.getAvailableSizes(), isDiet);
 
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
@@ -162,8 +164,8 @@ public class AdminView extends View {
             Scanner scanner = new Scanner(System.in);
             Product product = createAProductMenu();
             System.out.println("Is the dessert vegan?");
-            boolean vegan = scanner.nextBoolean();
-            adminService.createDessertProduct(product.getId(), product.getName(), product.getPrice(), vegan);
+            boolean isVegan = scanner.nextBoolean();
+            adminService.addDessert(product.getId(), product.getName(), product.getPrice(), product.getAvailableSizes(), isVegan);
 
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
@@ -181,20 +183,11 @@ public class AdminView extends View {
         try {
             System.out.println("All currently available pizzas:");
             printAllPizzas();
-            Scanner scanner = new Scanner(System.in);
-            System.out.println();
-            System.out.println();
             Product product = createAProductMenu();
-            printAllIngredients("sauce");
-            System.out.println("Choose the sauce(by entering it's id):");
-            int sauceId = scanner.nextInt();
-            scanner.nextLine();
-            Sauce sauce = new Sauce(sauceId, "");
             List<Size> sizes = selectSizes();
-            List<Cheese> cheeses = selectCheese();
-            List<Meat> meats = selectMeat();
-            List<Addon> addons = selectAddon();
-            adminService.createPizzaProduct(product.getId(), product.getName(), product.getPrice(), sauce, sizes, meats, cheeses, addons);
+
+            List<Ingredient> ingredients = selectIngredients();
+            adminService.addPizza(product.getId(), product.getName(), product.getPrice(), sizes, ingredients);
 
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
@@ -208,65 +201,12 @@ public class AdminView extends View {
         }
     }
 
-    private List<Meat> selectMeat() {
-        Scanner scanner = new Scanner(System.in);
-        List<Meat> meats = new ArrayList<>();
-        int input;
-        do {
-            System.out.println("Choose the meat(by entering it's id):");
-            printAllIngredients("meat");
-            int meatId = scanner.nextInt();
-            scanner.nextLine();
-            Meat meat = new Meat(meatId, "");
-            meats.add(meat);
-            System.out.println("Do you want to add more meat? (1.yes/0.no)");
-            input = scanner.nextInt();
-        } while (input == 1);
-        return meats;
-    }
-
-    private List<Cheese> selectCheese() {
-        Scanner scanner = new Scanner(System.in);
-        List<Cheese> cheeses = new ArrayList<>();
-        int input;
-        do {
-            System.out.println("Choose the cheese(by entering it's id):");
-            printAllIngredients("cheese");
-            int cheeseId = scanner.nextInt();
-            scanner.nextLine();
-            Cheese cheese = new Cheese(cheeseId, "");
-            cheeses.add(cheese);
-            System.out.println("Do you want to add more cheese? (1.yes/0.no)");
-            input = scanner.nextInt();
-        } while (input == 1);
-        return cheeses;
-    }
-
-    private List<Addon> selectAddon() {
-        Scanner scanner = new Scanner(System.in);
-
-        List<Addon> addons = new ArrayList<>();
-        int input;
-        do {
-            System.out.println("Choose the addon(by entering it's id):");
-            printAllIngredients("addon");
-            int addonId = scanner.nextInt();
-            scanner.nextLine();
-            Addon addon = new Addon(addonId, "");
-            addons.add(addon);
-            System.out.println("Do you want to add more addons? (1.y/0.n)");
-            input = scanner.nextInt();
-        } while (input == 1);
-        return addons;
-    }
-
     private List<Size> selectSizes() {
         Scanner scanner = new Scanner(System.in);
         List<Size> sizes = new ArrayList<>();
         int input;
         do {
             System.out.println("Choose the size(by entering it's id):");
-            printAllIngredients("size");
             int sizeId = scanner.nextInt();
             scanner.nextLine();
             Size size = new Size(sizeId, "");
@@ -277,9 +217,26 @@ public class AdminView extends View {
         return sizes;
     }
 
+    private List<Ingredient> selectIngredients() {
+        Scanner scanner = new Scanner(System.in);
+        List<Ingredient> ingredients = new ArrayList<>();
+        int input;
+        do {
+            System.out.println("Choose the size(by entering it's id):");
+            int ingredientId = scanner.nextInt();
+            scanner.nextLine();
+            Ingredient ingredient = new Ingredient(ingredientId, null, null);
+            ingredients.add(ingredient);
+            System.out.println("Do you want to add more ingredients? (1.y/0.n)");
+            input = scanner.nextInt();
+        } while (input == 1);
+        return ingredients;
+    }
+
     private Product createAProductMenu() {
         String productName = null;
         Double price = null;
+        Size size = new Size(null, "");
         int id = 0;
         try {
             Scanner scanner = new Scanner(System.in);
@@ -290,6 +247,8 @@ public class AdminView extends View {
             productName = scanner.nextLine();
             System.out.println("Enter the price of the product:");
             price = scanner.nextDouble();
+            System.out.println("Enter the size of the product:");
+
 
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
@@ -300,7 +259,7 @@ public class AdminView extends View {
             }
             createAProductMenu();
         }
-        return new Product(id, productName, price);
+        return null;
     }
 
     private void deleteAPizzaMenu() {
@@ -350,11 +309,15 @@ public class AdminView extends View {
 
     }
 
-    private void printAllIngredients(String tableName) {
-        adminService.getAllIngredients(tableName)
+
+    private void printAllAvailableIngredients() {
+        adminService.getAllIngredientsAvailable()
                 .values()
+                .stream()
+                .sorted(Comparator.comparing(ingredient -> ingredient.getIngredientType().getName()))
                 .forEach(System.out::println);
     }
+
 
     private void printAllUsers() {
         adminService.getAllUsers()
