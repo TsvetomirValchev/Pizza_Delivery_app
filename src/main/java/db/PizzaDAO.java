@@ -18,25 +18,23 @@ public class PizzaDAO extends DAO<Pizza> {
     @Override
     protected Map<Integer, Pizza> readAll() throws SQLException {
         String query = """
-                 SELECT p.id,
-                 p.name,
-                 p.type_id,
-                 pt.type_name,
-                 pi.ingredient_id,
-                 i.ingredient_name,
-                 i.ingredient_type_id,
-                 it.ingredient_type_name,
-                 ps.price,
-                 ps.size_id,
-                 s.size_name
-                 FROM product p JOIN product_type pt on p.type_id = pt.id
-                 JOIN product_ingredient pi on p.id = pi.product_id
-                 JOIN ingredient i on pi.ingredient_id = i.id
-                 JOIN ingredient_type it on i.ingredient_type_id = it.id
-                 JOIN product_size ps on pi.product_id = ps.product_id
-                 JOIN size s on ps.size_id = s.id
-                 WHERE pt.type_name = 'pizza';
-                ;""";
+                SELECT p.id,
+                p.name,
+                p.type_id,
+                pt.type_name,
+                pi.ingredient_id,
+                i.ingredient_name,
+                i.ingredient_type_id,
+                it.ingredient_type_name,
+                ps.price
+                FROM product p JOIN product_type pt on p.type_id = pt.id
+                JOIN product_ingredient pi on p.id = pi.product_id
+                JOIN ingredient i on pi.ingredient_id = i.id
+                JOIN ingredient_type it on i.ingredient_type_id = it.id
+                JOIN product_size ps on pi.product_id = ps.product_id
+                JOIN size s on ps.size_id = s.id
+                WHERE pt.type_name = 'pizza'
+                """;
         Map<Integer, Pizza> entries = new HashMap<>();
         try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();
@@ -74,15 +72,14 @@ public class PizzaDAO extends DAO<Pizza> {
     @Override
     protected Pizza mapResultSetToModel(ResultSet resultSet) throws SQLException {
         int pizzaId = resultSet.getInt("id");
-        List<Ingredient> ingredients = readAllIngredientsInsideProduct(pizzaId);
-        List<Size> availableSizes = readAllAvailableSizes(pizzaId);
+        List<Ingredient> ingredients = fetchAllIngredientsToProduct(pizzaId);
+        Map<Size, Double> availableSizesAndPrices = fetchAllAvailableSizesAndPricesToProduct(pizzaId);
 
         return new Pizza(
                 pizzaId,
                 resultSet.getString("name"),
-                resultSet.getDouble("price"),
                 new ProductType(resultSet.getInt("type_id"), resultSet.getString("type_name")),
-                availableSizes,
+                availableSizesAndPrices,
                 ingredients
         );
 
@@ -109,10 +106,12 @@ public class PizzaDAO extends DAO<Pizza> {
     }
 
 
-    public List<Ingredient> readAllIngredientsInsideProduct(Integer productId) throws SQLException {
-        String query = "SELECT i.ingredient_name, i.id FROM product_ingredient " +
-                "JOIN ingredient i ON i.id = product_ingredient.ingredient_id " +
-                "WHERE product_id =" + productId;
+    public List<Ingredient> fetchAllIngredientsToProduct(Integer productId) throws SQLException {
+        String query = "SELECT i.ingredient_name, i.id, i.ingredient_type_id, it.ingredient_type_name " +
+                " FROM product_ingredient pi " +
+                " JOIN ingredient i ON i.id = pi.ingredient_id " +
+                " JOIN ingredient_type it ON i.ingredient_type_id = it.id " +
+                " WHERE product_id =" + productId;
 
         List<Ingredient> allIngredients = new ArrayList<>();
         try (Connection connection = database.getConnection();
@@ -131,7 +130,8 @@ public class PizzaDAO extends DAO<Pizza> {
 
 
     public Map<Integer, Ingredient> readAllIngredientsAvailable() throws SQLException {
-        String query = "SELECT i.ingredient_name, i.id FROM ingredient i ";
+        String query = "SELECT i.ingredient_name, i.id, it.ingredient_type_name, ingredient_type_id FROM ingredient i " +
+                "JOIN ingredient_type it on it.id = i.ingredient_type_id ";
 
         Map<Integer, Ingredient> allIngredients = new HashMap<>();
         try (Connection connection = database.getConnection();
@@ -148,6 +148,7 @@ public class PizzaDAO extends DAO<Pizza> {
         }
         return allIngredients;
     }
+
 
     protected void deletePizzaIngredientList(int productId) throws SQLException {
         String query = "DELETE FROM product_ingredient WHERE product_id" + "= ? ";

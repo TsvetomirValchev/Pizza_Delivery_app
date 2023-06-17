@@ -1,19 +1,17 @@
 package db;
 
 import products.Drink;
-import products.Ingredient;
 import products.ProductType;
 import products.Size;
 
 import java.sql.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class DrinkDAO extends DAO<Drink> {
 
     protected DrinkDAO() {
-        super("drink", "product_id");
+        super("product", "id");
     }
 
     @Override
@@ -24,15 +22,9 @@ public class DrinkDAO extends DAO<Drink> {
                 p.type_id,
                 p.isDiet,
                 pt.type_name,
-                it.ingredient_type_name,
-                ps.price,
-                ps.size_id,
-                s.size_name
+                ps.price
                 FROM product p JOIN product_type pt on p.type_id = pt.id
-                JOIN product_ingredient pi on p.id = pi.product_id
-                JOIN ingredient i on pi.ingredient_id = i.id
-                JOIN ingredient_type it on i.ingredient_type_id = it.id
-                JOIN product_size ps on pi.product_id = ps.product_id
+                JOIN product_size ps on p.id = ps.product_id
                 JOIN size s on ps.size_id = s.id
                 WHERE type_name = 'drink'
                 """;
@@ -70,14 +62,13 @@ public class DrinkDAO extends DAO<Drink> {
 
     @Override
     protected Drink mapResultSetToModel(ResultSet resultSet) throws SQLException {
-        int pizzaId = resultSet.getInt("id");
-        List<Size> availableSizes = readAllAvailableSizes(pizzaId);
+        int drinkId = resultSet.getInt("id");
+        Map<Size, Double> availableSizesAndPrices = fetchAllAvailableSizesAndPricesToProduct(drinkId);
         return new Drink(
                 resultSet.getInt("id"),
                 resultSet.getString("name"),
-                resultSet.getDouble("price"),
                 new ProductType(resultSet.getInt("type_id"), resultSet.getString("type_name")),
-                availableSizes,
+                availableSizesAndPrices,
                 resultSet.getBoolean("isDiet")
         );
     }

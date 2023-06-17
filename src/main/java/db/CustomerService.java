@@ -3,10 +3,7 @@ package db;
 import order.Order;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import products.Dessert;
-import products.Drink;
-import products.Pizza;
-import products.Product;
+import products.*;
 import users.Customer;
 
 import java.sql.SQLException;
@@ -14,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class CustomerService extends Service {
-    
+
     private static final Logger LOGGER = LogManager.getLogger(CustomerService.class.getName());
     private final PizzaDAO pizzaDAO = new PizzaDAO();
     private final DAO<Drink> drinkDAO = new DrinkDAO();
@@ -59,10 +56,12 @@ public class CustomerService extends Service {
         }
     }
 
+    //TODO: make these methods work properly
     public String calculateCurrentOrderTotal() {
         double orderTotal = 0;
         for (Product product : getAllProductsInCurrentlyDeliveringOrder()) {
-            orderTotal += product.getPrice();
+            double sizePrice = getPriceForSizeOrdered(product);
+            orderTotal += sizePrice;
         }
         return orderTotal + " BGN";
     }
@@ -70,9 +69,20 @@ public class CustomerService extends Service {
     public String calculateCartTotal() {
         double orderTotal = 0;
         for (Product product : getAllProductsInCart()) {
-            orderTotal += product.getPrice();
+            double sizePrice = getPriceForSizeOrdered(product);
+            orderTotal += sizePrice;
         }
         return orderTotal + " BGN";
+    }
+
+
+    //TODO: think how to do that.
+    private Size getSizeOrdered(Product product) {
+        return null;
+    }
+
+    private double getPriceForSizeOrdered(Product product) {
+        return 0;
     }
 
     public List<Product> getAllProductsInCurrentlyDeliveringOrder() {

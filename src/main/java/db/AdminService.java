@@ -121,16 +121,6 @@ public class AdminService extends Service {
                 .orElse(null);
     }
 
-    public List<Ingredient> getAllIngredients(Integer productId) {
-        try {
-            return pizzaDAO.readAllIngredientsInsideProduct(productId);
-        } catch (SQLException e) {
-            LOGGER.debug(e.getMessage());
-            LOGGER.error("Couldn't read ingredients!");
-        }
-        return Collections.emptyList();
-    }
-
     public Map<Integer, Ingredient> getAllIngredientsAvailable() {
         try {
             return pizzaDAO.readAllIngredientsAvailable();
@@ -141,11 +131,20 @@ public class AdminService extends Service {
         return Collections.emptyMap();
     }
 
-    public void addPizza(int id, String name, double price, List<Size> sizes, List<Ingredient> ingredients) {
+    public Map<Integer, Size> getAllSizesAvailable() {
         try {
-            Pizza pizza = new Pizza(id, name, price, new ProductType(1, "pizza"), sizes, ingredients);
+            return pizzaDAO.readAllFromSizeTable();
+        } catch (SQLException e) {
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Couldn't read sizes!");
+        }
+        return Collections.emptyMap();
+    }
+
+    public void addPizza(int id, String name, Map<Size, Double> sizesAndPrices, List<Ingredient> ingredients) {
+        try {
+            Pizza pizza = new Pizza(id, name, new ProductType(1, "pizza"), sizesAndPrices, ingredients);
             pizzaDAO.insert(pizza);
-            addSizesToProduct(sizes, id, price);
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Couldn't add Pizza!");
@@ -153,33 +152,20 @@ public class AdminService extends Service {
     }
 
 
-    private void addSizesToProduct(List<Size> sizes, int productId, double price) throws SQLException {
+    public void addDrink(int productId, String name, Map<Size, Double> sizesAndPrices, boolean isDiet) {
         try {
-            for (Size size : sizes) {
-                pizzaDAO.insertInProductSizeTable(productId, size.getId(), price);
-            }
-        } catch (SQLException e) {
-            LOGGER.debug(e.getMessage());
-            LOGGER.error("Something went wrong with adding sizes to the pizza");
-        }
-    }
-
-    public void addDrink(int productId, String name, double price, List<Size> sizes, boolean isDiet) {
-        try {
-            Drink drink = new Drink(productId, name, price, new ProductType(2, "drink"), sizes, isDiet);
+            Drink drink = new Drink(productId, name, new ProductType(2, "drink"), sizesAndPrices, isDiet);
             drinkDAO.insert(drink);
-            addSizesToProduct(sizes, productId, price);
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Couldn't add drink!");
         }
     }
 
-    public void addDessert(int productId, String name, double price, List<Size> sizes, boolean isVegan) {
+    public void addDessert(int productId, String name, Map<Size, Double> sizesAndPrices, boolean isVegan) {
         try {
-            Dessert dessert = new Dessert(productId, name, price, new ProductType(3, "dessert"), sizes, isVegan);
+            Dessert dessert = new Dessert(productId, name, new ProductType(3, "dessert"), sizesAndPrices, isVegan);
             dessertDAO.insert(dessert);
-            addSizesToProduct(sizes, productId, price);
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Couldn't add dessert!");

@@ -21,6 +21,6 @@ public class Size {
 
     @Override
     public String toString() {
-        return getName();
+        return "id: " + getId() + " name: " + getName();
     }
 }

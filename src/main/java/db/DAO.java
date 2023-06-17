@@ -1,12 +1,10 @@
 package db;
 
-import products.Ingredient;
+import products.Product;
 import products.Size;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public abstract class DAO<T> {
@@ -36,6 +34,15 @@ public abstract class DAO<T> {
              PreparedStatement statement = connection.prepareStatement(buildInsertQuery(object))) {
             setInsertValues(statement, object);
             statement.executeUpdate();
+
+            if (object instanceof Product product) {
+                Map<Size, Double> sizePriceMapping = product.getSizesAndPrices();
+                for (Map.Entry<Size, Double> entry : sizePriceMapping.entrySet()) {
+                    Size size = entry.getKey();
+                    Double price = entry.getValue();
+                    insertInProductSizeTable(product.getId(), size.getId(), price);
+                }
+            }
         }
     }
 
@@ -88,22 +95,40 @@ public abstract class DAO<T> {
     }
 
 
-    public List<Size> readAllAvailableSizes(Integer product_id) throws SQLException {
-        String query = "SELECT s.id,s.size_name FROM product_size ps " +
+    public Map<Size, Double> fetchAllAvailableSizesAndPricesToProduct(Integer product_id) throws SQLException {
+        String query = "SELECT s.id,s.size_name, ps.price FROM product_size ps " +
                 "JOIN product p ON p.id = ps.product_id " +
                 "JOIN size s ON s.id = ps.size_id " +
                 "WHERE product_id =" + product_id;
 
-        List<Size> allAvailableSizes = new ArrayList<>();
+        Map<Size, Double> allAvailableSizesAndPrices = new HashMap<>();
         try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
                 Size size = (new Size(resultSet.getInt("id"),
-                        resultSet.getString("ingredient_name")));
-                allAvailableSizes.add(size.getId(), size);
+                        resultSet.getString("size_name")));
+                double price = resultSet.getDouble("price");
+                allAvailableSizesAndPrices.put(size, price);
             }
         }
-        return allAvailableSizes;
+        return allAvailableSizesAndPrices;
     }
+
+
+    public Map<Integer, Size> readAllFromSizeTable() throws SQLException {
+        String query = "SELECT s.id,s.size_name FROM size s ";
+        Map<Integer, Size> allSizes = new HashMap<>();
+        try (Connection connection = database.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                Size size = (new Size(resultSet.getInt("id"),
+                        resultSet.getString("size_name")));
+                allSizes.put(size.getId(), size);
+            }
+        }
+        return allSizes;
+    }
+    
 }

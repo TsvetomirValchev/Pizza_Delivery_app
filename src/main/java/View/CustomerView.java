@@ -1,7 +1,6 @@
 package View;
 
 import db.CustomerService;
-import products.Pizza;
 import products.Product;
 
 import java.util.Comparator;
@@ -135,17 +134,40 @@ public class CustomerView extends View {
     private void printCurrentOrderDetails() {
         System.out.println("All products in your order:");
         customerService.getAllProductsInCurrentlyDeliveringOrder().stream()
-                .sorted(Comparator.comparing(Product::getPrice))
-                .forEach(System.out::println);
+                .sorted(Comparator.comparing(product -> product.getSizesAndPrices()
+                        .values()
+                        .stream()
+                        .findFirst()
+                        .orElse(0.0)))
+                .forEach(product -> {
+                    System.out.println(product);
+                    System.out.println("Available sizes and prices:");
+                    product.getSizesAndPrices().forEach((size, price) ->
+                            System.out.println(size.getName() + ": " + price + " BGN")
+                    );
+                    System.out.println("----------------------");
+                });
         System.out.println("Order total: " + customerService.calculateCurrentOrderTotal());
     }
+
 
     private void printCartDetails() {
         System.out.println("All products in your order:");
         customerService.getAllProductsInCart()
                 .stream()
-                .sorted(Comparator.comparing(Product::getPrice))
-                .forEach(System.out::println);
+                .sorted(Comparator.comparing(product -> product.getSizesAndPrices()
+                        .values()
+                        .stream()
+                        .findFirst()
+                        .orElse(0.0)))
+                .forEach(product -> {
+                    System.out.println(product);
+                    System.out.println("Available sizes and prices:");
+                    product.getSizesAndPrices().forEach((size, price) ->
+                            System.out.println(size.getName() + ": " + price + " BGN")
+                    );
+                    System.out.println("----------------------");
+                });
         System.out.println("Order total: " + customerService.calculateCartTotal());
     }
 
@@ -161,7 +183,7 @@ public class CustomerView extends View {
         customerService.getAllPizzas()
                 .values()
                 .stream()
-                .sorted(Comparator.comparing(Pizza::getId))
+                .sorted(Comparator.comparing(Product::getId))
                 .forEach(System.out::println);
     }
 
@@ -176,6 +198,7 @@ public class CustomerView extends View {
     }
 
     private void printAllDrinks() {
+        System.out.println("All drinks in our restaurant:");
         customerService.getAllDrinks()
                 .values()
                 .stream()

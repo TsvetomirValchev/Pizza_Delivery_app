@@ -1,13 +1,12 @@
 package products;
 
-import java.util.List;
+import java.util.Map;
 
 public class Drink extends Product {
     private final boolean isDiet;
 
-
-    public Drink(Integer id, String name, Double price, ProductType productType, List<Size> size, boolean isDiet) {
-        super(id, name, price, productType, size);
+    public Drink(Integer id, String name, ProductType productType, Map<Size, Double> sizePriceMap, boolean isDiet) {
+        super(id, name, sizePriceMap, productType);
         this.isDiet = isDiet;
     }
 
@@ -18,6 +17,13 @@ public class Drink extends Product {
     @Override
     public String toString() {
         String isDiet = this.isDiet ? "Diet " : "";
-        return "\n№" + getId() + " " + isDiet + getName() + "\ncost: " + getPrice() + " BGN";
+
+
+        return "№" + getId() + " " + isDiet + getName() +
+                "\nPrices: " + buildSizesAndPricesString();
     }
+
 }
+
+
+

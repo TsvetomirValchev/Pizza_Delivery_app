@@ -1,13 +1,11 @@
 package db;
 
 import products.Dessert;
-import products.Ingredient;
 import products.ProductType;
 import products.Size;
 
 import java.sql.*;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class DessertDAO extends DAO<Dessert> {
@@ -20,22 +18,16 @@ public class DessertDAO extends DAO<Dessert> {
     protected Map<Integer, Dessert> readAll() throws SQLException {
         String query = """
                 SELECT p.id,
-                p.name,
-                p.type_id,
-                p.isVegan,
-                pt.type_name,
-                it.ingredient_type_name,
-                ps.price,
-                ps.size_id,
-                s.size_name
-                FROM product p JOIN product_type pt on p.type_id = pt.id
-                JOIN product_ingredient pi on p.id = pi.product_id
-                JOIN ingredient i on pi.ingredient_id = i.id
-                JOIN ingredient_type it on i.ingredient_type_id = it.id
-                JOIN product_size ps on pi.product_id = ps.product_id
-                JOIN size s on ps.size_id = s.id
-                WHERE type_name = 'dessert'
-                """;
+                 p.name,
+                 p.type_id,
+                 p.isDiet,
+                 pt.type_name,
+                 ps.price
+                 FROM product p JOIN product_type pt on p.type_id = pt.id
+                 JOIN product_size ps on p.id = ps.product_id
+                 JOIN size s on ps.size_id = s.id
+                 WHERE type_name = 'dessert'
+                 """;
         Map<Integer, Dessert> entries = new HashMap<>();
         try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();
@@ -70,13 +62,12 @@ public class DessertDAO extends DAO<Dessert> {
 
     @Override
     protected Dessert mapResultSetToModel(ResultSet resultSet) throws SQLException {
-        int pizzaId = resultSet.getInt("id");
-        List<Size> availableSizes = readAllAvailableSizes(pizzaId);
+        int dessertId = resultSet.getInt("id");
+        Map<Size, Double> availableSizes = fetchAllAvailableSizesAndPricesToProduct(dessertId);
 
         return new Dessert(
                 resultSet.getInt("id"),
                 resultSet.getString("name"),
-                resultSet.getDouble("price"),
                 new ProductType(resultSet.getInt("type_id"), resultSet.getString("type_name")),
                 availableSizes,
                 resultSet.getBoolean("isVegan")

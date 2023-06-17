@@ -1,12 +1,13 @@
 package products;
 
-import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
 
 public class Dessert extends Product {
     private final boolean isVegan;
 
-    public Dessert(Integer id, String name, Double price, ProductType productType, List<Size> size, boolean isVegan) {
-        super(id, name, price, productType, size);
+    public Dessert(Integer id, String name, ProductType productType, Map<Size, Double> sizePriceMap, boolean isVegan) {
+        super(id, name, sizePriceMap, productType);
         this.isVegan = isVegan;
     }
 
@@ -14,11 +15,16 @@ public class Dessert extends Product {
         return isVegan;
     }
 
-
     @Override
     public String toString() {
         String vegan = isVegan ? "Vegan " : "";
-        return "\n№" + getId() + " " +
-                vegan + getName() + "\ncost: " + getPrice() + " BGN";
+
+
+        return "№" + getId() + " " + vegan + getName() +
+                "\nPrices and sizes: " + buildSizesAndPricesString();
     }
+
 }
+
+
+

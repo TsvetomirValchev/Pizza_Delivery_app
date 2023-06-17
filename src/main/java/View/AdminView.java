@@ -1,15 +1,12 @@
 package View;
 
-import products.Ingredient;
-import products.IngredientType;
-import products.Product;
+import products.*;
 import db.AdminService;
 
 import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import products.Size;
 import users.User;
 
 public class AdminView extends View {
@@ -143,8 +140,7 @@ public class AdminView extends View {
             Product product = createAProductMenu();
             System.out.println("Is the drink Diet friendly?");
             boolean isDiet = scanner.nextBoolean();
-            adminService.addDrink(product.getId(), product.getName(), product.getPrice(), product.getAvailableSizes(), isDiet);
-
+            adminService.addDrink(product.getId(), product.getName(), product.getSizesAndPrices(), isDiet);
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
             if (e instanceof NumberFormatException) {
@@ -165,7 +161,7 @@ public class AdminView extends View {
             Product product = createAProductMenu();
             System.out.println("Is the dessert vegan?");
             boolean isVegan = scanner.nextBoolean();
-            adminService.addDessert(product.getId(), product.getName(), product.getPrice(), product.getAvailableSizes(), isVegan);
+            adminService.addDessert(product.getId(), product.getName(), product.getSizesAndPrices(), isVegan);
 
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
@@ -179,16 +175,13 @@ public class AdminView extends View {
 
     }
 
-    //TODO: make this method work...
     private void addAPizzaMenu() {
         try {
             System.out.println("All currently available pizzas:");
             printAllPizzas();
             Product product = createAProductMenu();
-            List<Size> sizes = selectSizes();
-
             List<Ingredient> ingredients = selectIngredients();
-            adminService.addPizza(product.getId(), product.getName(), product.getPrice(), sizes, ingredients);
+            adminService.addPizza(product.getId(), product.getName(), product.getSizesAndPrices(), ingredients);
 
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
@@ -202,20 +195,30 @@ public class AdminView extends View {
         }
     }
 
-    private List<Size> selectSizes() {
+    private Map<Size, Double> selectSizes() {
         Scanner scanner = new Scanner(System.in);
-        List<Size> sizes = new ArrayList<>();
+        Map<Size, Double> sizesAndPrice = new HashMap<>();
+
         int input;
         do {
-            System.out.println("Choose the size(by entering it's id):");
+            printAllAvailableSizes();
+            System.out.println("Choose the size (by entering its id):");
             int sizeId = scanner.nextInt();
             scanner.nextLine();
             Size size = new Size(sizeId, "");
-            sizes.add(size);
+
+            System.out.println("What should the price for this size be?");
+            double price = scanner.nextDouble();
+            scanner.nextLine();
+
+            sizesAndPrice.put(size, price);
+
             System.out.println("Do you want to add more sizes? (1.y/0.n)");
             input = scanner.nextInt();
+            scanner.nextLine();
         } while (input == 1);
-        return sizes;
+
+        return sizesAndPrice;
     }
 
     private List<Ingredient> selectIngredients() {
@@ -223,7 +226,8 @@ public class AdminView extends View {
         List<Ingredient> ingredients = new ArrayList<>();
         int input;
         do {
-            System.out.println("Choose the size(by entering it's id):");
+            System.out.println("Choose the ingredient(by entering it's id):");
+            printAllAvailableIngredients();
             int ingredientId = scanner.nextInt();
             scanner.nextLine();
             Ingredient ingredient = new Ingredient(ingredientId, null, null);
@@ -235,10 +239,8 @@ public class AdminView extends View {
     }
 
     private Product createAProductMenu() {
-        String productName = null;
-        Double price = null;
-        Size size = new Size(null, "");
-        int id = 0;
+        String productName;
+        int id;
         try {
             Scanner scanner = new Scanner(System.in);
             System.out.println("Enter the identification number of the product:");
@@ -246,10 +248,8 @@ public class AdminView extends View {
             scanner.nextLine();
             System.out.println("Enter the name of the product:");
             productName = scanner.nextLine();
-            System.out.println("Enter the price of the product:");
-            price = scanner.nextDouble();
-            System.out.println("Enter the size of the product:");
-
+            Map<Size, Double> sizesAndPrices = selectSizes();
+            return new Product(id, productName, sizesAndPrices, null);
 
         } catch (InputMismatchException | NumberFormatException e) {
             LOGGER.debug(e.getMessage());
@@ -258,10 +258,10 @@ public class AdminView extends View {
             } else {
                 System.err.println("Invalid input!");
             }
-            createAProductMenu();
+            return createAProductMenu();
         }
-        return null;
     }
+
 
     private void deleteAPizzaMenu() {
         try {
@@ -315,7 +315,15 @@ public class AdminView extends View {
         adminService.getAllIngredientsAvailable()
                 .values()
                 .stream()
-                .sorted(Comparator.comparing(ingredient -> ingredient.getIngredientType().getName()))
+                .sorted(Comparator.comparing(ingredient -> ingredient.getIngredientType().getId()))
+                .forEach(System.out::println);
+    }
+
+    private void printAllAvailableSizes() {
+        adminService.getAllSizesAvailable()
+                .values()
+                .stream()
+                .sorted(Comparator.comparing(Size::getId))
                 .forEach(System.out::println);
     }
 
@@ -332,7 +340,7 @@ public class AdminView extends View {
         adminService.getAllPizzas()
                 .values()
                 .stream()
-                .sorted(Comparator.comparing(Product::getId))
+                .sorted(Comparator.comparing(Pizza::getId))
                 .forEach(System.out::println);
     }
 
@@ -341,7 +349,7 @@ public class AdminView extends View {
         adminService.getAllDrinks()
                 .values()
                 .stream()
-                .sorted(Comparator.comparing(Product::getId))
+                .sorted(Comparator.comparing(Drink::getId))
                 .forEach(System.out::println);
     }
 
@@ -349,7 +357,7 @@ public class AdminView extends View {
         adminService.getAllDesserts()
                 .values()
                 .stream()
-                .sorted(Comparator.comparing(Product::getId))
+                .sorted(Comparator.comparing(Dessert::getId))
                 .forEach(System.out::println);
     }
 

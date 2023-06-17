@@ -2,19 +2,17 @@ package products;
 
 
 import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
 
 
 public class Pizza extends Product {
+    private final List<Ingredient> ingredients;
 
-
-    List<Ingredient> ingredients;
-
-
-    public Pizza(Integer id, String name, Double price, ProductType productType, List<Size> size, List<Ingredient> ingredients) {
-        super(id, name, price, productType, size);
+    public Pizza(Integer id, String name, ProductType productType, Map<Size, Double> sizePriceMap, List<Ingredient> ingredients) {
+        super(id, name, sizePriceMap, productType);
         this.ingredients = ingredients;
     }
-
 
     public List<Ingredient> getIngredients() {
         return ingredients;
@@ -23,15 +21,15 @@ public class Pizza extends Product {
 
     @Override
     public String toString() {
-
-
-        return "\n№" + getId() + "." +
-                getName() + " pizza \ningredients: " +
-                getIngredients() + "\navailable sizes: " +
-                "\ncosts: " + getPrice() + " BGN";
-
+        StringJoiner ingredientJoiner = new StringJoiner(", ");
+        for (Ingredient ingredient : getIngredients()) {
+            ingredientJoiner.add(ingredient.getName());
+        }
+        
+        return "№" + getId() + ". " + getName() + " pizza\nIngredients: " + ingredientJoiner +
+                "\nAvailable sizes and prices:\n" + buildSizesAndPricesString();
     }
 
-
 }
+
 

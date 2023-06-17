@@ -42,12 +42,12 @@ public class LoginView extends View {
                     case 1 -> printLoginMenu();
                     case 2 -> accountCreationChoice();
                     case 0 -> System.out.println("Exiting!");
-                    default -> LOGGER.error("Invalid account details!");
+                    default -> System.err.println("Invalid account details!");
                 }
             } while (choice != 0);
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.error("Invalid input");
+            System.err.println("Invalid input");
             getChoice();
         }
 
@@ -67,7 +67,7 @@ public class LoginView extends View {
 
         } catch (IllegalArgumentException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.error("Please enter valid account credentials");
+            System.err.println("Please enter valid account credentials");
             printLoginMenu();
         }
 
@@ -78,10 +78,10 @@ public class LoginView extends View {
             Customer customer = new Customer(user);
             openCustomerView(customer);
         } else if (user != null) {
-            LOGGER.error("Wrong password!");
+            System.err.println("Wrong password!");
             printLoginMenu();
         } else {
-            LOGGER.error("No account found with this username");
+            System.err.println("No account found with this username");
             accountCreationChoice();
         }
 
@@ -99,7 +99,6 @@ public class LoginView extends View {
         switch (choice) {
             case 1 -> {
                 printRegistrationMenu();
-                System.out.println("Account created!");
                 getChoice();
             }
             case 2 -> {
@@ -107,7 +106,7 @@ public class LoginView extends View {
                 getChoice();
             }
             default -> {
-                System.out.println("Invalid Choice!");
+                System.err.println("Invalid Choice!");
                 accountCreationChoice();
             }
 
@@ -135,10 +134,10 @@ public class LoginView extends View {
 
         } catch (InputMismatchException e) {
             LOGGER.debug(e.getMessage());
-            LOGGER.error("Invalid data entered");
+            System.err.println("Invalid data entered");
             printRegistrationMenu();
         }
-
+        System.out.println("Account Created!");
     }
 
     private void openAdminView() {

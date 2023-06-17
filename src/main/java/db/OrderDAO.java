@@ -2,13 +2,11 @@ package db;
 
 import order.Order;
 import products.Product;
+import products.Size;
 
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class OrderDAO extends DAO<Order> {
 
@@ -80,53 +78,71 @@ public class OrderDAO extends DAO<Order> {
         return object.getId();
     }
 
-    public List<Product> getAllProductsInOrder(int OrderId) throws SQLException {
-        String query = "SELECT product_id, name, price FROM order_item " +
-                "JOIN orders ON order_id = orders.id " +
-                "JOIN product p on p.id = order_item.product_id" +
-                " WHERE order_id = " + OrderId;
+    public List<Product> getAllProductsInOrder(int orderId) throws SQLException {
+        String query = "SELECT p.id, p.name, ps.price, ps.size_id " +
+                "FROM order_item oi " +
+                "JOIN product_size ps ON oi.product_size_id = ps.product_id " +
+                "JOIN product p ON ps.product_id = p.id " +
+                "WHERE oi.order_id = ?";
 
         List<Product> allProducts = new ArrayList<>();
         try (Connection connection = database.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-            while (resultSet.next()) {
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, orderId);
 
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    int productId = resultSet.getInt("id");
+                    String name = resultSet.getString("name");
+                    double price = resultSet.getDouble("price");
+                    int sizeId = resultSet.getInt("size_id");
+
+                    Size size = new Size(sizeId, "");
+                    Map<Size, Double> sizesAndPrices = new HashMap<>();
+                    sizesAndPrices.put(size, price);
+
+                    Product product = new Product(productId, name, sizesAndPrices, null);
+                    allProducts.add(product);
+                }
             }
         }
         return allProducts;
     }
 
+
     public List<Order> getOrderByProductId(int productId) throws SQLException {
-        String query = "SELECT order_id, customer_id, ordered_at, delivered_at FROM order_item " +
-                "JOIN orders ON order_id = orders.id " +
-                "JOIN product p ON p.id = order_item.product_id " +
-                "WHERE product_id = " + productId;
+        String query = "SELECT o.id AS order_id, o.customer_id, o.ordered_at, o.delivered_at FROM order_item oi " +
+                "JOIN orders o ON oi.order_id = o.id " +
+                "WHERE oi.product_size_id IN (SELECT ps.size_id FROM product_size ps WHERE ps.product_id = ?)";
 
         List<Order> allOrdersWithProductInThem = new ArrayList<>();
         try (Connection connection = database.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-            while (resultSet.next()) {
-                LocalDateTime deliveryTime = getLocalDateTimeFromTimestamp(resultSet.getTimestamp("delivered_at"));
-                LocalDateTime orderedAtTime = getLocalDateTimeFromTimestamp(resultSet.getTimestamp("ordered_at"));
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, productId);
 
-                allOrdersWithProductInThem.add(new Order(
-                        resultSet.getInt("order_id"),
-                        resultSet.getInt("customer_id"),
-                        Optional.ofNullable(orderedAtTime),
-                        Optional.ofNullable(deliveryTime)));
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    LocalDateTime deliveryTime = getLocalDateTimeFromTimestamp(resultSet.getTimestamp("delivered_at"));
+                    LocalDateTime orderedAtTime = getLocalDateTimeFromTimestamp(resultSet.getTimestamp("ordered_at"));
+
+                    allOrdersWithProductInThem.add(new Order(
+                            resultSet.getInt("order_id"),
+                            resultSet.getInt("customer_id"),
+                            Optional.ofNullable(orderedAtTime),
+                            Optional.ofNullable(deliveryTime)));
+                }
             }
         }
         return allOrdersWithProductInThem;
     }
+
 
     private LocalDateTime getLocalDateTimeFromTimestamp(Timestamp timestamp) {
         return (timestamp != null) ? timestamp.toLocalDateTime() : null;
     }
 
     public void InsertInOrderItemTable(int productId, int orderId) throws SQLException {
-        String query = "INSERT INTO order_item(order_id, product_id) VALUES(? , ?)";
+        String query = "INSERT INTO order_item(order_id, product_size_id) VALUES(? , ?)";
         try (Connection connection = database.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, orderId);
