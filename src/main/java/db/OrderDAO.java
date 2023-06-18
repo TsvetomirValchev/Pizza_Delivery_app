@@ -2,6 +2,7 @@ package db;
 
 import order.Order;
 import products.Product;
+import products.ProductType;
 import products.Size;
 
 import java.sql.*;
@@ -52,7 +53,7 @@ public class OrderDAO extends DAO<Order> {
 
 
     @Override
-    String buildUpdateQuery(int variableIndex) {
+    protected String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(
                 1, "id",
                 2, "customer_id",
@@ -65,7 +66,7 @@ public class OrderDAO extends DAO<Order> {
 
 
     @Override
-    void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
+    protected void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         switch (variableIndex) {
             case 1, 2 -> statement.setInt(1, (Integer) updatedValue);
             case 3, 4 -> statement.setTimestamp(1, Timestamp.valueOf((LocalDateTime) updatedValue));
@@ -78,11 +79,13 @@ public class OrderDAO extends DAO<Order> {
         return object.getId();
     }
 
-    public List<Product> getAllProductsInOrder(int orderId) throws SQLException {
-        String query = "SELECT p.id, p.name, ps.price, ps.size_id " +
+    protected List<Product> getAllProductsInOrder(int orderId) throws SQLException {
+        String query = "SELECT p.id, p.name, ps.price, ps.size_id, pt.type_name, p.type_id " +
                 "FROM order_item oi " +
                 "JOIN product_size ps ON oi.product_size_id = ps.product_id " +
                 "JOIN product p ON ps.product_id = p.id " +
+                "JOIN product_type pt on p.type_id = pt.id " +
+                "JOIN product_ingredient pi on p.id = pi.product_id " +
                 "WHERE oi.order_id = ?";
 
         List<Product> allProducts = new ArrayList<>();
@@ -96,12 +99,11 @@ public class OrderDAO extends DAO<Order> {
                     String name = resultSet.getString("name");
                     double price = resultSet.getDouble("price");
                     int sizeId = resultSet.getInt("size_id");
-
+                    ProductType productType = new ProductType(resultSet.getInt("type_id"), resultSet.getString("type_name"));
                     Size size = new Size(sizeId, "");
                     Map<Size, Double> sizesAndPrices = new HashMap<>();
                     sizesAndPrices.put(size, price);
-
-                    Product product = new Product(productId, name, sizesAndPrices, null);
+                    Product product = new Product(productId, name, sizesAndPrices, productType);
                     allProducts.add(product);
                 }
             }
@@ -110,7 +112,7 @@ public class OrderDAO extends DAO<Order> {
     }
 
 
-    public List<Order> getOrderByProductId(int productId) throws SQLException {
+    protected List<Order> getOrderByProductId(int productId) throws SQLException {
         String query = "SELECT o.id AS order_id, o.customer_id, o.ordered_at, o.delivered_at FROM order_item oi " +
                 "JOIN orders o ON oi.order_id = o.id " +
                 "WHERE oi.product_size_id IN (SELECT ps.size_id FROM product_size ps WHERE ps.product_id = ?)";
@@ -136,20 +138,87 @@ public class OrderDAO extends DAO<Order> {
         return allOrdersWithProductInThem;
     }
 
+    protected Map<Size, Double> getOrderedSizesAndPrices(Integer OrderId) throws SQLException {
+        Map<Size, Double> sizesAndPrices = new HashMap<>();
+
+        String query = "SELECT ps.size_id, s.size_name, ps.price " +
+                "FROM size s " +
+                "JOIN product_size ps ON s.id = ps.size_id " +
+                "JOIN order_item oi ON oi.product_size_id = ps.id " +
+                "WHERE oi.order_id = " + OrderId;
+
+        try (Connection connection = database.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                int sizeId = resultSet.getInt("size_id");
+                String sizeName = resultSet.getString("size_name");
+                double price = resultSet.getDouble("price");
+                Size size = new Size(sizeId, sizeName);
+                sizesAndPrices.put(size, price);
+            }
+        }
+
+        return sizesAndPrices;
+    }
+
 
     private LocalDateTime getLocalDateTimeFromTimestamp(Timestamp timestamp) {
         return (timestamp != null) ? timestamp.toLocalDateTime() : null;
     }
 
-    public void InsertInOrderItemTable(int productId, int orderId) throws SQLException {
+    protected void InsertInOrderItemTable(int orderId, int productSizeId) throws SQLException {
         String query = "INSERT INTO order_item(order_id, product_size_id) VALUES(? , ?)";
         try (Connection connection = database.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, orderId);
-            statement.setInt(2, productId);
+            statement.setInt(2, productSizeId);
             statement.executeUpdate();
         }
 
+    }
+
+    protected void DeleteProductFromCompletedOrder(int productId) throws SQLException {
+        String query = "DELETE FROM order_item WHERE product_size_id " +
+                "IN (SELECT id FROM product_size WHERE product_id = ?)";
+
+        try (Connection connection = database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, productId);
+            statement.executeUpdate();
+        }
+
+    }
+
+    protected boolean hasActiveOrders(int customerId) throws SQLException {
+        String query = "SELECT COUNT(*) AS active_orders FROM orders WHERE customer_id = ? AND delivered_at IS NULL";
+
+        try (Connection connection = database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, customerId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int activeOrders = resultSet.getInt("active_orders");
+                    return activeOrders > 0;
+                }
+            }
+            return false;
+        }
+    }
+
+
+    protected Integer getProductSizeTableIdBySizeAndProductId(int sizeId, int productId) throws SQLException {
+        String query = "SELECT ps.id FROM product_size ps " +
+                "WHERE ps.size_id =" + sizeId + " AND ps.product_id =" + productId;
+
+        try (Connection connection = database.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            if (resultSet.next()) {
+                return resultSet.getInt("id");
+            }
+        }
+        return 0;
     }
 
 

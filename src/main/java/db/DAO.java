@@ -1,10 +1,14 @@
 package db;
 
+import products.Ingredient;
+import products.IngredientType;
 import products.Product;
 import products.Size;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class DAO<T> {
@@ -94,8 +98,19 @@ public abstract class DAO<T> {
 
     }
 
+    protected void deleteProductSizesAndPrices(int productId) throws SQLException {
+        String query = "DELETE FROM product_size WHERE product_id" + "= ? ";
+        try (Connection connection = database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setObject(1, productId);
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Entry with key " + productId + " was not found!");
+            }
+        }
+    }
 
-    public Map<Size, Double> fetchAllAvailableSizesAndPricesToProduct(Integer product_id) throws SQLException {
+    protected Map<Size, Double> fetchAllAvailableSizesAndPricesToProduct(Integer product_id) throws SQLException {
         String query = "SELECT s.id,s.size_name, ps.price FROM product_size ps " +
                 "JOIN product p ON p.id = ps.product_id " +
                 "JOIN size s ON s.id = ps.size_id " +
@@ -116,7 +131,7 @@ public abstract class DAO<T> {
     }
 
 
-    public Map<Integer, Size> readAllFromSizeTable() throws SQLException {
+    protected Map<Integer, Size> readAllFromSizeTable() throws SQLException {
         String query = "SELECT s.id,s.size_name FROM size s ";
         Map<Integer, Size> allSizes = new HashMap<>();
         try (Connection connection = database.getConnection();
@@ -130,5 +145,74 @@ public abstract class DAO<T> {
         }
         return allSizes;
     }
-    
+
+    protected int readSizeIdBySizeName(String sizeName) throws SQLException {
+        String query = "SELECT s.id FROM product_size " +
+                "JOIN size s on product_size.size_id = s.id " +
+                "WHERE size_name = '" + sizeName + "'";
+        try (Connection connection = database.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            if (resultSet.next()) {
+                return resultSet.getInt("id");
+            }
+        }
+        return 0;
+    }
+
+    protected List<Ingredient> fetchAllIngredientsToProduct(Integer productId) throws SQLException {
+        String query = "SELECT i.ingredient_name, i.id, i.ingredient_type_id, it.ingredient_type_name " +
+                " FROM product_ingredient pi " +
+                " JOIN ingredient i ON i.id = pi.ingredient_id " +
+                " JOIN ingredient_type it ON i.ingredient_type_id = it.id " +
+                " WHERE product_id =" + productId;
+
+        List<Ingredient> allIngredients = new ArrayList<>();
+        try (Connection connection = database.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                Ingredient ingredient = (new Ingredient(resultSet.getInt("id"),
+                        resultSet.getString("ingredient_name"),
+                        new IngredientType(resultSet.getInt("ingredient_type_id"),
+                                resultSet.getString("ingredient_type_name"))));
+                allIngredients.add(ingredient);
+            }
+        }
+        return allIngredients;
+    }
+
+
+    protected Map<Integer, Ingredient> readAllIngredientsAvailable() throws SQLException {
+        String query = "SELECT i.ingredient_name, i.id, it.ingredient_type_name, ingredient_type_id FROM ingredient i " +
+                "JOIN ingredient_type it on it.id = i.ingredient_type_id ";
+
+        Map<Integer, Ingredient> allIngredients = new HashMap<>();
+        try (Connection connection = database.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                Ingredient ingredient = (new Ingredient(resultSet.getInt("id"),
+                        resultSet.getString("ingredient_name"),
+                        new IngredientType(resultSet.getInt("ingredient_type_id"),
+                                resultSet.getString("ingredient_type_name"))));
+
+                allIngredients.put(ingredient.getId(), ingredient);
+            }
+        }
+        return allIngredients;
+    }
+
+
+    protected void insertInProductIngredientTable(int productId, int ingredientId) throws SQLException {
+        String query = "INSERT INTO product_ingredient (product_id, ingredient_id) VALUES(? , ?)";
+        try (Connection connection = database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, productId);
+            statement.setInt(2, ingredientId);
+            statement.executeUpdate();
+        }
+
+    }
+
 }

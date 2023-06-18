@@ -20,7 +20,7 @@ public class DessertDAO extends DAO<Dessert> {
                 SELECT p.id,
                  p.name,
                  p.type_id,
-                 p.isDiet,
+                 p.isVegan,
                  pt.type_name,
                  ps.price
                  FROM product p JOIN product_type pt on p.type_id = pt.id
@@ -76,7 +76,7 @@ public class DessertDAO extends DAO<Dessert> {
 
 
     @Override
-    String buildUpdateQuery(int variableIndex) {
+    protected String buildUpdateQuery(int variableIndex) {
         Map<Integer, String> columnMap = Map.of(
                 1, "product_id",
                 2, "name",
@@ -88,7 +88,7 @@ public class DessertDAO extends DAO<Dessert> {
     }
 
     @Override
-    void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
+    protected void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         switch (variableIndex) {
             case 1, 3 -> statement.setInt(1, (Integer) updatedValue);
             case 2 -> statement.setString(1, (String) updatedValue);

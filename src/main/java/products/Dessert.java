@@ -1,7 +1,6 @@
 package products;
 
 import java.util.Map;
-import java.util.StringJoiner;
 
 public class Dessert extends Product {
     private final boolean isVegan;
@@ -21,7 +20,7 @@ public class Dessert extends Product {
 
 
         return "№" + getId() + " " + vegan + getName() +
-                "\nPrices and sizes: " + buildSizesAndPricesString();
+                "\nAvailable sizes and prices:\n" + buildSizesAndPricesString();
     }
 
 }

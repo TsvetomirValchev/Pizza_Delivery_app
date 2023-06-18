@@ -3,12 +3,11 @@ package View;
 import db.CustomerService;
 import products.Product;
 
-import java.util.Comparator;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import products.Size;
 
 public class CustomerView extends View {
 
@@ -88,15 +87,13 @@ public class CustomerView extends View {
     private void addAProductToShoppingCartMenu() {
         try {
             Scanner scanner = new Scanner(System.in);
-
             printAllProductsInTheRestaurant();
-
             System.out.println("Enter the ID of the product you wish to add to your cart:  ");
             int productId = scanner.nextInt();
-
-            if (customerService.placeAnOrder(productId)) {
-                System.out.println("Product has been added to your order");
-            }
+            scanner.nextLine();
+            System.out.println("Enter the size of you want: ");
+            String sizeName = scanner.nextLine();
+            customerService.placeAnOrder(productId, sizeName);
             markOrderAsFinalizedMenu();
         } catch (InputMismatchException e) {
             LOGGER.warn(e.getMessage());
@@ -131,50 +128,51 @@ public class CustomerView extends View {
 
     }
 
+
+    private void printProductDetails(boolean isOrder) {
+        String orderType = isOrder ? "order" : "cart";
+        List<Product> products = isOrder ? customerService.getAllProductsInCurrentlyDeliveringOrder() : customerService.getAllProductsInCart();
+
+        System.out.println("All products in your " + orderType + ":");
+
+        Map<Integer, Product> productMap = new HashMap<>();
+        for (Product product : products) {
+            productMap.putIfAbsent(product.getId(), product);
+        }
+
+        for (Product product : productMap.values()) {
+            System.out.println("ID: " + product.getId() + " Product Name: " + product.getName());
+            System.out.println("Ordered size and price:");
+            Map<Size, Double> sizesAndPrices = isOrder ? customerService.getSizeAndPriceOrderedForOrderAwaitingDelivery()
+                    : customerService.getSizeAndPriceOrderedForCart();
+            for (Map.Entry<Size, Double> entry : sizesAndPrices.entrySet()) {
+                Size size = entry.getKey();
+                double price = entry.getValue();
+                System.out.println(size.getName() + ", cost: " + price + " BGN");
+            }
+            System.out.println("----------------------");
+        }
+
+        String orderTotal = isOrder ? customerService.calculateCurrentOrderTotal() : customerService.calculateCartTotal();
+        System.out.println("Order total: " + orderTotal);
+    }
+
+
     private void printCurrentOrderDetails() {
-        System.out.println("All products in your order:");
-        customerService.getAllProductsInCurrentlyDeliveringOrder().stream()
-                .sorted(Comparator.comparing(product -> product.getSizesAndPrices()
-                        .values()
-                        .stream()
-                        .findFirst()
-                        .orElse(0.0)))
-                .forEach(product -> {
-                    System.out.println(product);
-                    System.out.println("Available sizes and prices:");
-                    product.getSizesAndPrices().forEach((size, price) ->
-                            System.out.println(size.getName() + ": " + price + " BGN")
-                    );
-                    System.out.println("----------------------");
-                });
-        System.out.println("Order total: " + customerService.calculateCurrentOrderTotal());
+        printProductDetails(true);
     }
 
 
     private void printCartDetails() {
-        System.out.println("All products in your order:");
-        customerService.getAllProductsInCart()
-                .stream()
-                .sorted(Comparator.comparing(product -> product.getSizesAndPrices()
-                        .values()
-                        .stream()
-                        .findFirst()
-                        .orElse(0.0)))
-                .forEach(product -> {
-                    System.out.println(product);
-                    System.out.println("Available sizes and prices:");
-                    product.getSizesAndPrices().forEach((size, price) ->
-                            System.out.println(size.getName() + ": " + price + " BGN")
-                    );
-                    System.out.println("----------------------");
-                });
-        System.out.println("Order total: " + customerService.calculateCartTotal());
+        printProductDetails(false);
     }
 
 
     private void printAllProductsInTheRestaurant() {
         printAllPizzas();
+        System.out.println();
         printAllDrinks();
+        System.out.println();
         printAllDesserts();
     }
 

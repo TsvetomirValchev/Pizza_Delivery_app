@@ -34,7 +34,9 @@ public class AdminService extends Service {
             } else if (isProductCurrentlyOrdered(drink.getId())) {
                 LOGGER.error("This product is currently in a delivery: '" + productId + "'");
             } else {
-                drinkDAO.delete(productId);
+                orderDAO.DeleteProductFromCompletedOrder(drink.getId());
+                drinkDAO.deleteProductSizesAndPrices(drink.getId());
+                drinkDAO.delete(drink.getId());
                 System.out.println("Drink removed successfully!");
             }
         } catch (SQLException e) {
@@ -55,7 +57,9 @@ public class AdminService extends Service {
             } else if (isProductCurrentlyOrdered(dessert.getId())) {
                 LOGGER.error("This product is currently in a delivery: '" + productId + "'");
             } else {
-                dessertDAO.delete(productId);
+                orderDAO.DeleteProductFromCompletedOrder(dessert.getId());
+                dessertDAO.deleteProductSizesAndPrices(dessert.getId());
+                dessertDAO.delete(dessert.getId());
                 System.out.println("Dessert removed successfully");
             }
 
@@ -77,7 +81,10 @@ public class AdminService extends Service {
             } else if (isProductCurrentlyOrdered(pizza.getId())) {
                 LOGGER.error("This product is currently in a delivery: '" + productId + "'");
             } else {
-                pizzaDAO.delete(productId);
+                orderDAO.DeleteProductFromCompletedOrder(pizza.getId());
+                pizzaDAO.deleteProductSizesAndPrices(pizza.getId());
+                pizzaDAO.deletePizzaIngredientList(pizza.getId());
+                pizzaDAO.delete(pizza.getId());
                 System.out.println("Pizza removed successfully!");
             }
 
@@ -96,19 +103,25 @@ public class AdminService extends Service {
         return Collections.emptyMap();
     }
 
-    public void deleteUser(String Username) {
+    public void deleteUser(String username) {
         try {
-            User user = getUserByUsername(Username);
-            if (user != null) {
-                userDAO.delete(user.getId());
-            } else {
-                LOGGER.error("User with username: '" + Username + "' does not exist!");
+            User user = getUserByUsername(username);
+            if (user == null) {
+                throw new IllegalArgumentException("User with username: '" + username + "' does not exist!");
+
             }
-        } catch (SQLException e) {
-
-            LOGGER.debug(e.getMessage());
-            LOGGER.error("Couldn't delete customer account!");
-
+            if (orderDAO.hasActiveOrders(user.getId())) {
+                throw new IllegalArgumentException("User is currently awaiting delivery and cannot be deleted.");
+            }
+            userDAO.delete(user.getId());
+        } catch (SQLException | IllegalArgumentException e) {
+            if (e instanceof IllegalArgumentException) {
+                LOGGER.debug(e.getMessage());
+                LOGGER.error(e.getMessage());
+            } else {
+                LOGGER.debug(e.getMessage());
+                LOGGER.error("Something went wrong with deleting user!");
+            }
         }
     }
 
@@ -143,8 +156,13 @@ public class AdminService extends Service {
 
     public void addPizza(int id, String name, Map<Size, Double> sizesAndPrices, List<Ingredient> ingredients) {
         try {
+
             Pizza pizza = new Pizza(id, name, new ProductType(1, "pizza"), sizesAndPrices, ingredients);
             pizzaDAO.insert(pizza);
+
+            for (Ingredient ingredient : ingredients) {
+                pizzaDAO.insertInProductIngredientTable(pizza.getId(), ingredient.getId());
+            }
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Couldn't add Pizza!");

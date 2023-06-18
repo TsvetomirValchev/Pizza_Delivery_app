@@ -98,55 +98,11 @@ public class PizzaDAO extends DAO<Pizza> {
     }
 
     @Override
-    void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
+    protected void setUpdatedValues(PreparedStatement statement, int variableIndex, Object updatedValue) throws SQLException {
         switch (variableIndex) {
             case 1, 3 -> statement.setInt(1, (Integer) updatedValue);
             case 2 -> statement.setString(1, (String) updatedValue);
         }
-    }
-
-
-    public List<Ingredient> fetchAllIngredientsToProduct(Integer productId) throws SQLException {
-        String query = "SELECT i.ingredient_name, i.id, i.ingredient_type_id, it.ingredient_type_name " +
-                " FROM product_ingredient pi " +
-                " JOIN ingredient i ON i.id = pi.ingredient_id " +
-                " JOIN ingredient_type it ON i.ingredient_type_id = it.id " +
-                " WHERE product_id =" + productId;
-
-        List<Ingredient> allIngredients = new ArrayList<>();
-        try (Connection connection = database.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-            while (resultSet.next()) {
-                Ingredient ingredient = (new Ingredient(resultSet.getInt("id"),
-                        resultSet.getString("ingredient_name"),
-                        new IngredientType(resultSet.getInt("ingredient_type_id"),
-                                resultSet.getString("ingredient_type_name"))));
-                allIngredients.add(ingredient);
-            }
-        }
-        return allIngredients;
-    }
-
-
-    public Map<Integer, Ingredient> readAllIngredientsAvailable() throws SQLException {
-        String query = "SELECT i.ingredient_name, i.id, it.ingredient_type_name, ingredient_type_id FROM ingredient i " +
-                "JOIN ingredient_type it on it.id = i.ingredient_type_id ";
-
-        Map<Integer, Ingredient> allIngredients = new HashMap<>();
-        try (Connection connection = database.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-            while (resultSet.next()) {
-                Ingredient ingredient = (new Ingredient(resultSet.getInt("id"),
-                        resultSet.getString("ingredient_name"),
-                        new IngredientType(resultSet.getInt("ingredient_type_id"),
-                                resultSet.getString("ingredient_type_name"))));
-
-                allIngredients.put(ingredient.getId(), ingredient);
-            }
-        }
-        return allIngredients;
     }
 
 
@@ -161,5 +117,6 @@ public class PizzaDAO extends DAO<Pizza> {
             }
         }
     }
+
 
 }

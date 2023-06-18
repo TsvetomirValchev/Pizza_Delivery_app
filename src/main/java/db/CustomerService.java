@@ -23,74 +23,84 @@ public class CustomerService extends Service {
         this.customer = customer;
     }
 
-    public boolean placeAnOrder(int productId) {
+    public void placeAnOrder(int productId, String sizeName) {
         try {
             if (getProductById(productId) == null) {
-                LOGGER.error("There is no product with such id");
-                return false;
+                throw new IllegalArgumentException("There is no product with such id");
             }
             if (!isOrderFinalized()) {
-                addProductToCart(productId);
+                addProductToCart(orderDAO.getProductSizeTableIdBySizeAndProductId(orderDAO.readSizeIdBySizeName(sizeName), productId));
             } else {
                 orderDAO.insert(new Order(null,
                         customer.getId(),
                         Optional.empty(),
                         Optional.empty()));
-                addProductToCart(productId);
-                System.out.println("the product has been added to your cart");
+                addProductToCart(orderDAO.getProductSizeTableIdBySizeAndProductId(orderDAO.readSizeIdBySizeName(sizeName), productId));
             }
 
-        } catch (SQLException e) {
-            LOGGER.debug(e.getMessage());
-            LOGGER.error("Couldn't place an order!");
+        } catch (SQLException | IllegalArgumentException e) {
+            if (e instanceof IllegalArgumentException) {
+                LOGGER.error(e.getMessage());
+            } else {
+                LOGGER.debug(e.getMessage());
+                LOGGER.error("Couldn't place an order!");
+            }
         }
-        return true;
     }
 
-    private void addProductToCart(int productId) {
+    private void addProductToCart(int productSizeId) {
         try {
-            orderDAO.InsertInOrderItemTable(productId, getCartOrderIdByCustomerId(customer.getId()));
+            orderDAO.InsertInOrderItemTable(getCartOrderIdByCustomerId(customer.getId()), productSizeId);
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Couldn't add product to cart!");
         }
     }
-
-    //TODO: make these methods work properly
+    
     public String calculateCurrentOrderTotal() {
         double orderTotal = 0;
-        for (Product product : getAllProductsInCurrentlyDeliveringOrder()) {
-            double sizePrice = getPriceForSizeOrdered(product);
-            orderTotal += sizePrice;
+        Map<Size, Double> sizesAndPrices = getSizeAndPriceOrderedForOrderAwaitingDelivery();
+        for (Double price : sizesAndPrices.values()) {
+            orderTotal += price;
         }
         return orderTotal + " BGN";
     }
 
     public String calculateCartTotal() {
         double orderTotal = 0;
-        for (Product product : getAllProductsInCart()) {
-            double sizePrice = getPriceForSizeOrdered(product);
-            orderTotal += sizePrice;
+        Map<Size, Double> sizesAndPrices = getSizeAndPriceOrderedForCart();
+        for (Double price : sizesAndPrices.values()) {
+            orderTotal += price;
         }
         return orderTotal + " BGN";
     }
 
 
-    //TODO: think how to do that.
-    private Size getSizeOrdered(Product product) {
-        return null;
+    public Map<Size, Double> getSizeAndPriceOrderedForCart() {
+        try {
+            return orderDAO.getOrderedSizesAndPrices(getCartOrderIdByCustomerId(customer.getId()));
+        } catch (SQLException e) {
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Something went wrong with getting ordered products' details");
+        }
+        return Collections.emptyMap();
     }
 
-    private double getPriceForSizeOrdered(Product product) {
-        return 0;
+    public Map<Size, Double> getSizeAndPriceOrderedForOrderAwaitingDelivery() {
+        try {
+            return orderDAO.getOrderedSizesAndPrices(getCurrentlyDeliveringOrderIdByCustomerId(customer.getId()));
+        } catch (SQLException e) {
+            LOGGER.debug(e.getMessage());
+            LOGGER.error("Something went wrong with getting ordered products' details");
+        }
+        return Collections.emptyMap();
     }
 
     public List<Product> getAllProductsInCurrentlyDeliveringOrder() {
         try {
             return new ArrayList<>(
                     orderDAO.getAllProductsInOrder
-                            (getCurrentlyDeliveringOrderIdByCustomerId(customer.getId())
-                            )
+                            (getCurrentlyDeliveringOrderIdByCustomerId(customer.getId()))
             );
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());

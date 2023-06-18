@@ -20,7 +20,7 @@ public class Drink extends Product {
 
 
         return "№" + getId() + " " + isDiet + getName() +
-                "\nPrices: " + buildSizesAndPricesString();
+                "\nAvailable sizes and prices:\n" + buildSizesAndPricesString();
     }
 
 }
