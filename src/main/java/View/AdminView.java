@@ -87,7 +87,7 @@ public class AdminView extends View {
             LOGGER.debug(e.getMessage());
             deleteAccountMenu();
         }
-
+        System.out.println("User deleted!");
     }
 
     private void addAProductMenu() {
