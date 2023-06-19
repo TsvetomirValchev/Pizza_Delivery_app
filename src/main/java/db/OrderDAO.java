@@ -82,11 +82,10 @@ public class OrderDAO extends DAO<Order> {
     protected List<Product> getAllProductsInOrder(int orderId) throws SQLException {
         String query = "SELECT p.id, p.name, ps.price, ps.size_id, pt.type_name, p.type_id " +
                 "FROM order_item oi " +
-                "JOIN product_size ps ON oi.product_size_id = ps.product_id " +
+                "JOIN product_size ps ON oi.product_size_id = ps.id " +
                 "JOIN product p ON ps.product_id = p.id " +
                 "JOIN product_type pt on p.type_id = pt.id " +
-                "JOIN product_ingredient pi on p.id = pi.product_id " +
-                "WHERE oi.order_id = ?";
+                "WHERE oi.order_id = ? AND p.id = ps.product_id";
 
         List<Product> allProducts = new ArrayList<>();
         try (Connection connection = database.getConnection();
@@ -138,14 +137,15 @@ public class OrderDAO extends DAO<Order> {
         return allOrdersWithProductInThem;
     }
 
-    protected Map<Size, Double> getOrderedSizesAndPrices(Integer OrderId) throws SQLException {
+    protected Map<Size, Double> getOrderedSizesAndPrices(Integer OrderId, Integer productId) throws SQLException {
         Map<Size, Double> sizesAndPrices = new HashMap<>();
 
         String query = "SELECT ps.size_id, s.size_name, ps.price " +
                 "FROM size s " +
                 "JOIN product_size ps ON s.id = ps.size_id " +
                 "JOIN order_item oi ON oi.product_size_id = ps.id " +
-                "WHERE oi.order_id = " + OrderId;
+                "JOIN product p on ps.product_id = p.id " +
+                "WHERE oi.order_id = " + OrderId + " AND p.id =" + productId;
 
         try (Connection connection = database.getConnection();
              Statement statement = connection.createStatement();

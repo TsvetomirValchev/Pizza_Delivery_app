@@ -128,32 +128,32 @@ public class CustomerView extends View {
 
     }
 
-
     private void printProductDetails(boolean isOrder) {
         String orderType = isOrder ? "order" : "cart";
         List<Product> products = isOrder ? customerService.getAllProductsInCurrentlyDeliveringOrder() : customerService.getAllProductsInCart();
-
+        Double orderTotal = 0.00;
+        System.out.println("Number of products: " + products.size());
         System.out.println("All products in your " + orderType + ":");
 
-        Map<Integer, Product> productMap = new HashMap<>();
         for (Product product : products) {
-            productMap.putIfAbsent(product.getId(), product);
-        }
+            int productID = product.getId();
+            System.out.println("ID: " + productID + " Product Name: " + product.getName());
 
-        for (Product product : productMap.values()) {
-            System.out.println("ID: " + product.getId() + " Product Name: " + product.getName());
-            System.out.println("Ordered size and price:");
-            Map<Size, Double> sizesAndPrices = isOrder ? customerService.getSizeAndPriceOrderedForOrderAwaitingDelivery()
-                    : customerService.getSizeAndPriceOrderedForCart();
+            Map<Size, Double> sizesAndPrices;
+            if (isOrder) {
+                sizesAndPrices = customerService.getSizeAndPriceOrderedForOrderAwaitingDelivery(productID);
+            } else {
+                sizesAndPrices = customerService.getSizeAndPriceOrderedForCart(productID);
+            }
+
             for (Map.Entry<Size, Double> entry : sizesAndPrices.entrySet()) {
                 Size size = entry.getKey();
                 double price = entry.getValue();
-                System.out.println(size.getName() + ", cost: " + price + " BGN");
+                System.out.println("Size: " + size.getName() + ", Price: " + String.format("%.2f", price) + " BGN");
+                orderTotal += price;
             }
-            System.out.println("----------------------");
         }
-
-        String orderTotal = isOrder ? customerService.calculateCurrentOrderTotal() : customerService.calculateCartTotal();
+        System.out.println("----------------------------------");
         System.out.println("Order total: " + orderTotal);
     }
 

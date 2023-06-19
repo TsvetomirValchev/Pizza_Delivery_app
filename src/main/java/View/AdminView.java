@@ -25,7 +25,7 @@ public class AdminView extends View {
         System.out.println("What would you like to do?");
         System.out.println("1. Add a new product to the menu");
         System.out.println("2. Delete a product from the menu");
-        System.out.println("3. Delete a customer's account");
+        System.out.println("3. Delete a user's account");
         System.out.println("4. Add a new admin account");
         System.out.println("5. View all products offered by the restaurant");
         System.out.println("6. View all accounts");

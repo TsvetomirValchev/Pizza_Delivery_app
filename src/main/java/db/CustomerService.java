@@ -56,29 +56,10 @@ public class CustomerService extends Service {
             LOGGER.error("Couldn't add product to cart!");
         }
     }
-    
-    public String calculateCurrentOrderTotal() {
-        double orderTotal = 0;
-        Map<Size, Double> sizesAndPrices = getSizeAndPriceOrderedForOrderAwaitingDelivery();
-        for (Double price : sizesAndPrices.values()) {
-            orderTotal += price;
-        }
-        return orderTotal + " BGN";
-    }
 
-    public String calculateCartTotal() {
-        double orderTotal = 0;
-        Map<Size, Double> sizesAndPrices = getSizeAndPriceOrderedForCart();
-        for (Double price : sizesAndPrices.values()) {
-            orderTotal += price;
-        }
-        return orderTotal + " BGN";
-    }
-
-
-    public Map<Size, Double> getSizeAndPriceOrderedForCart() {
+    public Map<Size, Double> getSizeAndPriceOrderedForCart(int productId) {
         try {
-            return orderDAO.getOrderedSizesAndPrices(getCartOrderIdByCustomerId(customer.getId()));
+            return orderDAO.getOrderedSizesAndPrices(getCartOrderIdByCustomerId(customer.getId()), productId);
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Something went wrong with getting ordered products' details");
@@ -86,9 +67,9 @@ public class CustomerService extends Service {
         return Collections.emptyMap();
     }
 
-    public Map<Size, Double> getSizeAndPriceOrderedForOrderAwaitingDelivery() {
+    public Map<Size, Double> getSizeAndPriceOrderedForOrderAwaitingDelivery(int productId) {
         try {
-            return orderDAO.getOrderedSizesAndPrices(getCurrentlyDeliveringOrderIdByCustomerId(customer.getId()));
+            return orderDAO.getOrderedSizesAndPrices(getCurrentlyDeliveringOrderIdByCustomerId(customer.getId()), productId);
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Something went wrong with getting ordered products' details");
