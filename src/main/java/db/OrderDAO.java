@@ -167,7 +167,7 @@ public class OrderDAO extends DAO<Order> {
         return (timestamp != null) ? timestamp.toLocalDateTime() : null;
     }
 
-    protected void InsertInOrderItemTable(int orderId, int productSizeId) throws SQLException {
+    protected void insertInOrderItemTable(int orderId, int productSizeId) throws SQLException {
         String query = "INSERT INTO order_item(order_id, product_size_id) VALUES(? , ?)";
         try (Connection connection = database.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -178,13 +178,36 @@ public class OrderDAO extends DAO<Order> {
 
     }
 
-    protected void DeleteProductFromCompletedOrder(int productId) throws SQLException {
+    protected void deleteProductFromCompletedOrder(int productId) throws SQLException {
         String query = "DELETE FROM order_item WHERE product_size_id " +
                 "IN (SELECT id FROM product_size WHERE product_id = ?)";
 
         try (Connection connection = database.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, productId);
+            statement.executeUpdate();
+        }
+
+    }
+
+    public void deleteCustomerFromCompletedOrder(int customerId) throws SQLException {
+        String query = "DELETE FROM orders WHERE customer_id = ? AND delivered_at IS NOT NULL";
+
+        try (Connection connection = database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, customerId);
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("No customer with id of " + customerId + " has an order!");
+            }
+        }
+    }
+
+    protected void deleteCompletedOrdersItemsList(int customerId) throws SQLException {
+        String query = "DELETE FROM order_item WHERE order_id IN (SELECT id FROM orders WHERE customer_id = ? AND delivered_at IS NOT NULL)";
+        try (Connection connection = database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, customerId);
             statement.executeUpdate();
         }
 

@@ -50,7 +50,7 @@ public class CustomerService extends Service {
 
     private void addProductToCart(int productSizeId) {
         try {
-            orderDAO.InsertInOrderItemTable(getCartOrderIdByCustomerId(customer.getId()), productSizeId);
+            orderDAO.insertInOrderItemTable(getCartOrderIdByCustomerId(customer.getId()), productSizeId);
         } catch (SQLException e) {
             LOGGER.debug(e.getMessage());
             LOGGER.error("Couldn't add product to cart!");

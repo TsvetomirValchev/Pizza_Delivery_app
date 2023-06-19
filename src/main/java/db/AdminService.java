@@ -34,7 +34,7 @@ public class AdminService extends Service {
             } else if (isProductCurrentlyOrdered(drink.getId())) {
                 LOGGER.error("This product is currently in a delivery: '" + productId + "'");
             } else {
-                orderDAO.DeleteProductFromCompletedOrder(drink.getId());
+                orderDAO.deleteProductFromCompletedOrder(drink.getId());
                 drinkDAO.deleteProductSizesAndPrices(drink.getId());
                 drinkDAO.delete(drink.getId());
                 System.out.println("Drink removed successfully!");
@@ -57,7 +57,7 @@ public class AdminService extends Service {
             } else if (isProductCurrentlyOrdered(dessert.getId())) {
                 LOGGER.error("This product is currently in a delivery: '" + productId + "'");
             } else {
-                orderDAO.DeleteProductFromCompletedOrder(dessert.getId());
+                orderDAO.deleteProductFromCompletedOrder(dessert.getId());
                 dessertDAO.deleteProductSizesAndPrices(dessert.getId());
                 dessertDAO.delete(dessert.getId());
                 System.out.println("Dessert removed successfully");
@@ -81,7 +81,7 @@ public class AdminService extends Service {
             } else if (isProductCurrentlyOrdered(pizza.getId())) {
                 LOGGER.error("This product is currently in a delivery: '" + productId + "'");
             } else {
-                orderDAO.DeleteProductFromCompletedOrder(pizza.getId());
+                orderDAO.deleteProductFromCompletedOrder(pizza.getId());
                 pizzaDAO.deleteProductSizesAndPrices(pizza.getId());
                 pizzaDAO.deletePizzaIngredientList(pizza.getId());
                 pizzaDAO.delete(pizza.getId());
@@ -113,6 +113,8 @@ public class AdminService extends Service {
             if (orderDAO.hasActiveOrders(user.getId())) {
                 throw new IllegalArgumentException("User is currently awaiting delivery and cannot be deleted.");
             }
+            orderDAO.deleteCompletedOrdersItemsList(user.getId());
+            orderDAO.deleteCustomerFromCompletedOrder(user.getId());
             userDAO.delete(user.getId());
         } catch (SQLException | IllegalArgumentException e) {
             if (e instanceof IllegalArgumentException) {
